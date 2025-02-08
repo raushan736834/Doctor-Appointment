@@ -509,8 +509,8 @@ const AppointmentDetails = () => {
         headers: { "Content-Type": "application/json" },
         withCredentials: true,
       });
-      console.log(response.data);
-      console.log(formData);
+      // console.log(response.data);
+      // console.log(formData);
       alert("Appointment Booked Successfully");
       setSuccess(true);
       setLoading(false);

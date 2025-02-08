@@ -505,7 +505,7 @@ const AppointmentDetails = () => {
         selectedPatient:
           values.selectedPatient === "option1" ? fetchName : "someone else",
       };
-      const response = await axios.post(BOOKED_URL, JSON.stringify(formData), {
+      const response = await axios.post(BOOKED_URL, JSON.stringify(formData), { 
         headers: { "Content-Type": "application/json" },
         withCredentials: true,
       });

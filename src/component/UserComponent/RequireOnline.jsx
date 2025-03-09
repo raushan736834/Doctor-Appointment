@@ -3,8 +3,6 @@ import useOnline from "../../hooks/useOnline";
 
 const RequireOnline = () => {
   const isOnline = useOnline();
-  console.log(isOnline)
-
   return isOnline ? (
     <Outlet />
   ) : (

@@ -1,7 +1,15 @@
+// import { Switch } from "@chakra-ui/react";
+import { Switch } from "@/components/ui/switch";
+import { Spinner } from "@chakra-ui/react";
+import { HiCheck, HiX } from "react-icons/hi"
 const AboutUs = () => {
   return (
     <div>
       <div>
+        <Switch size="lg" thumbLabel={{ on: <HiCheck />, off: <HiX /> }}>
+          Switch me
+        </Switch>
+        <Spinner colorPalettes ='orange' size="lg" />
         <span>Welcome to Appoint Doctor</span>
         <p>
           we are dedicated to making healthcare accessible and convenient for

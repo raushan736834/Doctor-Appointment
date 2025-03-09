@@ -4,12 +4,10 @@ import axios from "../../api/axios";
 import logo from "../../assets/img/appointDoctor.jpg";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 
-const LOGIN_URL = "/auth.login.user";
+const LOGIN_URL = "/auth/login";
 
-const DoctorLogin = () => {
-  const { setAuth } = useAuth();
-  const {auth} = useAuth();
-  
+const Login = () => {
+  const { auth, setAuth } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from?.pathname || "/";
@@ -19,8 +17,6 @@ const DoctorLogin = () => {
   const [email, setUser] = useState("");
   const [password, setPwd] = useState("");
   const [errMsg, setErrMsg] = useState("");
-
-  const LOGIN_URL = "http://localhost:8080/auth.login.doctor";
 
   useEffect(() => {
     userRef.current.focus();
@@ -33,7 +29,6 @@ const DoctorLogin = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      {console.log(email,password)}
       const response = await axios.post(
         LOGIN_URL,
         JSON.stringify({ email, password }),
@@ -42,14 +37,22 @@ const DoctorLogin = () => {
           withCredentials: true,
         }
       );
-      // console.log(JSON.stringify(response?.data));
-      console.log(JSON.stringify(response));
-
-      const accessToken = response?.data?.accessToken;
-      setAuth({ email, password, accessToken });
+      const accessToken = response?.data?.token;
+      const role = response?.data?.roles;
+      const fullname = response?.data?.fullname;
+      console.log(JSON.stringify(response?.data));
+      localStorage.setItem("token", accessToken);
+      localStorage.setItem("email", email);
+      localStorage.setItem("role", role);
+      setAuth({ email, accessToken, role,fullname });
+      console.log(auth);
       setUser("");
       setPwd("");
-      navigate(from, { replace: true });
+      if (role === "doctor") {
+        navigate("/doctor-dashboard", { replace: true });
+      } else {
+        navigate(from, { replace: true });
+      }
     } catch (err) {
       if (!err?.response) {
         setErrMsg("No Server Response");
@@ -70,10 +73,10 @@ const DoctorLogin = () => {
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           <img alt="" src={logo} className="mx-auto w-20 rounded-2xl " />
           <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-            Welcome Doctor, Sign in Here
+            Sign in to your account
           </h2>
         </div>
-        <section>
+        <div className="mt-2 sm:mx-auto sm:w-full sm:max-w-sm">
           <p
             ref={errRef}
             className={errMsg ? "errmsg" : "offscreen"}
@@ -81,15 +84,13 @@ const DoctorLogin = () => {
           >
             {errMsg}
           </p>
-        </section>
-        <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label
                 htmlFor="email"
                 className="block text-sm font-medium leading-6 text-gray-900"
               >
-                Doctor Email address
+                Email address
               </label>
               <div className="mt-2">
                 <input
@@ -147,12 +148,12 @@ const DoctorLogin = () => {
           </form>
 
           <p className="mt-4 text-center text-sm text-gray-500">
-            <Link to="/doctor-signup">Register as Doctor? </Link>
+            <Link to="/auth.signup.user">Not a member? </Link>
             <Link
-              to="/doctor-signup"
+              to="/auth.signup.user"
               className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
             >
-              Sign Up Doctor
+              Sign Up
             </Link>
           </p>
         </div>
@@ -161,6 +162,4 @@ const DoctorLogin = () => {
   );
 };
 
-
-
-export default DoctorLogin;
+export default Login;

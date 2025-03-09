@@ -20,7 +20,6 @@ const Body = () => {
 
   useEffect(() => {
     if (isOnline) {
-      console.log("is Online");
       getSpecialist();
     }
   }, [isOnline]);
@@ -30,7 +29,6 @@ const Body = () => {
       const url = `https://raushan736834.github.io/host_api/doctorCheckAPI.json`;
       const data = await fetch(url);
       const json = await data.json();
-      console.log(json);
       setAllSpecialist(json);
       setFilteredSpecialist(json);
     } catch (error) {

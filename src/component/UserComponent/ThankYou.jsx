@@ -3,8 +3,14 @@ import { Link } from 'react-router-dom';
 
 const ThankYou = () => {
     const location = useLocation();
-    const { date, time, doctorName, appointmentLocation } = location.state || {};
+    const { date, time, doctorName, appointmentLocation } = location?.state || {};
     console.log(location.state);
+    // console.log(new Date(date),tolocaleDateString());
+    const fomateDate =(date) => {
+        const d = new Date(date);
+        return `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
+
+    }
 
     return (
         <div className="text-center p-12 font-sans">
@@ -12,7 +18,8 @@ const ThankYou = () => {
             <p className="text-2xl text-gray-800">Your appointment has been successfully booked.</p>
             <p className="text-lg text-gray-500">We look forward to seeing you soon.</p>
             <div className="mt-8">
-                <p className="text-lg text-gray-700"><strong>Date:</strong> {date}</p>
+                {/* <p className="text-lg text-gray-700"><strong>Date:</strong> {date.toLocaleString()}</p> */}
+                <p className="text-lg text-gray-700"><strong>Date:</strong> {fomateDate(date)}</p>
                 <p className="text-lg text-gray-700"><strong>Time:</strong> {time}</p>
                 <p className="text-lg text-gray-700"><strong>Doctor:</strong> {doctorName}</p>
                 <p className="text-lg text-gray-700"><strong>Clinic Name:</strong> {appointmentLocation}</p>

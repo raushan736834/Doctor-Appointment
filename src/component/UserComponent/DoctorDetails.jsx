@@ -23,7 +23,6 @@ const DoctorDetails = () => {
       const url = `https://raushan736834.github.io/host_api/${id}.json`;
       const data = await fetch(url);
       const json = await data.json();
-      console.log(json);
       setDoctor(json);
     } catch (error) {
       setError(error);

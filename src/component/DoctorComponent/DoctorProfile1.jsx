@@ -24,7 +24,7 @@ const DoctorProfile1 = () => {
 
   // useEffect to call fetchData when the component mounts
   useEffect(() => {
-    fetchUserData();
+    // fetchUserData();
   }, []);
 
   return (
@@ -52,7 +52,7 @@ const DoctorProfile1 = () => {
             </div>
             <div className="sm:max-w-md">
               <div className="m-5 text-2xl font-medium">
-                Hello Dr. Harsh Raj{fetchName}! Let's build your dedicated
+                Hello Dr. {fetchName}! Let's build your dedicated
                 profile.
               </div>
               <Form>

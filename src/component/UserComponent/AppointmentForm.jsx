@@ -1,244 +1,23 @@
-// import React, { useState } from "react";
-// import DatePicker from "react-datepicker";
-// import "react-datepicker/dist/react-datepicker.css";
-// import { addDays, format } from "date-fns";
-// import { useNavigate } from "react-router-dom";
-// import useDate from "../../hooks/useDate";
-
-// const AppointmentForm = ({ id, specialization }) => {
-//   const navigate = useNavigate();
-//   const today = new Date().toISOString().split("T")[0];
-
-//   const { setData } = useDate();
-//   const [selectedDate, setSelectedDate] = useState(today);
-//   const [selectedPeriod, setSelectedPeriod] = useState("");
-//   const [selectedSlot, setSelectedSlot] = useState("");
-
-//   const morningSlots = [
-//     "8:00 AM",
-//     "8:20 AM",
-//     "8:40 AM",
-//     "9:00 AM",
-//     "9:20 AM",
-//     "9:40 AM",
-//     "10:00 AM",
-//     "10:20 AM",
-//     "10:40 AM",
-//     "11:00 AM",
-//   ];
-//   const noonSlots = [
-//     "1:00 PM",
-//     "1:20 PM",
-//     "1:40 PM",
-//     "2:00 PM",
-//     "2:20 PM",
-//     "2:40 PM",
-//     "3:00 PM",
-//     "3:20 PM",
-//     "3:40 PM",
-//     "4:00 PM",
-//   ];
-//   const eveningSlots = [
-//     "5:00 PM",
-//     "5:20 PM",
-//     "5:40 PM",
-//     "6:00 PM",
-//     "6:20 PM",
-//     "6:40 PM",
-//     "7:00 PM",
-//     "7:20 PM",
-//     "7:40 PM",
-//     "8:00 PM",
-//   ];
-
-//   const handleDateChange = (date) => {
-//     setSelectedDate(date);
-//     setSelectedPeriod(""); // Reset period and slot when date changes
-//     setSelectedSlot("");
-//   };
-
-//   const handlePeriodChange = (e) => {
-//     setSelectedPeriod(e.target.value);
-//   console.log(selectedPeriod);
-//     setSelectedSlot(""); // Reset slot when period changes
-//   };
-
-//   const handleSlotChange = (slot) => {
-//     setSelectedSlot(slot);
-//     if (selectedDate && slot) {
-//       setData({ selectedDate, slot, specialization,selectedPeriod });
-
-//       navigate("/appointment-details/" + id, {
-//         state: {
-//           date: format(selectedDate, "dd-MM-yyyy"),
-//           time: selectedSlot,
-//           period: selectedPeriod,
-//           specialization,
-//         },
-//       });
-//     } else {
-//       alert("Please select a date, period, and time slot.");
-//     }
-//   };
-
-//   const getAvailableSlots = () => {
-//     if (selectedPeriod === "Morning") return morningSlots;
-//     if (selectedPeriod === "Noon") return noonSlots;
-//     if (selectedPeriod === "Evening") return eveningSlots;
-//     return [];
-//   };
-
-//   return (
-//     <section className="flex items-center flex-col py-2">
-//       <form>
-//         <div>
-//           <label>Select Date: </label>
-//           <DatePicker
-//             selected={selectedDate}
-//             onChange={handleDateChange}
-//             minDate={new Date()}
-//             maxDate={addDays(new Date(), 14)}
-//             dateFormat="dd-MM-yyyy"
-//             placeholderText={today}
-//             className="border-blue-500 border-2 text-center ml-3 my-2 w-56 "
-//           />
-//         </div>
-
-//         <div>
-//           <label>Select Period: </label>
-//           <select
-//             value={selectedPeriod}
-//             onChange={handlePeriodChange}
-//             className="border-blue-500 border-2 my-2 w-56 text-center"
-//           >
-//             <option value="">Select a Period</option>
-//             <option value="Morning">Morning (8 AM - 11 AM)</option>
-//             <option value="Noon">Noon (1 PM - 4 PM)</option>
-//             <option value="Evening">Evening (5 PM - 8 PM)</option>
-//           </select>
-//         </div>
-
-//         {selectedPeriod && (
-//           <div>
-//             <label>Select Time Slot:</label>
-//             <div>
-//               {getAvailableSlots().map((slot) => (
-//                 <button
-//                   type="button"
-//                   key={slot}
-//                   className={`time-slot-btn ${
-//                     selectedSlot === slot ? "selected" : ""
-//                   }`}
-//                   onClick={() => handleSlotChange(slot)}
-//                 >
-//                   {slot}
-//                 </button>
-//               ))}
-//             </div>
-//           </div>
-//         )}
-//       </form>
-//     </section>
-//   );
-// };
-
-// export default AppointmentForm;
-
-import React, { useState, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { addDays, format } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import useDate from "../../hooks/useDate";
-import axios from "../../api/axios";
+import { allSlots } from "../../constants/slots";
+import { useBookedSlots } from "../../hooks/useBookedSlots";
 
 const AppointmentForm = ({ id, specialization }) => {
   const navigate = useNavigate();
-  const today = new Date();
-  
-  const [availableSlots, setAvailableSlots] = useState([]);
+  const today = useMemo(() => new Date(), []);
   const { setData } = useDate();
+
   const [selectedDate, setSelectedDate] = useState(today);
   const [selectedPeriod, setSelectedPeriod] = useState("");
   const [selectedSlot, setSelectedSlot] = useState("");
-  const [bookedSlots, setBookedSlots] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
 
-  const allSlots = {
-    Morning: [
-      "8:00 AM",
-      "8:20 AM",
-      "8:40 AM",
-      "9:00 AM",
-      "9:20 AM",
-      "9:40 AM",
-      "10:00 AM",
-      "10:20 AM",
-      "10:40 AM",
-      "11:00 AM",
-    ],
-    Noon: [
-      "1:00 PM",
-      "1:20 PM",
-      "1:40 PM",
-      "2:00 PM",
-      "2:20 PM",
-      "2:40 PM",
-      "3:00 PM",
-      "3:20 PM",
-      "3:40 PM",
-      "4:00 PM",
-    ],
-    Evening: [
-      "5:00 PM",
-      "5:20 PM",
-      "5:40 PM",
-      "6:00 PM",
-      "6:20 PM",
-      "6:40 PM",
-      "7:00 PM",
-      "7:20 PM",
-      "7:40 PM",
-      "8:00 PM",
-    ],
-  };
-
-  useEffect(() => {
-    if (selectedDate) {
-      fetchBookedSlots();
-    }
-  }, [selectedDate]);
-
-  const fetchBookedSlots = async () => {
-    setLoading(true);
-    setError("");
-    try {
-      const formattedDate = format(selectedDate, "yyyy-MM-dd");
-      const response = await axios.get("/appointment/booked-slots", {
-        params: {
-          date: formattedDate,
-          doctorId: id,
-        },
-      });
-      
-      console.log("🔹 Response from Backend:", response.data);
-      const fetchedSlots = response.data || [];
-      console.log("🔹 Raw Booked Slots from Backend:", fetchedSlots);
-      
-      // Normalize booked slots (trim and format)
-      const normalizedBookedSlots = fetchedSlots.map(slot => slot.trim());
-      console.log("🔹 Normalized Booked Slots:", normalizedBookedSlots);
-  
-      setBookedSlots(normalizedBookedSlots);
-    } catch (error) {
-      console.error("❌ Error fetching booked slots:", error);
-      setError("Failed to fetch booked slots. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-  
+  // Use shared hook for fetching booked slots
+  const { bookedSlots, isLoading, error } = useBookedSlots(id, selectedDate);
 
   const handleDateChange = (date) => {
     setSelectedDate(date);
@@ -247,10 +26,7 @@ const AppointmentForm = ({ id, specialization }) => {
   };
 
   const handlePeriodChange = (e) => {
-    const newPeriod = e.target.value;
-    console.log("Previous Period:", selectedPeriod);
-    console.log("New Period:", newPeriod);
-    setSelectedPeriod(newPeriod);
+    setSelectedPeriod(e.target.value);
     setSelectedSlot("");
   };
 
@@ -258,11 +34,10 @@ const AppointmentForm = ({ id, specialization }) => {
     setSelectedSlot(slot);
     if (selectedDate && slot) {
       setData({ selectedDate, slot, specialization, selectedPeriod });
-
       navigate("/appointment-details/" + id, {
         state: {
           date: format(selectedDate, "dd-MM-yyyy"),
-          time: selectedSlot,
+          time: slot,
           period: selectedPeriod,
           specialization,
         },
@@ -272,85 +47,129 @@ const AppointmentForm = ({ id, specialization }) => {
     }
   };
 
+  function getSlotDateTime(date, slot) {
+    const [time, meridian] = slot.split(" ");
+    const [hours, minutes] = time.split(":").map(Number);
+    let hour = meridian === "PM" && hours !== 12 ? hours + 12 : hours;
+    if (meridian === "AM" && hours === 12) hour = 0;
+
+    const slotDate = new Date(date);
+    slotDate.setHours(hour, minutes, 0, 0);
+    return slotDate;
+  }
 
   const getAvailableSlots = () => {
-    console.log("🔹 Selected Period:", selectedPeriod);
     if (!selectedPeriod) return [];
-  
-    const normalizedBookedSlots = bookedSlots.map((slot) => slot.trim());
-    console.log("🔹 Booked Slots (Normalized):", normalizedBookedSlots);
-  
-    const periodSlots = allSlots[selectedPeriod] || [];
-    console.log("🔹 All Slots for Selected Period:", periodSlots);
-  
-    const availableSlots = periodSlots.filter((slot) => !normalizedBookedSlots.includes(slot));
-    console.log("🟢 Final Available Slots:", availableSlots);
-    
-    return availableSlots;
-  };
-   // Run when `selectedPeriod` or `bookedSlots` change
 
+    const normalizedBookedSlots = bookedSlots.map((slot) => slot.trim());
+    const periodSlots = allSlots[selectedPeriod] || [];
+    const now = new Date();
+
+    return periodSlots.filter((slot) => {
+      const isBooked = normalizedBookedSlots.includes(slot);
+      const slotDateTime = getSlotDateTime(selectedDate, slot);
+      const isToday =
+        format(selectedDate, "yyyy-MM-dd") === format(today, "yyyy-MM-dd");
+      const isInFuture = !isToday || slotDateTime > now;
+
+      return !isBooked && isInFuture;
+    });
+  };
 
   return (
-    <section className="flex items-center flex-col py-2">
-      <form>
-        <div>
-          <label>Select Date: </label>
-          <DatePicker
-            selected={selectedDate}
-            onChange={handleDateChange}
-            minDate={today}
-            maxDate={addDays(today, 14)}
-            dateFormat="dd-MM-yyyy"
-            className="border-blue-500 border-2 text-center ml-3 my-2 w-56"
+    <section className="flex flex-col items-center py-4 px-4 sm:px-6 md:px-8">
+      <form className="w-full max-w-md space-y-6">
+        <DateSelector
+          selectedDate={selectedDate}
+          onDateChange={handleDateChange}
+          today={today}
+        />
+        <PeriodSelector
+          selectedPeriod={selectedPeriod}
+          onPeriodChange={handlePeriodChange}
+        />
+        {error && <p className="text-center text-red-500">{error}</p>}
+        {selectedPeriod && !isLoading && (
+          <SlotSelector
+            availableSlots={getAvailableSlots()}
+            selectedSlot={selectedSlot}
+            handleSlotChange={handleSlotChange}
           />
-        </div>
-
-        <div>
-          <label>Select Period: </label>
-          <select
-            value={selectedPeriod}
-            selected={selectedPeriod}
-            onChange={handlePeriodChange}
-            className="border-blue-500 border-2 my-2 w-56 text-center"
-          >
-            <option value="">Select a Period</option>
-            <option value="Morning">Morning (8 AM - 11 AM)</option>
-            <option value="Noon">Noon (1 PM - 4 PM)</option>
-            <option value="Evening">Evening (5 PM - 8 PM)</option>
-          </select>
-        </div>
-
-        {loading && <p>Loading slots...</p>}
-        {error && <p className="text-red-500">{error}</p>}
-
-        {selectedPeriod && !loading && (
-          <div>
-            <label>Select Time Slot:</label>
-            <div>
-              {/* {console.log(getAvailableSlots())} */}
-              {getAvailableSlots().length > 0 ? (
-                getAvailableSlots().map((slot) => (
-                  <button
-                    type="button"
-                    key={slot}
-                    className={`time-slot-btn ${
-                      selectedSlot === slot ? "selected" : ""
-                    }`}
-                    onClick={() => handleSlotChange(slot)}
-                  >
-                    {slot}
-                  </button>
-                ))
-              ) : (
-                <p>No available slots for this period.</p>
-              )}
-            </div>
-          </div>
         )}
       </form>
     </section>
   );
 };
+
+function DateSelector({ selectedDate, onDateChange, today }) {
+  return (
+    <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4">
+      <label className="mb-2 sm:mb-0 font-semibold w-32 text-gray-700">
+        Select Date:
+      </label>
+      <DatePicker
+        selected={selectedDate}
+        onChange={onDateChange}
+        minDate={today}
+        maxDate={addDays(today, 14)}
+        dateFormat="dd-MM-yyyy"
+        className="border-2 border-blue-500 rounded px-3 py-2 w-full sm:w-auto text-center"
+      />
+    </div>
+  );
+}
+
+function PeriodSelector({ selectedPeriod, onPeriodChange }) {
+  return (
+    <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4">
+      <label className="mb-2 sm:mb-0 font-semibold w-32 text-gray-700">
+        Select Period:
+      </label>
+      <select
+        value={selectedPeriod}
+        onChange={onPeriodChange}
+        className="border-2 border-blue-500 rounded px-[6px] py-2 w-full sm:w-auto text-center"
+      >
+        <option value="">Select a Period</option>
+        <option value="Morning">Morning (8 AM - 11 AM)</option>
+        <option value="Noon">Noon (1 PM - 4 PM)</option>
+        <option value="Evening">Evening (5 PM - 8 PM)</option>
+      </select>
+    </div>
+  );
+}
+
+function SlotSelector({ availableSlots, selectedSlot, handleSlotChange }) {
+  return (
+    <div>
+      <label className="block mb-2 font-semibold text-gray-700">
+        Select Time Slot:
+      </label>
+      <div className="flex flex-wrap gap-3 max-w-md mx-auto justify-center">
+        {availableSlots.length > 0 ? (
+          availableSlots.map((slot) => (
+            <button
+              type="button"
+              key={slot}
+              className={`px-4 py-2 rounded-full border transition-colors duration-200 text-sm sm:text-base
+                ${
+                  selectedSlot === slot
+                    ? "bg-blue-600 text-white border-blue-600"
+                    : "bg-white text-gray-700 border-gray-300 hover:bg-blue-100"
+                }`}
+              onClick={() => handleSlotChange(slot)}
+            >
+              {slot}
+            </button>
+          ))
+        ) : (
+          <p className="text-center text-gray-500">
+            No available slots for this period.
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export default AppointmentForm;

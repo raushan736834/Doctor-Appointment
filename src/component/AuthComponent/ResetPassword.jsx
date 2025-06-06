@@ -158,9 +158,9 @@ const ResetPassword = ({email}) => {
 
                   <div>
                     <p className="text-center text-sm text-gray-500">
-                      <Link to="/auth.login.user">Already a member? </Link>
+                      <Link to="/auth/login">Already a member? </Link>
                       <Link
-                        to="/auth.login.user"
+                        to="/auth/login"
                         className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
                       >
                         Login

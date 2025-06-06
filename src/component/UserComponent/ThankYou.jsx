@@ -5,7 +5,6 @@ const ThankYou = () => {
     const location = useLocation();
     const { date, time, doctorName, appointmentLocation } = location?.state || {};
     console.log(location.state);
-    // console.log(new Date(date),tolocaleDateString());
     const fomateDate =(date) => {
         const d = new Date(date);
         return `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;

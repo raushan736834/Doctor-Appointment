@@ -204,9 +204,9 @@ const ForgetPassword = () => {
             </form>
 
             <p className="mt-4 text-center text-sm text-gray-500">
-              <Link to="/auth.login.user">already a member? </Link>
+              <Link to="/auth/login">already a member? </Link>
               <Link
-                to="/auth.login.user"
+                to="/auth/login"
                 className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
               >
                 Login

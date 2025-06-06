@@ -6,10 +6,6 @@ const AboutUs = () => {
   return (
     <div>
       <div>
-        <Switch size="lg" thumbLabel={{ on: <HiCheck />, off: <HiX /> }}>
-          Switch me
-        </Switch>
-        <Spinner colorPalettes ='orange' size="lg" />
         <span>Welcome to Appoint Doctor</span>
         <p>
           we are dedicated to making healthcare accessible and convenient for

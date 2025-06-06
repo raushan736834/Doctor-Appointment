@@ -1,11 +1,11 @@
-import React, { lazy , useEffect} from "react";
+import React, { lazy, useEffect } from "react";
 import ReactDOM from "react-dom/client";
 import {
   BrowserRouter as Router,
   Routes,
   Route,
   Outlet,
-  useNavigate
+  useNavigate,
 } from "react-router-dom";
 import { Provider } from "@/components/ui/provider";
 import Header from "./component/UserComponent/Header";
@@ -15,20 +15,21 @@ import AboutUs from "./component/UserComponent/AboutUs";
 import ContactUs from "./component/UserComponent/ContactUS";
 import Error from "./component/UserComponent/Error";
 import DoctorDetails from "./component/UserComponent/DoctorDetails";
-import Login from "./component/UserComponent/Login";
-import SignUp from "./component/UserComponent/SignUp";
-import ForgetPassword from "./component/UserComponent/ForgetPassword";
-import { AuthProvider } from "./context/AuthProvider";
+import Login from "./component/AuthComponent/Login";
+import SignUp from "./component/AuthComponent/SignUp";
+import ForgetPassword from "./component/AuthComponent/ForgetPassword";
+import { AuthProvider } from "./component/GlobalComponent/AuthProvider";
 import AppointmentDetails from "./component/UserComponent/AppointmentDetails";
-import RequireAuth from "./component/UserComponent/RequireAuth";
-import RequireOnline from "./component/UserComponent/RequireOnline";
+import RequireAuth from "./component/GlobalComponent/RequireAuth";
+import RequireOnline from "./component/GlobalComponent/RequireOnline";
 import DoctorPersonalInfo from "./component/DoctorComponent/DoctorPersonalInfo";
 import DoctorProfile1 from "./component/DoctorComponent/DoctorProfile1";
-import { DateTimeProvider } from "./context/DateTimeProvider";
+import { DateTimeProvider } from "./component/GlobalComponent/DateTimeProvider";
 import UserProfile from "./component/UserComponent/UserProfile";
 import ThankYou from "./component/UserComponent/ThankYou";
 import BookingDetails from "./component/UserComponent/BookingDetails";
 import DoctorDashboard from "./component/DoctorComponent/DoctorDashboard";
+import useAuth from "./hooks/useAuth";
 
 // const AppointmentDetails = lazy(() => import("./component/AppointmentDetails"));
 
@@ -36,16 +37,17 @@ const AppLayout = () => {
   const navigate = useNavigate();
   const role = localStorage.getItem("role");
 
-  useEffect(() => {
-    if (role === "doctor") {
-      navigate("/doctor-dashboard");
-    }
-  }, [role, navigate]);
+  // useEffect(() => {
+  //   if (role === "doctor") {
+  //     navigate("/doctor-dashboard");
+  //   }
+  // }, [role, navigate]);
 
   return (
     <>
       <Provider>
         <AuthProvider>
+          {/* {role !== "doctor" && <Header />} */}
           <Header />
           <DateTimeProvider>
             <div
@@ -56,7 +58,7 @@ const AppLayout = () => {
               <Outlet />
             </div>
           </DateTimeProvider>
-          <Footer />
+          {role !== "doctor" && <Footer />}
         </AuthProvider>
       </Provider>
     </>
@@ -74,9 +76,9 @@ const App = () => {
             <Route path="about" element={<AboutUs />} />
             <Route path="contact" element={<ContactUs />} />
             <Route path="specialist/:id" element={<DoctorDetails />} />
-            <Route path="auth.login.user" element={<Login />} />
+            <Route path="auth/login" element={<Login />} />
             <Route path="forget" element={<ForgetPassword />} />
-            <Route path="auth.signup.user" element={<SignUp />} />
+            <Route path="auth/signup" element={<SignUp />} />
             <Route element={<RequireAuth />}>
               <Route path="thankyou" element={<ThankYou />} />
               <Route path="/profile" element={<UserProfile />} />
@@ -85,8 +87,6 @@ const App = () => {
                 element={<AppointmentDetails />}
               />
               <Route path="booking-details" element={<BookingDetails />} />
-
-              {/* Doctor Specific Routes */}
               <Route path="/doctor-dashboard" element={<DoctorDashboard />} />
               <Route
                 path="/doctor-personalInfo"

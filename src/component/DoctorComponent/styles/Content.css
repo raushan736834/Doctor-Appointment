@@ -1,0 +1,55 @@
+.content{
+    width: 75%;
+}
+.content--header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.header--title{
+    color: #526d82;
+}
+.header--activity{
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.search-box{
+    background-color: #dde6ed;
+    border-radius: 10px;
+    padding: 5px 10px;
+    display: flex;   
+}
+.search-box input{
+    border:none;
+    outline: none;
+    font-size: small;
+    background: transparent;
+    padding: 5px;
+}
+.search-box .icon{
+    color: #969393;
+    cursor: pointer;
+    transition: 0.5s ease-in-out;
+    padding-top:5px;
+}
+.notify{
+    background:#dde6ed;
+    padding: 12px;
+    border-radius: 10px;
+    color: #969393;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.notify .icon{
+    font-size: 20px;
+    transition: 0.5s ease-in-out;
+}
+
+.icon:hover{
+    cursor: pointer;
+    transition: scale(1.3);
+}

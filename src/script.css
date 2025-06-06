@@ -1,7 +1,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
+*{
+    /* border: 1px solid red; */
+}
 .hide{
     display: none;
 }
@@ -55,6 +57,14 @@
     border: 1px solid #ccc;
     border-radius: 5px;
     cursor: pointer;
+}
+
+.blink-shimmer {
+  animation: blink 1.2s infinite cubic-bezier(0.4, 0, 0.6, 1);
+}
+@keyframes blink {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
 }
 
 

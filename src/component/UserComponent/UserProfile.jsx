@@ -1,13 +1,15 @@
 import { ChevronDownIcon } from "@heroicons/react/16/solid";
 import useAuth from "../../hooks/useAuth";
-import Login from "./Login";
+import Login from "../AuthComponent/Login";
 import { useState, useEffect } from "react";
 import axios from "../../api/axios";
+import useAxios from "@/hooks/useAxios";
 
 const UserProfile = () => {
   const { auth } = useAuth();
   const accessToken = auth.accessToken;
   const email = localStorage.getItem("email");
+  const { fetchData, loading } = useAxios();
   console.log(email);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -28,10 +30,10 @@ const UserProfile = () => {
 
   const fetchUserData = async () => {
     try {
-      const response = await axios.get(
-        `http://localhost:8080/user-profile/${email}`
-      );
-      
+      const response = await fetchData({
+        url: `/user-profile/${email}`,
+      });
+
       console.log(response);
       const fullName = response.data.fullName;
       const [first, last] = fullName.split(" ");
@@ -63,12 +65,19 @@ const UserProfile = () => {
         pincode,
         city,
       };
-      const response = await axios.put(`/user-profile/update`,JSON.stringify(formData), {
-        headers: { "Content-Type": "application/json" },
-        withCredentials: true,
-      });
-      console.log(formData)
-      console.log(response.data)
+      const response = await axios.put(
+        `/user-profile/update`,
+        JSON.stringify(formData),
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          withCredentials: true,
+        }
+      );
+      console.log(formData);
+      console.log(response.data);
       alert("Profile updated successfully");
     } catch (err) {
       setErrMsg("Failed to update profile");

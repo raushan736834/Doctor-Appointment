@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 
 const appointments = [
   {
@@ -119,59 +119,6 @@ const AppointmentDashboard = () => {
           </svg>
         </button>
       </div>
-
-      {/* Sidebar */}
-      <aside
-        ref={sidebarRef}
-        className={`
-    fixed top-14 left-0 bottom-0 w-48 z-40 bg-white p-6 transform
-    transition-transform duration-300 ease-in-out
-    ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
-    md:relative md:top-0 md:translate-x-0 md:w-64 md:block md:shadow-none
-  `}
-      >
-        <div className="flex items-center space-x-2 mb-2">
-          <div className="text-3xl hidden md:block">🩺</div>
-          <h1 className="text-xl font-semibold hidden md:block">
-            Doctor Panel
-          </h1>
-        </div>
-        <nav className="space-y-4">
-          <a
-            href="#"
-            onClick={() => setSidebarOpen(false)}
-            className="flex items-center space-x-2 text-blue-600 font-medium"
-          >
-            <span>🏠</span>
-            <span>Home</span>
-          </a>
-          <a
-            href="#"
-            onClick={() => setSidebarOpen(false)}
-            className="flex items-center space-x-2 text-gray-600 hover:text-blue-600"
-          >
-            <span>📅</span>
-            <span>Appointments</span>
-          </a>
-          <a
-            href="#"
-            onClick={() => setSidebarOpen(false)}
-            className="flex items-center space-x-2 text-gray-600 hover:text-blue-600"
-          >
-            <span>👥</span>
-            <span>Patients</span>
-          </a>
-          <a
-            href="#"
-            onClick={() => setSidebarOpen(false)}
-            className="flex items-center space-x-2 text-gray-600 hover:text-blue-600"
-          >
-            <span>⚙️</span>
-            <span>Settings</span>
-          </a>
-        </nav>
-      </aside>
-
       {/* Main Content */}
       <main className="flex-1 p-4 md:p-8">
         <h2 className="text-2xl font-semibold mb-6">Upcoming Appointments</h2>

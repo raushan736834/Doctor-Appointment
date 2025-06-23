@@ -2,14 +2,12 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Shimmer from "./Shimmer";
 import DoctorCard from "./DoctorCard";
-import Searchbar from "../Common/Searchbar";
-import useAxios from "@/hooks/useAxios";
+import useAxios from "../../hooks/useAxios";
 
-const DoctorDetails = () => {
+const DoctorDetails = (doctorData) => {
   const param = useParams();
   const id = param.id;
 
-  const [searchText, setSearchText] = useState("");
   const [doctor, setDoctor] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -22,7 +20,7 @@ const DoctorDetails = () => {
   async function getDoctorDetails() {
     setLoading(true);
     try {
-      const url = `/api/doctors/search?keyword=${id}`;
+      const url = `/api/public/search?keyword=${id}`;
       const response = await fetchData({
         url : url,
       })
@@ -46,12 +44,12 @@ const DoctorDetails = () => {
 
   return (
     <main className="flex flex-col">
-      <header className="bg-white shadow flex">
+      {/* <header className="bg-white shadow flex">
         <Searchbar
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
         />
-      </header>
+      </header> */}
       <div className="flex justify-center my-2">
         <span className="text-gray-600 text-xl sm:text-2xl text-wrap">Doctor Specialized in {id}</span>
       </div>

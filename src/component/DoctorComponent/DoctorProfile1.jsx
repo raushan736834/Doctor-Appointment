@@ -1,44 +1,52 @@
 import { useState, useEffect } from "react";
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import axios from "../../api/axios";
+import useAxios from "../../hooks/useAxios";
+
+const ALL_SPECIALIST_URL = "api/user/allSpecialist";
 
 const DoctorProfile1 = () => {
-  const [name, setName] = useState();
-  const [fetchName, setFetchName] = useState("");
+  const [name, setName] = useState(localStorage.getItem("name"));
+  const [specialist, setSpecialist] = useState([]);
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const {fetchData} = useAxios();
+  
   const [selectedOption, setSelectedOption] = useState("first");
 
-  const fetchUserData = async () => {
+
+  useEffect(() => {
+    // fetchSpecialist();
+  }, []);
+
+  const fetchSpecialist = async () => {
     try {
-      const response = await axios.get(`http://localhost:8080/user/${email}`);
-      setFetchName(response.data);
+      const response = await fetchData({
+        url: ALL_SPECIALIST_URL
+      });
       console.log(response);
-      setLoading(false); // Set loading to false after data is fetched
+      setSpecialist(response?.data);
+      console.log(response.data)
     } catch (err) {
-      setError(err.message);
-      setLoading(false);
+      setError(err?.message || String(err));
     }
   };
 
-  // useEffect to call fetchData when the component mounts
-  useEffect(() => {
-    // fetchUserData();
-  }, []);
 
   return (
     <>
       <Formik
         initialValues={{
-          name: "",
+          title : "",
+          name: name,
           specialization: "",
           gender: "",
           city: "",
         }}
         validationSchema={Yup.object({
+          title: Yup.string()
+            .oneOf(["Dr.", "Mr.", "Ms."], "Select a valid title")
+            .required("Title is required"),
           name: Yup.string()
-            .required("Required")
             .max(40, "Must be less than 40 Character"),
           specialization: Yup.string().required("Specialization is required"),
           gender: Yup.string().required("Gender is required"),
@@ -52,7 +60,7 @@ const DoctorProfile1 = () => {
             </div>
             <div className="sm:max-w-md">
               <div className="m-5 text-2xl font-medium">
-                Hello Dr. {fetchName}! Let's build your dedicated
+                Hello Dr. {name}! Let's build your dedicated
                 profile.
               </div>
               <Form>
@@ -64,15 +72,21 @@ const DoctorProfile1 = () => {
                     Name
                   </label>
                   <div className="flex mt-1">
-                    <div className="border-[1px] border-gray-400 p-2 border-solid">
-                      Dr./Mr./Ms.
-                    </div>
+                    <Field
+                      as="select"
+                      name="title"
+                      className="border-[1px] border-gray-400 p-2 border-solid rounded-l"
+                      style={{ minWidth: "90px" }}
+                    >
+                      <option value="Dr.">Dr.</option>
+                      <option value="Mr.">Mr.</option>
+                      <option value="Ms.">Ms.</option>
+                    </Field>
                     <Field
                       id="name"
                       name="name"
                       autoComplete="off"
-                      onChange={setName}
-                      className="border-y-[1px] rounded-r border-gray-400 border-r sm:w-64 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      className="border-y-[1px] px-2 rounded-r border-gray-400 border-r sm:w-64 focus:outline-none focus:ring-1 focus:ring-blue-500"
                     />
                     <div className="text-sm text-red-700">
                       <ErrorMessage name="name" />
@@ -91,10 +105,11 @@ const DoctorProfile1 = () => {
                     <option value="" disabled>
                       select an option
                     </option>
-                    <option value="Cardiology">Cardiology</option>
-                    <option value="Neurology">Neurology</option>
-                    <option value="Oncology">Oncology</option>
-                    <option value="Pediatrics">Pediatrics</option>
+                    {specialist && specialist.length > 0 && specialist.map((item, idx) => (
+                      <option key={idx} value={item}>
+                        {item}
+                      </option>
+                    ))}
                   </Field>
                   <div className="text-sm text-red-700">
                     <ErrorMessage name="specialization" />
@@ -104,16 +119,31 @@ const DoctorProfile1 = () => {
                   <label className="text-xs text-gray-600 my-2">Gender</label>
                   <div className="flex justify-start">
                     <label className="mr-5">
-                      <Field type="radio" name="gender" value="male" className="my-2 mr-2"/>
+                      <Field
+                        type="radio"
+                        name="gender"
+                        value="male"
+                        className="my-2 mr-2"
+                      />
                       Male
                     </label>
 
                     <label className="mx-5">
-                      <Field type="radio" name="gender" value="female" className="m-2"/>
+                      <Field
+                        type="radio"
+                        name="gender"
+                        value="female"
+                        className="m-2"
+                      />
                       Female
                     </label>
                     <label className="mx-5">
-                      <Field type="radio" name="gender" value="other" className="m-2"/>
+                      <Field
+                        type="radio"
+                        name="gender"
+                        value="other"
+                        className="m-2"
+                      />
                       Other
                     </label>
                   </div>

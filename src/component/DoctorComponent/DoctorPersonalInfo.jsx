@@ -1,113 +1,126 @@
 import { useState, useRef, useEffect } from "react";
-import { Formik, Field, Form, ErrorMessage } from "formik";
-import { useNavigate } from "react-router-dom";
+import { Formik, Field, Form, ErrorMessage, FieldArray } from "formik";
 import * as Yup from "yup";
-import axios from "../../api/axios";
-import DatePicker from "react-datepicker";
+import useAxios from "../../hooks/useAxios";
+
 import "react-datepicker/dist/react-datepicker.css";
-import useAuth from "@/hooks/useAuth";
+
+const ALL_SPECIALIST_URL = "api/user/allSpecialist";
 
 const DoctorPersonalInfo = () => {
   const errRef = useRef();
-  const navigate = useNavigate();
   const [errMsg, setErrMsg] = useState("");
   const [success, setSuccess] = useState(false);
-  const [profilePhoto, setProfilePhoto] = useState(null);
-  const [name, setName] = useState("");
-  const auth = useAuth();
+  const [specialist, setSpecialist] = useState([]);
+  const [name, setName] = useState(localStorage.getItem("name") || "");
   const email = localStorage.getItem("email");
+  const { fetchData } = useAxios();
 
-  const handleImageChange = (event, setFieldValue) => {
-    const file = event.currentTarget.files[0];
-    if (file) {
-      setFieldValue("profilePhoto", file); // Update Formik's state with the file
-      setProfilePhoto(URL.createObjectURL(file)); // Generate profilePhoto URL
-    }
-  };
+  const currentYear = new Date().getFullYear();
+  const years = Array.from(new Array(60), (val, index) => currentYear - index);
 
-  const fetchUserData = async () => {
-    try {
-      const response = await axios.get(`http://localhost:8080/doctor/${email}`);
-      setFetchName(response.data);
-      console.log(response);
+  // const fetchUserData = async () => {
+  //   try {
+  //     const response = await axios.get(`http://localhost:8080/doctor/${email}`);
+  //     setFetchName(response.data);
+  //     console.log(response);
 
-      setLoading(false); // Set loading to false after data is fetched
-    } catch (err) {
-      setError(err.message);
-      setLoading(false);
-    }
-  };
+  //     setLoading(false); // Set loading to false after data is fetched
+  //   } catch (err) {
+  //     setLoading(false);
+  //   }
+  // };
 
   useEffect(() => {
-    // fetchUserData();
+    fetchSpecialist();
   }, []);
 
-  const [selectedDate, setSelectedDate] = useState(null);
-  const today = new Date();
-
-  const handleDateChange = (date) => {
-    setSelectedDate(date);
-    console.log("Selected date:", date);
+  const fetchSpecialist = async () => {
+    try {
+      const response = await fetchData({
+        url: ALL_SPECIALIST_URL,
+      });
+      console.log(response);
+      setSpecialist(response?.data);
+      console.log(response.data);
+    } catch (err) {}
   };
 
-  const handleRemoveImage = (setFieldValue) => {
-    setFieldValue("profilePhoto", null);
-    setProfilePhoto(null);
-    document.getElementById("photo-upload").value = "";
-  };
-
-  if(success) {
-    navigate("auth/login")
-  }
   return (
     <>
       <Formik
         initialValues={{
-          image: null,
+          name: name || "",
+          image: null || "",
           phone: "",
+          email: email || "",
           gender: "",
-          dob: "",
-          bloodgrp: "",
-          area: "",
           locality: "",
           city: "",
           state: "",
-          country: "",
           pincode: "",
-          alternatePhone: "",
+          specialization: "",
+          qualifications: [
+            { qualification: "", college: "", completionYear: "" },
+          ],
+          experience: "",
+          fees: "",
         }}
         validationSchema={Yup.object({
-          fullName: Yup.string()
+          image: Yup.string().required("Required"),
+          name: Yup.string()
             .required("Required")
             .max(40, "Must be less than 40 letters"),
-          email: Yup.string()
-            .email("Invalid email address")
-            .required("Required"),
-          password: Yup.string()
-            .min(6, "Must be 6 characters or more")
-            .required("Required"),
-          gender: Yup.string().required("Gender is required"),
+          phone: Yup.string()
+            .required("Required")
+            .matches(
+              /^\d{10}$/,
+              "Phone number must be 10 digits and Only Number"
+            ),
+          gender: Yup.string().required("Required"),
+          locality: Yup.string().required("Required"),
+          city: Yup.string().required("Required"),
+          state: Yup.string().required("Required"),
+          pincode: Yup.number()
+            .required("Required")
+            .positive("Must be a positive number")
+            .integer("Must be an integer"),
+          specialization: Yup.string().required("Required"),
+          qualifications: Yup.array()
+            .of(
+              Yup.object().shape({
+                qualification: Yup.string().required("Required"),
+                college: Yup.string().required("Required"),
+                completionYear: Yup.number()
+                  .required("Required")
+                  .positive("Must be a positive number")
+                  .integer("Must be an integer")
+                  .max(
+                    new Date().getFullYear(),
+                    "Year cannot be in the future"
+                  ),
+              })
+            )
+            .min(1, "At least one qualification is required")
+            .max(4, "Maximum 4 qualifications allowed"),
+          fees: Yup.number()
+            .required("Required")
+            .positive("Must be a positive number"),
+          experience: Yup.number()
+            .required("Required")
+            .min(0, "Experience must be non-negative"),
         })}
         onSubmit={async (values, actions) => {
           setErrMsg("");
+          console.log(values);
           try {
-            const userData = {
-              fullName: values.fullName,
-              email: values.email,
-              password: values.password,
-            };
-            const response = await axios.post(
-              REGISTER_URL,
-              JSON.stringify(userData),
-              {
-                headers: { "Content-Type": "application/json" },
-                withCredentials: true,
-              }
-            );
+            const response = await fetchData({
+              url: url,
+              data: JSON.stringify(values),
+              method: "PUT",
+            });
             console.log(response.data);
-            alert("Account Created Successfully");
             setSuccess(true);
-            actions.resetForm();
           } catch (err) {
             if (!err?.response) {
               // No response from server
@@ -125,24 +138,20 @@ const DoctorPersonalInfo = () => {
               // Other errors
               setErrMsg("Registration Failed");
             }
-            console.error(
-              "Error details:",
-              err.response?.data || err.message || err
-            );
             errRef.current.focus();
           } finally {
             actions.setSubmitting(false);
           }
         }}
       >
-        {({ isValid, isSubmitting, setFieldValue }) => (
+        {({ isValid, isSubmitting }) => (
           <>
-            <div className="m-8 sm:w-full mt-3">
-              <h2 className="text-xl font-medium leading-9 tracking-tight text-gray-600 border-b-[1px] py-2">
-                Personal Info
-              </h2>
-            </div>
             <Form>
+              <div className="m-4 sm:w-full mt-3">
+                <h2 className="text-xl font-medium leading-9 tracking-tight text-gray-600 border-b-[1px] py-2">
+                  Personal Info
+                </h2>
+              </div>
               <div className="flex justify-center">
                 <p
                   ref={errRef}
@@ -152,83 +161,55 @@ const DoctorPersonalInfo = () => {
                   {errMsg}
                 </p>
               </div>
-              <div className="flex flex-col min-h-full px-6 py-1 lg:px-8">
-                <div className="mt-2 sm:w-full sm:max-w-max">
-                  <div className="border-b border-gray-900/10 pb-4">
+              <div className="flex flex-col min-h-full px-2 lg:px-2">
+                <div className="sm:w-full sm:max-w-max">
+                  <div className="border-b border-gray-900/10 ">
                     <div className="flex flex-col gap-y-4">
-                      <div className="flex flex-wrap gap-x-8">
-                        <div className="flex items-start flex-col gap-x-6 mb-4 w-64">
-                          <div className="text-sm font-semibold">
-                            <span>Profile Photo</span>
-                          </div>
-                          <div className="w-24 h-24 bg-gray-200 rounded-full overflow-hidden flex items-center justify-center">
-                            {profilePhoto ? (
-                              <img
-                                src={profilePhoto}
-                                alt="Profile"
-                                className="w-full h-full object-cover relative inline-block align-middle bg-[#F0F0F5] overflow-hidden"
-                              />
-                            ) : (
-                              <span className="text-sm">Add Photo</span>
-                            )}
-                          </div>
-                          <div>
-                            <input
-                              type="file"
-                              accept="image/*"
-                              id="photo-upload"
-                              className="hidden"
-                              onChange={(event) =>
-                                handleImageChange(event, setFieldValue)
-                              }
-                            />
-                            {!profilePhoto ? (
-                              <label
-                                htmlFor="photo-upload"
-                                className="text-blue-500 underline cursor-pointer"
-                              >
-                                Add Photo
-                              </label>
-                            ) : (
-                              <div className="flex space-x-4">
-                                <label
-                                  htmlFor="photo-upload"
-                                  className="text-blue-500 underline cursor-pointer"
-                                >
-                                  Edit
-                                </label>
-                                <button
-                                  type="button"
-                                  className="text-blue-500 underline cursor-pointer"
-                                  onClick={() =>
-                                    handleRemoveImage(setFieldValue)
-                                  }
-                                >
-                                  Remove
-                                </button>
-                              </div>
-                            )}
+                      <div className="flex flex-col">
+                        <div className="flex flex-col gap-y-2">
+                          <label
+                            htmlFor="image"
+                            className="text-xs font-normal text-gray-500 flex"
+                          >
+                            <span className="">Profile Photo Url</span>
+                          </label>
+                          <Field
+                            id="image"
+                            name="image"
+                            type="text"
+                            placeholder="Your Profile Url"
+                            className="border border-gray-300 rounded p-2 text-sm w-full sm:w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                          <div className="text-xs text-red-700">
+                            <ErrorMessage name="image" />
                           </div>
                         </div>
-
-                        <div className="flex flex-col mx-3 gap-y-2">
+                        <div className="flex flex-col">
                           <label
-                            htmlFor="fullName"
-                            className="text-xs font-normal gap-x-1 text-gray-500"
+                            htmlFor="name"
+                            className="text-xs font-normal text-gray-500"
                           >
                             Name
                           </label>
-                          <Field
-                            id="fullName"
-                            name="fullName"
-                            type="text"
-                            value={name}
-                            disabled
-                            className="border border-gray-300 rounded p-2 w-full text-sm sm:w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            placeholder="Enter your name"
-                          />
-                          <div className="text-sm text-red-700">
-                            <ErrorMessage name="fullName" />
+                          <div className="flex mt-1">
+                            <Field
+                              as="select"
+                              name="title"
+                              className="border-[1px] border-gray-400 p-2 border-solid rounded-l min-w-16"
+                            >
+                              <option value="Dr.">Dr.</option>
+                              <option value="Mr.">Mr.</option>
+                              <option value="Ms.">Ms.</option>
+                            </Field>
+                            <Field
+                              id="name"
+                              name="name"
+                              autoComplete="off"
+                              className="border-y-[1px] px-2 rounded-r border-gray-400 border-r sm:w-[192px] focus:outline-none"
+                            />
+                          </div>
+                          <div className="text-xs text-red-700">
+                            <ErrorMessage name="name" />
                           </div>
                         </div>
                       </div>
@@ -248,7 +229,7 @@ const DoctorPersonalInfo = () => {
                             className="border border-gray-300 rounded p-2 w-full text-sm sm:w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             placeholder="Enter your phone number"
                           />
-                          <div className="text-sm text-red-700">
+                          <div className="text-xs text-red-700">
                             <ErrorMessage name="phone" />
                           </div>
                         </div>
@@ -263,19 +244,18 @@ const DoctorPersonalInfo = () => {
                             id="email"
                             name="email"
                             type="email"
-                            value={email}
                             disabled
-                            className="border border-gray-300 rounded p-2 w-full text-sm sm:w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="border border-gray-300 rounded p-2 w-full text-sm sm:w-64 focus:outline-none cursor-not-allowed focus:ring-2 focus:ring-blue-500"
                             placeholder="Enter your email address"
                           />
-                          <div className="text-sm text-red-700">
+                          <div className="text-xs text-red-700">
                             <ErrorMessage name="email" />
                           </div>
                         </div>
 
                         <div className="flex flex-col gap-y-2">
                           <label
-                            htmlFor="password"
+                            htmlFor="gender"
                             className="text-xs font-normal text-gray-500"
                           >
                             Gender
@@ -285,73 +265,12 @@ const DoctorPersonalInfo = () => {
                             name="gender"
                             className="border border-gray-300 rounded p-2 w-full text-sm sm:w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
                           >
-                            <option value="" disabled>
-                              select an option
-                            </option>
+                            <option value="">Select an option</option>
                             <option value="male">Male</option>
                             <option value="female">Female</option>
                             <option value="other">Other</option>
                           </Field>
-                          <div className="text-sm text-red-700">
-                            <ErrorMessage name="gender" />
-                          </div>
-                        </div>
-
-                        <div className="flex flex-col gap-y-2 rounded w-full sm:w-64">
-                          <label
-                            htmlFor="dob"
-                            className="text-xs font-normal text-gray-500"
-                          >
-                            Date of Birth
-                          </label>
-                          <DatePicker
-                            selected={selectedDate}
-                            onChange={handleDateChange}
-                            dateFormat="dd/MM/yyyy"
-                            placeholderText="Click to select a date"
-                            showYearDropdown
-                            showMonthDropdown
-                            dropdownMode="select"
-                            className="w-full p-2 border border-gray-300 rounded-md text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            calendarClassName="rounded-lg shadow-lg border"
-                            dayClassName={(date) =>
-                              date.getDate() === today.getDate()
-                                ? "bg-blue-500 text-white rounded-full"
-                                : "hover:bg-blue-100 text-gray-800"
-                            }
-                            wrapperClassName="w-full"
-                            maxDate={today}
-                          />
-                          <div className="text-sm text-red-700">
-                            <ErrorMessage name="dob" />
-                          </div>
-                        </div>
-
-                        <div className="flex flex-col gap-y-2">
-                          <label
-                            htmlFor="password"
-                            className="text-xs font-normal text-gray-500"
-                          >
-                            Blood Group
-                          </label>
-                          <Field
-                            as="select"
-                            name="gender"
-                            className="border border-gray-300 rounded p-2 w-full text-sm sm:w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          >
-                            <option value="" disabled>
-                              select an option
-                            </option>
-                            <option value="male">O+</option>
-                            <option value="female">A+</option>
-                            <option value="other">B+</option>
-                            <option value="other">O-</option>
-                            <option value="other">A-</option>
-                            <option value="other">B-</option>
-                            <option value="other">AB+</option>
-                            <option value="other">AB-</option>
-                          </Field>
-                          <div className="text-sm text-red-700">
+                          <div className="text-xs text-red-700">
                             <ErrorMessage name="gender" />
                           </div>
                         </div>
@@ -360,23 +279,6 @@ const DoctorPersonalInfo = () => {
                       <div>
                         <span className="text-sm font-semibold">Address</span>
                         <div className="flex flex-wrap gap-x-11">
-                          <div className="flex flex-col gap-y-2">
-                            <label
-                              htmlFor="area"
-                              className="text-xs font-normal text-gray-500 "
-                            >
-                              House No./Street Name/Area
-                            </label>
-                            <Field
-                              id="area"
-                              name="area"
-                              type="text"
-                              className="border border-gray-300 rounded p-2 text-sm w-full sm:w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                            <div className="text-sm text-red-700">
-                              <ErrorMessage name="area" />
-                            </div>
-                          </div>
                           <div className="flex flex-col gap-y-2">
                             <label
                               htmlFor="locality"
@@ -390,7 +292,7 @@ const DoctorPersonalInfo = () => {
                               type="text"
                               className="border border-gray-300 rounded p-2 w-full text-sm sm:w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
-                            <div className="text-sm text-red-700">
+                            <div className="text-xs text-red-700">
                               <ErrorMessage name="locality" />
                             </div>
                           </div>
@@ -399,7 +301,7 @@ const DoctorPersonalInfo = () => {
                               htmlFor="city"
                               className="text-xs font-normal text-gray-500"
                             >
-                              city
+                              City
                             </label>
                             <Field
                               id="city"
@@ -407,7 +309,7 @@ const DoctorPersonalInfo = () => {
                               type="city"
                               className="border border-gray-300 rounded p-2 text-sm w-full sm:w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
-                            <div className="text-sm text-red-700">
+                            <div className="text-xs text-red-700">
                               <ErrorMessage name="city" />
                             </div>
                           </div>
@@ -416,7 +318,7 @@ const DoctorPersonalInfo = () => {
                               htmlFor="state"
                               className="text-xs font-normal text-gray-500"
                             >
-                              state
+                              State
                             </label>
                             <Field
                               id="state"
@@ -424,7 +326,7 @@ const DoctorPersonalInfo = () => {
                               type="text"
                               className="border border-gray-300 rounded text-sm p-2 w-full sm:w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
-                            <div className="text-sm text-red-700">
+                            <div className="text-xs text-red-700">
                               <ErrorMessage name="state" />
                             </div>
                           </div>
@@ -433,7 +335,7 @@ const DoctorPersonalInfo = () => {
                               htmlFor="pincode"
                               className="text-xs font-normal text-gray-500"
                             >
-                              Pincode*
+                              Pincode
                             </label>
                             <Field
                               id="pincode"
@@ -441,7 +343,7 @@ const DoctorPersonalInfo = () => {
                               type="text"
                               className="border border-gray-300 rounded text-sm p-2 w-full sm:w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
-                            <div className="text-sm text-red-700">
+                            <div className="text-xs text-red-700">
                               <ErrorMessage name="pincode" />
                             </div>
                           </div>
@@ -450,16 +352,195 @@ const DoctorPersonalInfo = () => {
                     </div>
                   </div>
                 </div>
+              </div>
+              <div className="m-2 sm:w-full mt-3">
+                <h2 className="text-xl font-medium leading-9 tracking-tight text-gray-600 border-b-[1px] ">
+                  qualifications Info
+                </h2>
+              </div>
+              <div className="flex flex-col min-h-full px-2 lg:px-2">
+                <div className=" border-b border-gray-900/10 pb-2">
+                  <div className="my-1 flex flex-col sm:w-[355px]">
+                    <label className="text-xs text-gray-600 mb-2">
+                      Specialization
+                    </label>
+                    <Field
+                      as="select"
+                      name="specialization"
+                      className="border border-gray-300 rounded sm:w-64 p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="">Select an option</option>
+                      {specialist &&
+                        specialist.length > 0 &&
+                        specialist.map((item, idx) => (
+                          <option key={idx} value={item}>
+                            {item}
+                          </option>
+                        ))}
+                    </Field>
+                    <div className="text-xs text-red-700">
+                      <ErrorMessage name="specialization" />
+                    </div>
+                  </div>
+                  {/* Qualification Fields in a single row, dynamic with plus button */}
+                  <FieldArray name="qualifications">
+                    {({ push, remove, form }) => (
+                      <div>
+                        {form.values.qualifications.map((_, idx) => (
+                          <div
+                            key={idx}
+                            className="flex flex-row flex-wrap gap-3 justify-between w-full bg-white p-2 my-2 max-w-60 md:max-w-full lg:max-w-full items-end"
+                          >
+                            <div className="flex w-64 flex-col min-w-52 max-w-56">
+                              <label className="text-xs text-gray-600 mb-2">
+                                Qualification
+                              </label>
+                              <Field
+                                id={`qualifications.${idx}.qualification`}
+                                name={`qualifications.${idx}.qualification`}
+                                type="text"
+                                placeholder="Enter your qualification"
+                                className="border border-gray-300 rounded p-2 text-sm w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              />
+                              <div className="text-xs text-red-700">
+                                <ErrorMessage
+                                  name={`qualifications.${idx}.qualification`}
+                                />
+                              </div>
+                            </div>
+                            <div className="flex w-64 flex-col min-w-52 max-w-56">
+                              <label className="text-xs text-gray-600 mb-2">
+                                College
+                              </label>
+                              <Field
+                                id={`qualifications.${idx}.college`}
+                                name={`qualifications.${idx}.college`}
+                                type="text"
+                                placeholder="Enter your college"
+                                className="border border-gray-300 rounded p-2 text-sm w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              />
+                              <div className="text-xs text-red-700">
+                                <ErrorMessage
+                                  name={`qualifications.${idx}.college`}
+                                />
+                              </div>
+                            </div>
+                            <div className="flex flex-col w-64 min-w-52 max-w-56">
+                              <label className="text-xs text-gray-600 mb-2">
+                                Completion Year
+                              </label>
+                              <Field
+                                as="select"
+                                id={`qualifications.${idx}.completionYear`}
+                                name={`qualifications.${idx}.completionYear`}
+                                className="border border-gray-300 rounded p-2 text-sm w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              >
+                                <option value="">Select year</option>
+                                {years.map((year) => (
+                                  <option key={year} value={year}>
+                                    {year}
+                                  </option>
+                                ))}
+                              </Field>
 
-                <div className="mt-4 flex justify-center pt-2">
-                  <button
-                    type="submit"
-                    disabled={!isValid || isSubmitting}
-                    className="rounded-md bg-indigo-600 px-3 py-2 text-base font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 w-24"
-                  >
-                    Save
-                  </button>
+                              <div className="text-xs text-red-700">
+                                <ErrorMessage
+                                  name={`qualifications.${idx}.completionYear`}
+                                />
+                              </div>
+                            </div>
+                            {/* Remove button always visible except when only 1 row */}
+                            <button
+                              type="button"
+                              onClick={() => remove(idx)}
+                              className="text-red-500 text-2xl font-bold pb-2 hover:text-red-700"
+                              title="Remove this qualification"
+                              disabled={form.values.qualifications.length === 1}
+                            >
+                              &minus;
+                            </button>
+                            {/* Plus button only visible if only 1 row, or last row and less than 4 */}
+                            {form.values.qualifications.length < 4 &&
+                              ((form.values.qualifications.length === 1 &&
+                                idx === 0) ||
+                                (form.values.qualifications.length > 1 &&
+                                  idx ===
+                                    form.values.qualifications.length - 1)) && (
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    push({
+                                      qualification: "",
+                                      college: "",
+                                      completionYear: "",
+                                    })
+                                  }
+                                  className="text-green-500 text-2xl font-bold pb-2 hover:text-green-700"
+                                  title="Add another qualification"
+                                >
+                                  +
+                                </button>
+                              )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </FieldArray>
                 </div>
+              </div>
+              <div className="m-2 sm:w-full mt-3">
+                <h2 className="text-xl font-medium leading-9 tracking-tight text-gray-600 border-b-[1px] ">
+                  Other Info
+                </h2>
+              </div>
+              <div className="flex flex-col min-h-full px-2 lg:px-2">
+                <div className=" border-b border-gray-900/10 pb-2">
+                  <div className="flex flex-wrap gap-x-11">
+                    <div className="flex flex-col gap-y-2">
+                      <label
+                        htmlFor="fees"
+                        className="text-xs font-normal text-gray-500"
+                      >
+                        Consulation Fees
+                      </label>
+                      <Field
+                        id="fees"
+                        name="fees"
+                        type="number"
+                        className="border border-gray-300 rounded p-2 w-full text-sm sm:w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                      <div className="text-xs text-red-700">
+                        <ErrorMessage name="fees" />
+                      </div>
+                    </div>
+                    <div className="flex flex-col gap-y-2">
+                      <label
+                        htmlFor="experience"
+                        className="text-xs font-normal text-gray-500"
+                      >
+                        Experience Years
+                      </label>
+                      <Field
+                        id="experience"
+                        name="experience"
+                        type="number"
+                        className="border border-gray-300 rounded p-2 text-sm w-full sm:w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                      <div className="text-xs text-red-700">
+                        <ErrorMessage name="experience" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-4 flex justify-center pt-2">
+                <button
+                  type="submit"
+                  disabled={!isValid || isSubmitting}
+                  className="rounded-md bg-indigo-600 px-3 py-2 text-base font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 w-24"
+                >
+                  Save
+                </button>
               </div>
             </Form>
           </>

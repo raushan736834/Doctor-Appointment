@@ -7,7 +7,8 @@ import useDate from "../../hooks/useDate";
 import { allSlots } from "../../constants/slots";
 import { useBookedSlots } from "../../hooks/useBookedSlots";
 
-const AppointmentForm = ({ id, specialization }) => {
+
+const AppointmentForm = ({ id, specialization, isReschedule }) => {
   const navigate = useNavigate();
   const today = useMemo(() => new Date(), []);
   const { setData } = useDate();
@@ -33,15 +34,19 @@ const AppointmentForm = ({ id, specialization }) => {
   const handleSlotChange = (slot) => {
     setSelectedSlot(slot);
     if (selectedDate && slot) {
-      setData({ selectedDate, slot, specialization, selectedPeriod });
-      navigate("/appointment-details/" + id, {
-        state: {
-          date: format(selectedDate, "dd-MM-yyyy"),
-          time: slot,
-          period: selectedPeriod,
-          specialization,
-        },
-      });
+      if (!isReschedule) {
+        setData({ selectedDate, slot, specialization, selectedPeriod });
+        navigate("/appointment-details/" + id, {
+          state: {
+            date: format(selectedDate, "dd-MM-yyyy"),
+            time: slot,
+            period: selectedPeriod,
+            specialization,
+          },
+        });
+      } else {
+
+      }
     } else {
       alert("Please select a date, period, and time slot.");
     }

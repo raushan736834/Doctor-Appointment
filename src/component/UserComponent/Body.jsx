@@ -4,7 +4,8 @@ import Shimmer from "./Shimmer";
 import { Link } from "react-router-dom";
 import Searchbar from "../Common/Searchbar";
 import useOnline from "../../hooks/useOnline";
-import useAxios from "@/hooks/useAxios";
+import useAxios from "../../hooks/useAxios";
+
 
 function filterData(searchText, data) {
   const filterData = data.filter((ele) =>
@@ -13,7 +14,7 @@ function filterData(searchText, data) {
   return filterData;
 }
 
-const SPECIALIST_URL = "/getSpecialist";
+const SPECIALIST_URL = "api/public/getSpecialist";
 
 const Body = () => {
   const [searchText, setSearchText] = useState("");
@@ -28,17 +29,15 @@ const Body = () => {
   }, [isOnline]);
 
   async function getSpecialist() {
-    console.log("function called")
     try {
       const response = await fetchData({
         url: SPECIALIST_URL,
       });
-      console.log("inside func")
       const json = response.data;
       setAllSpecialist(json);
     } catch (error) {
-      console.log(error)
-    } 
+      console.log(error);
+    }
     // finally {
     // }
   }
@@ -46,8 +45,6 @@ const Body = () => {
   const handleSearch = () => {
     const filteredData = filterData(searchText, allSpecialist);
   };
-
-
 
   if (!allSpecialist) return null;
 

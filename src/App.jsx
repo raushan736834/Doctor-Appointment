@@ -1,4 +1,4 @@
-import React, { lazy, useEffect } from "react";
+import { useEffect } from "react";
 import ReactDOM from "react-dom/client";
 import {
   BrowserRouter as Router,
@@ -6,8 +6,9 @@ import {
   Route,
   Outlet,
   useNavigate,
+  useLocation,
 } from "react-router-dom";
-import { Provider } from "@/components/ui/provider";
+import { ChakraProvider } from "@chakra-ui/react";
 import Header from "./component/UserComponent/Header";
 import Body from "./component/UserComponent/Body";
 import Footer from "./component/UserComponent/Footer";
@@ -29,13 +30,16 @@ import UserProfile from "./component/UserComponent/UserProfile";
 import ThankYou from "./component/UserComponent/ThankYou";
 import BookingDetails from "./component/UserComponent/BookingDetails";
 import DoctorDashboard from "./component/DoctorComponent/DoctorDashboard";
-import useAuth from "./hooks/useAuth";
-
-// const AppointmentDetails = lazy(() => import("./component/AppointmentDetails"));
+import DoctorCard from "./component/UserComponent/DoctorCard";
+import { ROLES } from "./constants/slots";
+import Appointments from "./component/DoctorComponent/Appointments";
+import DoctorLayout from "./component/DoctorComponent/DoctorLayout";
+import DoctorSetting from "./component/DoctorComponent/DoctorSetting";
 
 const AppLayout = () => {
   const navigate = useNavigate();
   const role = localStorage.getItem("role");
+  const { pathname } = useLocation();
 
   // useEffect(() => {
   //   if (role === "doctor") {
@@ -43,12 +47,27 @@ const AppLayout = () => {
   //   }
   // }, [role, navigate]);
 
+  const accessToken = localStorage.getItem("token");
+
+  useEffect(() => {
+    console.log(accessToken);
+    const cond =
+      pathname === "auth/login" ||
+      pathname === "auth/signup" ||
+      pathname === "/forget";
+    console.log("cond : ", cond);
+    if (accessToken && cond) {
+      navigate("/", { redirect: true });
+    }
+  }, [pathname]);
+
   return (
     <>
-      <Provider>
+      <ChakraProvider>
         <AuthProvider>
-          {/* {role !== "doctor" && <Header />} */}
-          <Header />
+          {/* Show Header if role is null or does not include doctor */}
+          {(!role || role.includes(ROLES.doctor) === false) && <Header />}
+          {/* <Header /> */}
           <DateTimeProvider>
             <div
               style={{
@@ -58,15 +77,15 @@ const AppLayout = () => {
               <Outlet />
             </div>
           </DateTimeProvider>
-          {role !== "doctor" && <Footer />}
+          {/* Show Footer if role is null or is not doctor */}
+          {(!role || role.includes(ROLES.doctor) === false) && <Footer />}
         </AuthProvider>
-      </Provider>
+      </ChakraProvider>
     </>
   );
 };
 
 const App = () => {
-  const role = localStorage.getItem("role");
   return (
     <Router future={{ v7_relativeSplatPath: true }}>
       <Routes>
@@ -78,6 +97,7 @@ const App = () => {
             <Route path="specialist/:id" element={<DoctorDetails />} />
             <Route path="auth/login" element={<Login />} />
             <Route path="forget" element={<ForgetPassword />} />
+            <Route path="/search/doctor" element={<DoctorCard />} />
             <Route path="auth/signup" element={<SignUp />} />
             <Route element={<RequireAuth />}>
               <Route path="thankyou" element={<ThankYou />} />
@@ -87,12 +107,16 @@ const App = () => {
                 element={<AppointmentDetails />}
               />
               <Route path="booking-details" element={<BookingDetails />} />
-              <Route path="/doctor-dashboard" element={<DoctorDashboard />} />
-              <Route
-                path="/doctor-personalInfo"
-                element={<DoctorPersonalInfo />}
-              />
-              <Route path="/doctor-profile1" element={<DoctorProfile1 />} />
+              <Route path="doctor" element={<DoctorLayout />}>
+                <Route path="doctor-dashboard" element={<DoctorDashboard />} />
+                <Route
+                  path="/doctor-personalInfo"
+                  element={<DoctorPersonalInfo />}
+                />
+                <Route path="appointments" element={<Appointments />} />
+                <Route path="/doctor-profile1" element={<DoctorProfile1 />} />
+                <Route path="settings" element={<DoctorSetting />} />
+              </Route>
             </Route>
           </Route>
           <Route path="*" element={<Error />} />

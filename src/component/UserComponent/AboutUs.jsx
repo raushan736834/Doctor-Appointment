@@ -1,7 +1,3 @@
-// import { Switch } from "@chakra-ui/react";
-import { Switch } from "@/components/ui/switch";
-import { Spinner } from "@chakra-ui/react";
-import { HiCheck, HiX } from "react-icons/hi"
 const AboutUs = () => {
   return (
     <div>

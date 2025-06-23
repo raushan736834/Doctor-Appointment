@@ -3,7 +3,7 @@ import useAuth from "../../hooks/useAuth";
 import Login from "../AuthComponent/Login";
 import { useState, useEffect } from "react";
 import axios from "../../api/axios";
-import useAxios from "@/hooks/useAxios";
+import useAxios from "../../hooks/useAxios";
 
 const UserProfile = () => {
   const { auth } = useAuth();

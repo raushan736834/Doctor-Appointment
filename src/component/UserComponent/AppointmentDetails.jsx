@@ -8,7 +8,7 @@ import * as Yup from "yup";
 import useDate from "../../hooks/useDate";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { format } from "date-fns";
-import useAxios from "@/hooks/useAxios";
+import useAxios from "../../hooks/useAxios";
 
 // function filterData(id, data) {
 //   return data.filter((ele) => ele.id === parseInt(id));
@@ -97,15 +97,13 @@ const AppointmentDetails = () => {
   }
 
   const handleSubmit = async (values) => {
+    console.log("handleSubmit");
     setIsLoading(true);
     setErrMsg("");
     setIsSubmitting(true);
     try {
       const formattedDate = format(new Date(date), "yyyy-MM-dd");
-      const appointmentId = uuid();
-      console.log(appointmentId)
       const formData = {
-        appointmentId, // send generated appointmentId
         email,
         time,
         period,

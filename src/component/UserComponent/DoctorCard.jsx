@@ -1,65 +1,40 @@
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo } from "react";
 import defaultDoctorImage from "../../assets/img/defaultClinicImage.jpg";
 import AppointmentForm from "./AppointmentForm";
 import { allSlots } from "../../constants/slots";
-import useAxios from "../../hooks/useAxios";
+import { useBookedSlots } from "../../hooks/useBookedSlots";
 
-function DoctorCard({
-  id,
-  doctorName,
-  specialization,
-  consultationFees,
-  experienceYears,
-  profilePhoto,
-  locality,
-  clinicName,
-  city,
-}) {
+function DoctorCard(props) {
+  const {
+    id,
+    doctorName,
+    specialization,
+    consultationFees,
+    experienceYears,
+    profilePhoto,
+    locality,
+    clinicName,
+    city,
+  } = props;
+
   const [selectedId, setSelectedId] = useState(null);
   const [selectedSpecialization, setSelectedSpecialization] = useState(null);
-  const [bookedSlots, setBookedSlots] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
   const today = useMemo(() => new Date(), []);
+  const { bookedSlots, loading, error } = useBookedSlots(id, today);
   const allPossibleSlots = useMemo(() => Object.values(allSlots).flat(), []);
-  const photoUrl = profilePhoto || defaultDoctorImage;
-  const { fetchData } = useAxios();
-
-  // Manual fetch function for booked slots
-  const fetchBookedSlots = useCallback(async () => {
-    setLoading(true);
-    setError("");
-    try {
-      const response = await fetchData({
-        url: "/appointment/booked-slots",
-        method: "post",
-        data: {
-          date: today.toISOString().slice(0, 10),
-          doctor: { id },
-        },
-      });
-      setBookedSlots((response.data || []).map((slot) => slot.trim()));
-    } catch (err) {
-      setError("Failed to fetch availability");
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchData, id, today]);
-
-  // Only show slots that are not booked
   const availableSlots = useMemo(
     () => allPossibleSlots.filter((slot) => !bookedSlots.includes(slot)),
     [allPossibleSlots, bookedSlots]
   );
   const isAvailableToday = availableSlots.length > 0;
+  const photoUrl =
+    profilePhoto && profilePhoto ? profilePhoto : defaultDoctorImage;
 
-  const handleClick = async () => {
+  const handleClick = (id, specialization) => {
     if (selectedId === id) {
       setSelectedId(null);
       setSelectedSpecialization(null);
-      setBookedSlots([]);
     } else {
-      await fetchBookedSlots();
       setSelectedId(id);
       setSelectedSpecialization(specialization);
       localStorage.setItem("specialization", specialization);
@@ -100,29 +75,25 @@ function DoctorCard({
         </div>
         {/* Button section */}
         <div className="flex flex-col items-center justify-center mt-4 lg:mt-0 lg:mr-6">
-          {loading && (
+          {loading ? (
             <span className="text-gray-500 font-medium mb-2">
               Checking availability...
             </span>
-          )}
-          {error && !loading && (
+          ) : error ? (
             <span className="text-red-500 font-medium mb-2">{error}</span>
-          )}
-          {!loading && !error && (
-            <span
-              className={
-                isAvailableToday
-                  ? "text-green-700 font-medium mb-2"
-                  : "text-red-500 font-medium mb-2 cursor-not-allowed"
-              }
-            >
-              {isAvailableToday ? "Available Today" : "Fully Booked Today"}
+          ) : isAvailableToday ? (
+            <span className="text-green-700 font-medium mb-2">
+              Available Today
+            </span>
+          ) : (
+            <span className="text-red-500 font-medium mb-2">
+              Fully Booked Today
             </span>
           )}
           <button
             aria-pressed={selectedId === id}
             className="w-full sm:w-40 py-2 bg-sky-500 hover:bg-sky-600 rounded-md text-white font-semibold transition-colors duration-200"
-            onClick={handleClick}
+            onClick={() => handleClick(id, specialization)}
             disabled={!isAvailableToday}
             title={
               isAvailableToday

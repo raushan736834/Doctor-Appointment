@@ -1,9 +1,10 @@
 import { useLocation, Navigate, Outlet } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 const RequireAuth = () => {
   const location = useLocation();
   const [accessToken] = useState(localStorage.getItem("token"));
+  // const {accessToken} = useAuth();
 
   // useEffect(() => {
   //   const handleStorageChange = () => {

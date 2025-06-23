@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback,useMemo } from "react";
 import axios from "axios";
 import useAuth from "./useAuth";
-// export const baseUrl = "http://192.168.182.57:8080";
 export const baseUrl = "http://localhost:8080";
 
 const useAxios = () => {

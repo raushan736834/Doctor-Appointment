@@ -1,13 +1,10 @@
 import logo from "../../assets/img/appointDoctor.jpg";
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useRef, useState, useEffect } from "react";
 import axios from "../../api/axios";
-import { useNavigate } from "react-router-dom";
-import { HStack } from "@chakra-ui/react";
-import { Radio, RadioGroup } from "@/components/ui/radio";
-import useAuth from "@/hooks/useAuth";
+import useAuth from "../../hooks/useAuth";
 
 const REGISTER_URL = "/auth/signup";
 
@@ -40,6 +37,7 @@ const SignUp = () => {
   const [errMsg, setErrMsg] = useState("");
   const [success, setSuccess] = useState(false);
   const { setIsLoading } = useAuth();
+  const [checked, setChecked] = useState(false);
 
   useEffect(() => {
     if (success) {
@@ -62,7 +60,7 @@ const SignUp = () => {
           email: "",
           password: "",
           confirm_pass: "",
-          accountFor: "user",
+          roles: ["USER"],
         }}
         validationSchema={Yup.object({
           firstName: Yup.string()
@@ -83,6 +81,7 @@ const SignUp = () => {
             .required("*Required"),
         })}
         onSubmit={async (values, actions) => {
+          console.log("Submitted roles:", values.roles);
           setErrMsg("");
           setIsLoading(true);
           try {
@@ -91,7 +90,7 @@ const SignUp = () => {
               lastName: values.lastName,
               email: values.email,
               password: values.password,
-              roles: values.accountFor, // user or doctor
+              roles: values.roles, // user or doctor
             };
             const response = await axios.post(
               REGISTER_URL,
@@ -187,28 +186,33 @@ const SignUp = () => {
                           type="password"
                           colSpan={6}
                         />
-                        {/* <div className="sm:col-span-6">
-                          <label
-                            htmlFor="accountFor"
-                            className="block text-sm font-medium leading-6 text-gray-900"
-                          >
-                            Creating Account For?
+                        <div className="sm:col-span-6">
+                          <label className="block text-sm font-medium leading-6 text-gray-900">
+                            <Field name="roles">
+                              {({ form }) => (
+                                <div className="flex items-center space-x-2">
+                                  <input
+                                    type="checkbox"
+                                    checked={form.values.roles.includes(
+                                      "DOCTOR"
+                                    )}
+                                    onChange={(e) => {
+                                      const isChecked = e.target.checked;
+                                      setChecked(isChecked);
+                                      form.setFieldValue(
+                                        "roles",
+                                        isChecked
+                                          ? ["USER", "DOCTOR"]
+                                          : ["USER"]
+                                      );
+                                    }}
+                                  />
+                                  <span>Register as a doctor</span>
+                                </div>
+                              )}
+                            </Field>
                           </label>
-                          <Field name="accountFor">
-                            {({ field }) => (
-                              <RadioGroup
-                                {...field}
-                                colorPalette="black"
-                                variant="subtle"
-                              >
-                                <HStack gap="10">
-                                  <Radio value="user">User</Radio>
-                                  <Radio value="doctor">Doctor</Radio>
-                                </HStack>
-                              </RadioGroup>
-                            )}
-                          </Field>
-                        </div> */}
+                        </div>
                       </div>
                     </div>
                   </div>

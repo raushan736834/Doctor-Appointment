@@ -42,7 +42,8 @@ const Header = () => {
     setAuth({});
     localStorage.clear();
     setRole("");
-    window.dispatchEvent(new Event("storage"));
+    console.log(auth)
+    // window.dispatchEvent(new Event("storage"));
   }, [setAuth]);
 
   const navigation = useMemo(() => getNavigation(role, location), [role, location]);
@@ -51,6 +52,7 @@ const Header = () => {
     <Disclosure as="nav" className="bg-gray-800">
       {({ open, close }) => {
         // Close on outside click when mobile menu is open
+        // eslint-disable-next-line react-hooks/rules-of-hooks
         useEffect(() => {
           if (!open) return;
           function handleClick(e) {

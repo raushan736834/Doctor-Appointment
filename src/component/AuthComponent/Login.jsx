@@ -6,7 +6,6 @@ import logo from "../../assets/img/appointDoctor.jpg";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import useAxios from "../../hooks/useAxios";
 
-
 const LOGIN_URL = "/auth/login";
 
 const Login = () => {
@@ -37,35 +36,44 @@ const Login = () => {
           email: values.email,
           password: values.password,
         },
-      })
-      console.log(response.data)
+      });
+
+      console.log(response.data);
       const json = response?.data?.body;
-      console.log(json)
+      console.log(json);
+
       const token = json?.token;
       const email = json?.email;
-      const role = json?.roles;
+      const roleString = json?.roles || "";
       const fullname = json?.fullname;
+
+      // Convert roles string to array
+      const roleArray = roleString.split(",").map((r) => r.trim());
+
+      // Store in localStorage
       localStorage.setItem("token", token);
       localStorage.setItem("email", email);
-      localStorage.setItem("role", role);
+      localStorage.setItem("role", JSON.stringify(roleArray));
+      localStorage.setItem("name", fullname);
 
-      setAuth({ email:email, accessToken:token,role: role, fullname });
+      // Update auth context/state
+      setAuth({ email, accessToken: token, role: roleArray, fullname });
 
-      if (role === "doctor") {
-        navigate("/doctor-dashboard", { replace: true });
+      // Navigate based on role
+      if (roleArray.includes("ROLE_DOCTOR")) {
+        navigate("/doctor/doctor-dashboard", { replace: true });
       } else {
-        if (from.includes("doctor")) navigate("/");
-        else navigate(from, { replace: true });
+        if (from.includes("ROLE_DOCTOR")) {
+          navigate("/");
+        } else {
+          navigate(from, { replace: true });
+        }
       }
     } catch (err) {
-      console.log(err)
-      if (err) {
-        console.log(err.message)
-        const backendMessage = err.response?.data?.message || err.message|| "Login Failed";
-        setErrors({ server: backendMessage });
-      } else {
-        setErrors({ server: "No Server Response" });
-      }
+      console.error(err);
+      const backendMessage =
+        err.response?.data?.message || err.message || "Login Failed";
+      setErrors({ server: backendMessage });
       errRef.current?.focus();
     } finally {
       setSubmitting(false);

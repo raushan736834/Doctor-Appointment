@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import Searchbar from "../Common/Searchbar";
 import useOnline from "../../hooks/useOnline";
 import useAxios from "../../hooks/useAxios";
-
+import api from "../../hooks/useAxios";
 
 function filterData(searchText, data) {
   const filterData = data.filter((ele) =>
@@ -20,7 +20,7 @@ const Body = () => {
   const [searchText, setSearchText] = useState("");
   const [allSpecialist, setAllSpecialist] = useState([]);
   const isOnline = useOnline();
-  const { fetchData, loading } = useAxios();
+  const { loading } = useAxios();
 
   useEffect(() => {
     if (isOnline) {
@@ -30,16 +30,12 @@ const Body = () => {
 
   async function getSpecialist() {
     try {
-      const response = await fetchData({
-        url: SPECIALIST_URL,
-      });
+      const response = await api.get(SPECIALIST_URL);
       const json = response.data;
       setAllSpecialist(json);
     } catch (error) {
       console.log(error);
     }
-    // finally {
-    // }
   }
 
   const handleSearch = () => {
@@ -88,8 +84,9 @@ function CategoryTitle() {
 }
 
 function SpecialistList({ allSpecialist }) {
+  console.log(allSpecialist)
   return (
-    <div className="mx-5 px-4 py-6 mb-5 sm:px-6 lg:px-8 bg-gray-200 rounded-lg flex flex-wrap justify-evenly">
+    <div className="mx-5 px-4 mb-5 sm:px-6 lg:px-8 bg-white rounded-lg flex flex-wrap justify-evenly">
       {allSpecialist?.length === 0 ? (
         <h1>No Specialist Found!!</h1>
       ) : (

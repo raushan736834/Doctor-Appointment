@@ -1,53 +1,59 @@
-import { useState, useEffect, useCallback,useMemo } from "react";
 import axios from "axios";
-import useAuth from "./useAuth";
-export const baseUrl = "http://localhost:8080";
 
-const useAxios = () => {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const { auth } = useAuth();
+const baseUrl = "http://localhost:8080"; // your backend
 
-  const axiosInstance = axios.create({
-      baseURL: baseUrl,
-      timeout: 10000,
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        Authorization: auth?.accessToken ? `Bearer ${auth.accessToken}` : "",
-        withCredentials: true,
-      },
-    });
+const api = axios.create({
+  baseURL: baseUrl,
+  withCredentials: true, 
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
 
-  const fetchData = useCallback(
-    async ({ url, method = "GET", data: bodyData, headers = {},signal } = {}) => {
-      setLoading(true);
-      setError(null);
+// Request Interceptor: attach access token
+api.interceptors.request.use(
+  (config) => {
+    const accessToken = localStorage.getItem("token");
+    if (accessToken) {
+      config.headers.Authorization = `Bearer ${accessToken}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+// Response Interceptor: handle token refresh
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      localStorage.getItem("refreshToken")
+    ) {
+      originalRequest._retry = true;
       try {
-        const response = await axiosInstance({
-          url: url,
-          method: method,
-          data: bodyData,
-          headers: { ...headers },
-          signal:signal
-        });
-        setData(response.data);
-        return response;
-      } catch (err) {
-        console.log(err);
-        setError(
-          err.response?.data?.message || err.message || "An error occurred"
-        );
-        throw err.response?.data;
-      } finally {
-        setLoading(false);
+        const refreshToken = localStorage.getItem("refreshToken");
+        const { data } = await axios.post(`${baseUrl}/auth/refresh-token`, { refreshToken });
+        console.log("Refresh token called")
+        const newAccessToken = data.accessToken;
+        localStorage.setItem("token", newAccessToken);
+
+        // Update Authorization header and retry
+        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+        return api(originalRequest);
+      } catch (refreshError) {
+        console.error("Refresh failed. Logging out.");
+        localStorage.clear();
+        window.location.href = "/auth/login";
+        return Promise.reject(refreshError);
       }
-    },
-    [auth?.accessToken]
-  );
+    }
 
-  return { data, loading, error, fetchData };
-};
+    return Promise.reject(error);
+  }
+);
 
-export default useAxios;
+export default api;

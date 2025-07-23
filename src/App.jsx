@@ -14,7 +14,6 @@ import Body from "./component/UserComponent/Body";
 import Footer from "./component/UserComponent/Footer";
 import AboutUs from "./component/UserComponent/AboutUs";
 import ContactUs from "./component/UserComponent/ContactUS";
-import Error from "./component/UserComponent/Error";
 import DoctorDetails from "./component/UserComponent/DoctorDetails";
 import Login from "./component/AuthComponent/Login";
 import SignUp from "./component/AuthComponent/SignUp";
@@ -24,7 +23,6 @@ import AppointmentDetails from "./component/UserComponent/AppointmentDetails";
 import RequireAuth from "./component/GlobalComponent/RequireAuth";
 import RequireOnline from "./component/GlobalComponent/RequireOnline";
 import DoctorPersonalInfo from "./component/DoctorComponent/DoctorPersonalInfo";
-import DoctorProfile1 from "./component/DoctorComponent/DoctorProfile1";
 import { DateTimeProvider } from "./component/GlobalComponent/DateTimeProvider";
 import UserProfile from "./component/UserComponent/UserProfile";
 import ThankYou from "./component/UserComponent/ThankYou";
@@ -35,27 +33,21 @@ import { ROLES } from "./constants/slots";
 import Appointments from "./component/DoctorComponent/Appointments";
 import DoctorLayout from "./component/DoctorComponent/DoctorLayout";
 import DoctorSetting from "./component/DoctorComponent/DoctorSetting";
+import { Navigate } from "react-router-dom";
+import PageNotFound from "./component/Common/PageNotFound";
 
 const AppLayout = () => {
   const navigate = useNavigate();
   const role = localStorage.getItem("role");
   const { pathname } = useLocation();
 
-  // useEffect(() => {
-  //   if (role === "doctor") {
-  //     navigate("/doctor-dashboard");
-  //   }
-  // }, [role, navigate]);
-
   const accessToken = localStorage.getItem("token");
 
   useEffect(() => {
-    console.log(accessToken);
     const cond =
       pathname === "auth/login" ||
       pathname === "auth/signup" ||
       pathname === "/forget";
-    console.log("cond : ", cond);
     if (accessToken && cond) {
       navigate("/", { redirect: true });
     }
@@ -108,18 +100,15 @@ const App = () => {
               />
               <Route path="booking-details" element={<BookingDetails />} />
               <Route path="doctor" element={<DoctorLayout />}>
-                <Route path="doctor-dashboard" element={<DoctorDashboard />} />
-                <Route
-                  path="/doctor-personalInfo"
-                  element={<DoctorPersonalInfo />}
-                />
+                <Route index element={<Navigate to="dashboard" replace />} />
+                <Route path="dashboard" element={<DoctorDashboard />} />
+                <Route path="personalInfo" element={<DoctorPersonalInfo />} />
                 <Route path="appointments" element={<Appointments />} />
-                <Route path="/doctor-profile1" element={<DoctorProfile1 />} />
                 <Route path="settings" element={<DoctorSetting />} />
               </Route>
             </Route>
           </Route>
-          <Route path="*" element={<Error />} />
+          <Route path="*" element={<PageNotFound />} />
         </Route>
       </Routes>
     </Router>

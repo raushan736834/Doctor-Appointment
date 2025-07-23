@@ -1,7 +1,6 @@
 import { Tab, TabList, Tabs, TabPanels, TabPanel } from "@chakra-ui/react";
 import React from "react";
 import DoctorPersonalInfo from "./DoctorPersonalInfo";
-import DoctorProfile1 from "./DoctorProfile1";
 
 function DataTabs({ data }) {
   return (

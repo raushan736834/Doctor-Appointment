@@ -1,51 +1,31 @@
 import React, { useEffect, useState } from "react";
 import defaultProfile from "../../assets/img/defaultClinicImage.jpg";
 import PopUp from "../Common/PopUp";
-import useAxios from "../../hooks/useAxios";
 import useAuth from "../../hooks/useAuth";
-import AppointmentForm from "./AppointmentForm";
+import { useToast } from "@chakra-ui/react";
+import OverlayLoader from "../Common/Loader";
+import api from "../../hooks/useAxios";
+import RescheduleModal from "../DoctorComponent/RescheduleModal";
 
-const Appointments = () => {
+const BookingDetails = () => {
   const email = localStorage.getItem("email");
   const [showPopup, setShowPopup] = useState(false);
   const [appointments, setAppointments] = useState([]);
-  const [appointmentId, setappointmentId] = useState();
   const [rescheduleAppointment, setRescheduleAppointment] = useState(null);
-  const { fetchData } = useAxios();
-  const { setIsLoading } = useAuth();
+  const [cancelAppointment, setCancelAppointment] = useState(null);
+  const { setIsLoading, isLoading } = useAuth();
+  const toast = useToast();
 
   useEffect(() => {
     if (!email) return;
-    setIsLoading(true);
-    fetchData({
-      url: `appointment/booking/${email}`,
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    })
-      .then((response) => {
-        setAppointments(response.data.reverse());
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching appointments:", error);
-        setIsLoading(false);
-      });
+    fetchAppointments();
   }, [email]);
 
   const fetchAppointments = () => {
     if (!email) return;
     setIsLoading(true);
-    fetchData({
-      url: `appointment/booking/${email}`,
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    })
+    api
+      .get(`appointment/booking/${email}`)
       .then((response) => {
         setAppointments(response.data.reverse());
         setIsLoading(false);
@@ -56,50 +36,59 @@ const Appointments = () => {
       });
   };
 
-  const handleCancelAppointment = async () => {
-    const response = await fetchData({
-      url: `appointment/cancel-appointment`,
-      method: "PUT",
-      data: {
+  const handleCancelAppointment = async (appointment) => {
+    try {
+      if (appointment.selectedPayment === "Online Payment") {
+        const paymentId = appointment.payment.paymentId;
+        const amount = appointment.doctor.consultationFees;
+        const data = {
+          payId: paymentId,
+          amount: amount,
+        };
+        const razorpayResponse = await api.post("api/payment/refund", data);
+        if (!razorpayResponse || razorpayResponse.status !== 200) {
+          throw new Error("Razorpay refund failed");
+        }
+        console.log("Razorpay refund response:", razorpayResponse.data);
+      }
+
+      const body = {
         status: true,
         cancelledBy: "user",
-        appointmentId: appointmentId,
-      },
-    });
-    console.log(response);
-    setShowPopup(false);
-    // Refresh appointments after cancel to show only active appointments
-    setIsLoading(true);
-    fetchData({
-      url: `appointment/booking/${email}`,
-    })
-      .then((response) => {
-        setAppointments(response.data.reverse());
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching appointments:", error);
-        setIsLoading(false);
-      });
-  };
+        appointmentId: appointment.appointmentId,
+      };
+      const response = await api.put(`appointment/cancel-appointment`, body);
+      console.log(response);
+      setShowPopup(false);
+      setIsLoading(true);
 
-  const handleRescheduleApi = async ({ appointmentId, newDate, newTime }) => {
-    setIsLoading(true);
-    try {
-      await fetchData({
-        url: `appointment/reschedule-appointment`,
-        method: "PUT",
-        data: {
-          appointmentId: String(appointmentId),
-          newDate,
-          newTime,
-        },
-      });
-      setRescheduleAppointment(null);
+      if (response.status === 200) {
+        toast({
+          position: "top-center",
+          title: "Appointment Sucessfully Cancelled!",
+          description: "Happy Booking",
+          status: "success",
+          duration: 1500,
+          isClosable: true,
+          containerStyle: { marginTop: 20, marginRight: 5 },
+        });
+      } else {
+        toast({
+          position: "top-center",
+          title: "Oops! Appointment Cancelling Fail",
+          description: "Try Again",
+          status: "error",
+          duration: 1500,
+          isClosable: true,
+          containerStyle: { marginTop: 20, marginRight: 5 },
+        });
+      }
+
       fetchAppointments();
     } catch (error) {
-      console.error("Error rescheduling appointment:", error);
+      console.error("Error cancelling appointment:", error);
       setIsLoading(false);
+      setShowPopup(false);
     }
   };
 
@@ -108,12 +97,19 @@ const Appointments = () => {
     setShowPopup(false);
   };
 
-  const handleClick = (data) => {
-    setappointmentId(data.appointmentId);
+  const handleRescheduleSuccess = () => {
+    fetchAppointments();
+  };
+
+  const handleClick = (appointment) => {
+    setCancelAppointment(appointment);
     setShowPopup(true);
   };
 
-  // --- Rendered Components ---
+  const goHome = () => {
+    window.location.href = "/";
+  };
+
   function AppointmentCard({ appointment, onCancel, onReschedule }) {
     if (appointments == null) return "No Booking Found";
     return (
@@ -191,10 +187,49 @@ const Appointments = () => {
   }
 
   // --- Main Render ---
+  if (isLoading) return <OverlayLoader />;
   return (
     <>
       {appointments.length === 0 ? (
-        <p>No appointments found.</p>
+        <div className="flex min-h-[calc(100vh-140px)] justify-center items-center bg-gradient-to-br from-gray-50 to-blue-50 p-4">
+          <div className="text-center max-w-md w-full">
+            {/* Illustration */}
+            <div className="w-32 h-32 mx-auto mb-8 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center shadow-lg animate-pulse">
+              <span className="text-6xl">📅</span>
+            </div>
+
+            {/* Main content card */}
+            <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-white/20">
+              <h2 className="text-3xl font-bold text-gray-800 mb-4">
+                No Appointments Booked!
+              </h2>
+
+              <p className="text-gray-600 mb-8 leading-relaxed">
+                Your calendar is empty. Ready to schedule your first appointment
+                and get started on your journey?
+              </p>
+
+              {/* Action buttons */}
+              <div className="space-y-4">
+                <button
+                  onClick={goHome}
+                  className="w-full px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-lg flex items-center justify-center gap-3"
+                >
+                  <span className="text-xl">🏠</span>
+                  Back to Home
+                </button>
+
+                <button
+                  onClick={() => (window.location.href = "/book-appointment")}
+                  className="w-full px-8 py-4 bg-white border-2 border-blue-500 text-blue-500 hover:bg-blue-50 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-lg flex items-center justify-center gap-3"
+                >
+                  <span className="text-xl">📅</span>
+                  Book New Appointment
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       ) : (
         <>
           <AppointmentList
@@ -209,31 +244,18 @@ const Appointments = () => {
               show={showPopup}
               title={"Cancel Your Appointment"}
               autoDismiss={false}
-              handleCancelAppointment={handleCancelAppointment}
+              handleCancelAppointment={() =>
+                handleCancelAppointment(cancelAppointment)
+              }
               handleRescheduleAppointment={() => setShowPopup(false)}
             />
           )}
           {rescheduleAppointment && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-              <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg">
-                <AppointmentForm
-                  specialization={
-                    rescheduleAppointment.doctor?.specialization ||
-                    rescheduleAppointment.specialization
-                  }
-                  isReschedule={true}
-                  appointmentId={rescheduleAppointment.appointmentId}
-                  onReschedule={handleRescheduleApi}
-                  onClose={() => setRescheduleAppointment(null)}
-                />
-                <button
-                  className="mt-4 px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-700"
-                  onClick={() => setRescheduleAppointment(null)}
-                >
-                  Close
-                </button>
-              </div>
-            </div>
+            <RescheduleModal
+              rescheduleAppointment={rescheduleAppointment}
+              onClose={() => setRescheduleAppointment(null)}
+              onRescheduleSuccess={handleRescheduleSuccess}
+            />
           )}
         </>
       )}
@@ -241,4 +263,4 @@ const Appointments = () => {
   );
 };
 
-export default Appointments;
+export default BookingDetails;

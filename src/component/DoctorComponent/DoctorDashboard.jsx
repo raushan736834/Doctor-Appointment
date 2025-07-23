@@ -1,4 +1,5 @@
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
+import DoctorDashboardStats from "./DoctorDashboardStats";
 
 const appointments = [
   {
@@ -59,17 +60,12 @@ const appointments = [
   },
 ];
 
-const statusStyles = {
-  Confirmed: "bg-blue-100 text-blue-800",
-  Pending: "bg-yellow-100 text-yellow-800",
-};
-
 const ITEMS_PER_PAGE = 5;
 
-const AppointmentDashboard = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+const DoctorDashboard = () => {
   const [currentPage, setCurrentPage] = useState(1);
-  const sidebarRef = useRef(null);
+  const name = localStorage.getItem("name")?.split(" ")[0] || "Doctor";
+  const patient = 0; // Replace with actual patient count
 
   const totalPages = Math.ceil(appointments.length / ITEMS_PER_PAGE);
   const paginatedAppointments = appointments.slice(
@@ -77,125 +73,107 @@ const AppointmentDashboard = () => {
     currentPage * ITEMS_PER_PAGE
   );
 
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (
-        sidebarRef.current &&
-        !sidebarRef.current.contains(event.target) &&
-        sidebarOpen
-      ) {
-        setSidebarOpen(false);
-      }
-    }
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [sidebarOpen]);
-
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col md:flex-row">
-      {/* Hamburger Icon */}
-      <div className="bg-white px-4 py-3 shadow md:hidden flex justify-between items-center fixed top-0 left-0 right-0 z-50 h-14">
-        <button
-          onClick={() => setSidebarOpen(!sidebarOpen)}
-          aria-label={sidebarOpen ? "Close sidebar" : "Open sidebar"}
-        >
-          <svg
-            className="w-6 h-6 text-gray-700"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d={
-                sidebarOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"
-              }
-            />
-          </svg>
-        </button>
+    <div className="p-4 space-y-6 bg-gradient-to-b from-[#f0f4ff] to-[#ffffff] min-h-full">
+      {/* Header */}
+      <div className="bg-white rounded-2xl shadow-lg p-6 space-y-2">
+        <h2 className="text-xl font-semibold text-indigo-700">
+          Good Morning, Dr. {name}!
+        </h2>
+        <p className="text-sm text-gray-500">
+          You have {patient} patients waiting today.
+        </p>
       </div>
-      {/* Main Content */}
-      <main className="flex-1 p-4 md:p-8">
-        <h2 className="text-2xl font-semibold mb-6">Upcoming Appointments</h2>
 
-        <div className="hidden md:grid grid-cols-5 gap-4 px-4 py-2 text-sm font-semibold text-gray-600 bg-gray-100 rounded-t-md">
+      {/* Dashboard Stats */}
+      <DoctorDashboardStats />
+
+      {/* Appointments */}
+      <div className="bg-white rounded-2xl shadow-lg p-6 space-y-4">
+        <div className="border-b pb-2">
+          <h2 className="text-xl font-semibold text-indigo-700">
+            Upcoming Appointments
+          </h2>
+          <p className="text-sm text-gray-500">
+            These are your appointments for today.
+          </p>
+        </div>
+        <div className="hidden md:grid grid-cols-5 gap-4 px-4 py-2 text-sm font-semibold text-black text-center">
           <div>Date</div>
           <div>Time</div>
           <div>Patient</div>
           <div>Reason</div>
           <div>Status</div>
         </div>
-
-        {paginatedAppointments.map((appt) => (
-          <div
-            key={appt.id}
-            className="grid grid-cols-1 md:grid-cols-5 gap-2 md:gap-4 px-4 py-4 bg-white border-b text-sm text-gray-700 md:items-center"
-          >
-            <div>
-              <span className="md:hidden font-semibold">Date: </span>
-              {appt.date}
+        <div className="space-y-3">
+          {paginatedAppointments.map((appt) => (
+            <div
+              key={appt.id}
+              className="bg-gray-100 rounded-2xl shadow-md hover:shadow-xl hover:scale-[1.01] transition transform p-4 grid grid-cols-1 md:grid-cols-5 gap-2 text-sm text-gray-800 items-center text-center"
+            >
+              <div className="font-medium">
+                <span className="md:hidden font-semibold">Date: </span>
+                {appt.date}
+              </div>
+              <div>
+                <span className="md:hidden font-semibold">Time: </span>
+                {appt.time}
+              </div>
+              <div>
+                <span className="md:hidden font-semibold">Patient: </span>
+                {appt.patient}
+              </div>
+              <div className="text-purple-600 font-medium">
+                <span className="md:hidden font-semibold">Reason: </span>
+                {appt.reason}
+              </div>
+              <div>
+                <span className="md:hidden font-semibold">Status: </span>
+                <span
+                  className={`px-2 py-0.5 inline-flex text-xs leading-5 font-medium rounded-full ${
+                    appt.status === "Confirmed"
+                      ? "bg-emerald-100 text-emerald-800"
+                      : "bg-yellow-100 text-yellow-800"
+                  }`}
+                >
+                  {appt.status}
+                </span>
+              </div>
             </div>
-            <div>
-              <span className="md:hidden font-semibold">Time: </span>
-              {appt.time}
-            </div>
-            <div>
-              <span className="md:hidden font-semibold">Patient: </span>
-              {appt.patient}
-            </div>
-            <div>
-              <span className="md:hidden font-semibold">Reason: </span>
-              {appt.reason}
-            </div>
-            <div>
-              <span className="md:hidden font-semibold">Status: </span>
-              <span
-                className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                  statusStyles[appt.status]
-                }`}
-              >
-                {appt.status}
-              </span>
-            </div>
-          </div>
-        ))}
-
-        {/* Pagination */}
-        <div className="flex justify-between items-center mt-6">
-          <button
-            disabled={currentPage === 1}
-            onClick={() => setCurrentPage((prev) => prev - 1)}
-            className={`px-4 py-2 rounded ${
-              currentPage === 1
-                ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-                : "bg-blue-500 text-white hover:bg-blue-600"
-            }`}
-          >
-            Previous
-          </button>
-          <span className="text-gray-600">
-            Page {currentPage} of {totalPages}
-          </span>
-          <button
-            disabled={currentPage === totalPages}
-            onClick={() => setCurrentPage((prev) => prev + 1)}
-            className={`px-4 py-2 rounded ${
-              currentPage === totalPages
-                ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-                : "bg-blue-500 text-white hover:bg-blue-600"
-            }`}
-          >
-            Next
-          </button>
+          ))}
         </div>
-      </main>
+      </div>
+
+      {/* Pagination */}
+      <div className="flex justify-between items-center mt-4">
+        <button
+          disabled={currentPage === 1}
+          onClick={() => setCurrentPage((prev) => prev - 1)}
+          className={`px-4 py-2 rounded-lg font-medium transition ${
+            currentPage === 1
+              ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+              : "bg-gradient-to-r from-indigo-500 to-purple-500 text-white hover:opacity-90"
+          }`}
+        >
+          Previous
+        </button>
+        <span className="text-gray-600">
+          Page {currentPage} of {totalPages}
+        </span>
+        <button
+          disabled={currentPage === totalPages}
+          onClick={() => setCurrentPage((prev) => prev + 1)}
+          className={`px-4 py-2 rounded-lg font-medium transition ${
+            currentPage === totalPages
+              ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+              : "bg-gradient-to-r from-indigo-500 to-purple-500 text-white hover:opacity-90"
+          }`}
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
 };
 
-export default AppointmentDashboard;
+export default DoctorDashboard;

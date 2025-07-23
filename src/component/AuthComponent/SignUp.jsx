@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useRef, useState, useEffect } from "react";
 import axios from "../../api/axios";
 import useAuth from "../../hooks/useAuth";
+import { useToast } from "@chakra-ui/react";
 
 const REGISTER_URL = "/auth/signup";
 
@@ -38,9 +39,18 @@ const SignUp = () => {
   const [success, setSuccess] = useState(false);
   const { setIsLoading } = useAuth();
   const [checked, setChecked] = useState(false);
-
+  const toast = useToast();
+  
   useEffect(() => {
     if (success) {
+      toast({
+        position: 'top',
+        title: "Account created.",
+        description: "We've created your account for you.",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
       navigate("/auth/login");
     }
   }, [success, navigate]);

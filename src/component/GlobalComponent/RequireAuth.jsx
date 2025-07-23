@@ -1,29 +1,20 @@
 import { useLocation, Navigate, Outlet } from "react-router-dom";
-import { useState } from "react";
+import useAuth from "../../hooks/useAuth"; // adjust the path as per your structure
 
 const RequireAuth = () => {
   const location = useLocation();
-  const [accessToken] = useState(localStorage.getItem("token"));
-  // const {accessToken} = useAuth();
+  const { auth } = useAuth();
 
-  // useEffect(() => {
-  //   const handleStorageChange = () => {
-  //     setAccessToken(localStorage.getItem("token")); // Update state when localStorage changes
-  //   };
-
-  //   window.addEventListener("storage", handleStorageChange);
-  //   return () => window.removeEventListener("storage", handleStorageChange);
-  // }, []);
-
-  return accessToken ? (
+  return auth?.accessToken ? (
     <Outlet />
   ) : (
     <Navigate
-      to="auth/login"
-      state={{ from: location}}
+      to="/auth/login"
+      state={{ from: location }}
       replace
     />
   );
 };
 
 export default RequireAuth;
+

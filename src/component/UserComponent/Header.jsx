@@ -9,6 +9,7 @@ import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import useAuth from "../../hooks/useAuth";
 import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import ProfileButton from "../Common/ProfileButton";
+import { useToast } from "@chakra-ui/react";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -22,8 +23,16 @@ function getNavigation(role, location) {
       current:
         location.pathname === "/" || location.pathname === "/doctor-dashboard",
     },
-    { name: "About Us", href: "/about", current: location.pathname === "/about" },
-    { name: "Contact Us", href: "/contact", current: location.pathname === "/contact" },
+    {
+      name: "About Us",
+      href: "/about",
+      current: location.pathname === "/about",
+    },
+    {
+      name: "Contact Us",
+      href: "/contact",
+      current: location.pathname === "/contact",
+    },
   ];
 }
 
@@ -32,6 +41,7 @@ const Header = () => {
   const [role, setRole] = useState(localStorage.getItem("role"));
   const location = useLocation();
   const headerRef = useRef(null);
+  const toast = useToast();
 
   useEffect(() => {
     const storedRole = localStorage.getItem("role");
@@ -42,11 +52,21 @@ const Header = () => {
     setAuth({});
     localStorage.clear();
     setRole("");
-    console.log(auth)
-    // window.dispatchEvent(new Event("storage"));
+    console.log(auth);
+    toast({
+      position: "top-right",
+      title: "Logout successful!",
+      status: "success",
+      duration: 2000,
+      isClosable: true,
+      containerStyle: { marginTop: 20, marginRight: 5 },
+    });
   }, [setAuth]);
 
-  const navigation = useMemo(() => getNavigation(role, location), [role, location]);
+  const navigation = useMemo(
+    () => getNavigation(role, location),
+    [role, location]
+  );
 
   return (
     <Disclosure as="nav" className="bg-gray-800">
@@ -107,7 +127,7 @@ const Header = () => {
 
                 {/* Profile dropdown / button */}
                 <div className="flex items-center">
-                  <ProfileButton handleLogout={handleLogout}/>
+                  <ProfileButton handleLogout={handleLogout} />
                 </div>
               </div>
             </div>

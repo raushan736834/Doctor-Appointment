@@ -1,0 +1,142 @@
+[
+  {
+    "id": 8,
+    "image": "https://cdn-thumbs.imagevenue.com/d4/71/c7/ME194HGH_t.jpg",
+    "specialist": "Ayurveda",
+    "specialist_of": "Holistic Healing",
+    "description": "Ayurveda specialists use ancient Indian holistic practices to treat health issues by balancing mind, body, and spirit using herbs, diet plans, detox therapies, and lifestyle guidance to enhance your natural healing and immunity."
+  },
+  {
+    "id": 6,
+    "image": "https://cdn-thumbs.imagevenue.com/16/07/f1/ME194HGI_t.jpg",
+    "specialist": "Cardiologist",
+    "specialist_of": "Heart Care",
+    "description": "Cardiologists specialize in diagnosing and treating heart and blood vessel conditions, including hypertension, chest pain, arrhythmias, and cholesterol issues, helping patients improve their heart health and prevent future complications."
+  },
+  {
+    "id": 5,
+    "image": "https://cdn-thumbs.imagevenue.com/6a/d0/af/ME194HGJ_t.jpg",
+    "specialist": "Dermatologist",
+    "specialist_of": "Skin Care",
+    "description": "Dermatologists diagnose and treat conditions related to the skin, hair, and nails, including acne, eczema, psoriasis, hair loss, and skin allergies. They also offer cosmetic treatments for skin rejuvenation and anti-aging."
+  },
+  {
+    "id": 11,
+    "image": "https://cdn-thumbs.imagevenue.com/c6/23/78/ME194HGK_t.jpg",
+    "specialist": "Ear-Nose-Throat (ENT) Specialist",
+    "specialist_of": "ENT Care",
+    "description": "ENT specialists manage conditions involving the ear, nose, and throat, including hearing loss, sinusitis, allergies, tonsillitis, and voice issues, providing medical and surgical care to improve breathing, hearing, and overall ENT health."
+  },
+  {
+    "id": 4,
+    "image": "https://cdn-thumbs.imagevenue.com/ae/b7/b0/ME194HGL_t.jpg",
+    "specialist": "Gastroenterologist",
+    "specialist_of": "Digestive Health",
+    "description": "Gastroenterologists focus on diagnosing and treating digestive system issues, including acid reflux, ulcers, irritable bowel syndrome (IBS), liver diseases, and chronic stomach pain, helping patients maintain a healthy digestive system."
+  },
+  {
+    "id": 1,
+    "image": "https://cdn-thumbs.imagevenue.com/be/12/34/ME194HGM_t.jpg",
+    "specialist": "General Physician",
+    "specialist_of": "Primary Care",
+    "description": "General physicians provide comprehensive primary healthcare, managing fevers, infections, lifestyle diseases like diabetes and hypertension, and conducting routine health checkups to monitor and maintain overall wellness."
+  },
+  {
+    "id": 16,
+    "image": "https://cdn-thumbs.imagevenue.com/d6/10/86/ME194HGN_t.jpg",
+    "specialist": "General Surgeon",
+    "specialist_of": "Surgical Care",
+    "description": "General surgeons perform surgical procedures for conditions such as appendicitis, hernias, gallstones, and minor soft tissue surgeries, using both traditional and minimally invasive methods to ensure effective recovery."
+  },
+  {
+    "id": 3,
+    "image": "https://cdn-thumbs.imagevenue.com/6a/99/6c/ME194HGO_t.jpg",
+    "specialist": "Gynecologist & Obstetrician",
+    "specialist_of": "Women's Health",
+    "description": "Gynecologists and obstetricians specialize in women's reproductive health, offering care for menstrual issues, fertility, pregnancy monitoring, childbirth, and menopause management to ensure women's health at every stage."
+  },
+  {
+    "id": 12,
+    "image": "https://cdn-thumbs.imagevenue.com/b6/a3/c5/ME194HGP_t.jpg",
+    "specialist": "Homoeopath",
+    "specialist_of": "Natural Healing",
+    "description": "Homeopaths use natural, diluted remedies to stimulate the body's self-healing abilities, treating chronic conditions, allergies, stress-related issues, and lifestyle concerns without side effects for holistic well-being."
+  },
+  {
+    "id": 7,
+    "image": "https://cdn-thumbs.imagevenue.com/db/ee/e0/ME194HGQ_t.jpg",
+    "specialist": "Neonatologist",
+    "specialist_of": "Newborn Care",
+    "description": "Neonatologists care for newborns, especially premature and ill babies, managing breathing issues, infections, and birth-related complications, ensuring specialized care and monitoring during the critical first weeks of life."
+  },
+  {
+    "id": 9,
+    "image": "https://cdn-thumbs.imagevenue.com/46/17/d5/ME194HGR_t.jpg",
+    "specialist": "Nephrologist",
+    "specialist_of": "Kidney Care",
+    "description": "Nephrologists diagnose and manage kidney-related conditions, including chronic kidney disease, kidney stones, hypertension related to kidney health, and dialysis care to maintain and improve kidney function."
+  },
+  {
+    "id": 18,
+    "image": "https://cdn-thumbs.imagevenue.com/9b/7a/3d/ME194HGS_t.jpg",
+    "specialist": "Neurologist",
+    "specialist_of": "Brain & Nerve Care",
+    "description": "Neurologists specialize in diagnosing and managing disorders of the brain, nerves, and spinal cord, including migraines, epilepsy, stroke recovery, neuropathy, and movement disorders like Parkinson's disease."
+  },
+  {
+    "id": 13,
+    "image": "https://cdn-thumbs.imagevenue.com/ec/3b/ec/ME194HGT_t.jpg",
+    "specialist": "Ophthalmologist",
+    "specialist_of": "Eye Care",
+    "description": "Ophthalmologists provide comprehensive eye care, diagnosing and treating eye diseases such as cataracts, glaucoma, and vision problems, and performing eye surgeries to maintain and restore vision health."
+  },
+  {
+    "id": 17,
+    "image": "https://cdn-thumbs.imagevenue.com/9d/a6/27/ME194HGU_t.jpg",
+    "specialist": "Orthopedist",
+    "specialist_of": "Bone & Joint Care",
+    "description": "Orthopedists manage bone, joint, and muscle-related issues including fractures, arthritis, back pain, sports injuries, and post-surgical rehabilitation to restore mobility and reduce pain effectively."
+  },
+  {
+    "id": 2,
+    "image": "https://cdn-thumbs.imagevenue.com/6c/12/f8/ME194HGV_t.jpg",
+    "specialist": "Paediatrician",
+    "specialist_of": "Child Health",
+    "description": "Paediatricians specialize in child healthcare, providing routine checkups, vaccinations, growth and development monitoring, and treating common illnesses to ensure children's health and well-being."
+  },
+  {
+    "id": 15,
+    "image": "https://cdn-thumbs.imagevenue.com/85/66/7c/ME194HGW_t.jpg",
+    "specialist": "Physiotherapist",
+    "specialist_of": "Physical Therapy",
+    "description": "Physiotherapists assist in recovery from injuries and surgeries, offering exercises and therapies to relieve pain, improve mobility, and strengthen muscles, aiding in long-term physical health."
+  },
+  {
+    "id": 10,
+    "image": "https://cdn-thumbs.imagevenue.com/b6/9f/b3/ME194HGX_t.jpg",
+    "specialist": "Psychiatrist",
+    "specialist_of": "Mental Health",
+    "description": "Psychiatrists provide diagnosis and treatment for mental health issues such as depression, anxiety, stress, and mood disorders, offering therapy and medication support for emotional and mental wellness."
+  },
+  {
+    "id": 14,
+    "image": "https://cdn-thumbs.imagevenue.com/0c/07/09/ME194HGY_t.jpg",
+    "specialist": "Sexologist",
+    "specialist_of": "Sexual Health",
+    "description": "Sexologists offer consultation and treatment for sexual health concerns, intimacy issues, and reproductive wellness, helping individuals and couples achieve a healthier sexual life with privacy and care."
+  },
+  {
+    "id": 20,
+    "image": "https://cdn-thumbs.imagevenue.com/2f/73/88/ME194HGZ_t.jpg",
+    "specialist": "Veterinarian",
+    "specialist_of": "Animal Care",
+    "description": "Veterinarians care for pets and animals, providing vaccinations, treatment for illnesses, routine health checks, and surgical care, ensuring the health and wellness of your furry companions."
+  },
+  {
+    "id": 19,
+    "image": "https://cdn-thumbs.imagevenue.com/29/dc/12/ME194HH0_t.jpg",
+    "specialist": "Yoga & Naturopathy",
+    "specialist_of": "Natural Wellness",
+    "description": "Yoga and Naturopathy specialists guide you through yoga practices, meditation, detox plans, and natural therapies to manage stress, enhance immunity, and promote holistic health without medications."
+  }
+]

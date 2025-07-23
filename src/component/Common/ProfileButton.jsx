@@ -11,8 +11,6 @@ function classNames(...classes) {
 const ProfileButton = ({handleLogout}) => {
   const { auth } = useAuth();
   const role = localStorage.getItem("role");
-  console.log(role)
-
   return (
     <div className="flex w-full items-center">
       <Menu as="div" className="relative">

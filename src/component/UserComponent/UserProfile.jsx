@@ -2,15 +2,16 @@ import { ChevronDownIcon } from "@heroicons/react/16/solid";
 import useAuth from "../../hooks/useAuth";
 import Login from "../AuthComponent/Login";
 import { useState, useEffect } from "react";
-import axios from "../../api/axios";
-import useAxios from "../../hooks/useAxios";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "@chakra-ui/react";
+import api from "../../hooks/useAxios";
+
+const USER_UPDATE_URL = '/user/update-profile';
 
 const UserProfile = () => {
   const { auth } = useAuth();
   const accessToken = auth.accessToken;
   const email = localStorage.getItem("email");
-  const { fetchData, loading } = useAxios();
-  console.log(email);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [phone, setPhone] = useState("");
@@ -21,6 +22,9 @@ const UserProfile = () => {
   const [pincode, setPincode] = useState("");
   const [country, setCountry] = useState("");
   const [errMsg, setErrMsg] = useState("");
+  const [initialData, setInitialData] = useState({});
+  const navigate = useNavigate();
+  const toast = useToast();
 
   useEffect(() => {
     if (email) {
@@ -30,9 +34,10 @@ const UserProfile = () => {
 
   const fetchUserData = async () => {
     try {
-      const response = await fetchData({
-        url: `/user-profile/${email}`,
-      });
+      const response = await api.get(`/user/${email}`);
+      // fetchData({
+      //   url: `/user/${email}`,
+      // });
 
       console.log(response);
       const fullName = response.data.fullName;
@@ -46,6 +51,19 @@ const UserProfile = () => {
       setState(response.data.state || "");
       setCity(response.data.city || "");
       setPincode(response.data.pincode || "");
+
+      const userData = {
+        email,
+        fullName: `${first} ${last}`,
+        phone: response.data.phone || "",
+        gender: response.data.gender || "",
+        country: response.data.country || "",
+        address: response.data.address || "",
+        state: response.data.state || "",
+        city: response.data.city || "",
+        pincode: response.data.pincode || "",
+      };
+      setInitialData(userData);
     } catch (err) {
       setErrMsg("Failed to fetch user data");
     }
@@ -53,35 +71,62 @@ const UserProfile = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const formData = {
+      email,
+      fullName: `${firstName} ${lastName}`,
+      phone,
+      gender,
+      address,
+      state,
+      country,
+      pincode,
+      city,
+    };
+  
+    const isChanged = Object.keys(formData).some(
+      (key) => formData[key] !== initialData[key]
+    );
+    if (!isChanged) {
+      return;
+    }
     try {
-      const formData = {
-        email,
-        fullName: `${firstName} ${lastName}`,
-        phone,
-        gender,
-        address,
-        state,
-        country,
-        pincode,
-        city,
-      };
-      const response = await axios.put(
-        `/user-profile/update`,
-        JSON.stringify(formData),
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-          },
-          withCredentials: true,
-        }
-      );
-      console.log(formData);
-      console.log(response.data);
-      alert("Profile updated successfully");
+      const response = await api.put(USER_UPDATE_URL,formData);
+      // fetchData({
+      //   url: USER_UPDATE_URL,
+      //   method: "PUT",
+      //   data: formData,
+      // });
+      
+      setInitialData(formData); 
+      toast({
+          position: "top-right",
+          title: response.data,
+          status: "success",
+          duration: 2000,
+          isClosable: true,
+          containerStyle: { marginTop: 20, marginRight: 5 },
+        });
     } catch (err) {
       setErrMsg("Failed to update profile");
+      let toastMsg = "No response from the server";
+      if (err && err.response && err.response.data) {
+        toastMsg = err.response.data;
+      } else if (err && err.message) {
+        toastMsg = err.message;
+      }
+      toast({
+          position: "top-right",
+          title: toastMsg,
+          status: "error",
+          duration: 2000,
+          isClosable: true,
+          containerStyle: { marginTop: 20, marginRight: 5 },
+        });
     }
+  };
+
+  const handleCancel = () => {
+    navigate("/");
   };
 
   return (
@@ -89,8 +134,8 @@ const UserProfile = () => {
       {!accessToken ? (
         <Login />
       ) : (
-        <main className="sm:m-20 bg-white">
-          <div className="p-20 bg-gray-200 rounded-lg">
+        <main className="sm:m-10 bg-white">
+          <div className="p-10 bg-gray-200 rounded-lg">
             <form onSubmit={handleSubmit}>
               <div className="space-y-12">
                 <div className="border-b border-gray-900/10 pb-12">
@@ -313,6 +358,7 @@ const UserProfile = () => {
                 <button
                   type="button"
                   className="text-sm/6 font-semibold text-gray-900 w-24"
+                  onClick={handleCancel}
                 >
                   Cancel
                 </button>

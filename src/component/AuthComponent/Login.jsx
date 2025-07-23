@@ -1,10 +1,12 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import useAuth from "../../hooks/useAuth";
 import logo from "../../assets/img/appointDoctor.jpg";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import useAxios from "../../hooks/useAxios";
+import { useToast } from "@chakra-ui/react";
+import api from "../../hooks/useAxios";
 
 const LOGIN_URL = "/auth/login";
 
@@ -15,12 +17,9 @@ const Login = () => {
   const from = location.state?.from?.pathname || "/";
   const errRef = useRef();
   const { fetchData } = useAxios();
+  const toast = useToast();
 
-  useEffect(() => {
-    document.getElementById("email")?.focus();
-  }, []);
-
-  const validationSchema = Yup.object().shape({
+  const validationSchema = Yup.object({
     email: Yup.string()
       .email("*Invalid email address")
       .required("*Email is required"),
@@ -29,40 +28,57 @@ const Login = () => {
 
   const handleLogin = async (values, { setSubmitting, setErrors }) => {
     try {
-      const response = await fetchData({
-        url: LOGIN_URL,
-        method: "POST",
-        data: {
+      const data= {
           email: values.email,
           password: values.password,
-        },
-      });
+        }
+      const json = await api.post(LOGIN_URL, data)
+      // fetchData({
+      //   url: LOGIN_URL,
+      //   method: "POST",
+      //   data: {
+      //     email: values.email,
+      //     password: values.password,
+      //   },
+      // });
 
-      console.log(response.data);
-      const json = response?.data?.body;
-      console.log(json);
 
-      const token = json?.token;
-      const email = json?.email;
-      const roleString = json?.roles || "";
-      const fullname = json?.fullname;
+      const token = json.data?.token;
+      const email = json.data?.email;
+      const roleString = json.data?.roles || "";
+      const fullname = json.data?.fullname;
+      const refreshToken = json.data?.refreshToken;
 
-      // Convert roles string to array
       const roleArray = roleString.split(",").map((r) => r.trim());
-
-      // Store in localStorage
       localStorage.setItem("token", token);
       localStorage.setItem("email", email);
       localStorage.setItem("role", JSON.stringify(roleArray));
       localStorage.setItem("name", fullname);
+      localStorage.setItem("refreshToken",refreshToken);
 
-      // Update auth context/state
       setAuth({ email, accessToken: token, role: roleArray, fullname });
 
-      // Navigate based on role
       if (roleArray.includes("ROLE_DOCTOR")) {
-        navigate("/doctor/doctor-dashboard", { replace: true });
+        toast({
+          position: "top-right",
+          title: "Login successful!",
+          description: "Welcome back, Doctor.",
+          status: "success",
+          duration: 2000,
+          isClosable: true,
+          containerStyle: { marginTop: 20, marginRight: 5 },
+        });
+        navigate("/doctor/dashboard", { replace: true });
       } else {
+        toast({
+          position: "top-right",
+          title: "Login successful!",
+          description: `Welcome back, ${fullname || email}!`,
+          status: "success",
+          duration: 2000,
+          isClosable: true,
+          containerStyle: { marginTop: 20, marginRight: 5 },
+        });
         if (from.includes("ROLE_DOCTOR")) {
           navigate("/");
         } else {

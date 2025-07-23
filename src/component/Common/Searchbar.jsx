@@ -1,40 +1,72 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import AutoSuggestion from "./AutoSuggestion";
+import { useNavigate } from "react-router-dom";
+import api from "../../hooks/useAxios";
 
-const Searchbar = ({ searchText, onChange, onSearch }) => {
-  const [doctorData, setDoctorData] = useState([]);
+const Searchbar = ({ searchText, onChange }) => {
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [suggestions, setSuggestions] = useState([]);
+  const navigate = useNavigate();
+  const debounceRef = useRef();
+  
 
+  // Fetch suggestions as user types
   useEffect(() => {
-    getDoctor();
-  }, []);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    if (searchText.trim() === "") {
+      setSuggestions([]);
+      setShowDropdown(false);
+      return;
+    }
+    debounceRef.current = setTimeout(() => {
+      const fetchSuggestions = async () => {
+        try {
+          const response = await api.get(`/api/public/search?keyword=${searchText}`);
+          // fetchData({
+          //   url: `/api/public/search?keyword=${searchText}`,
+          // });
+          setSuggestions(response?.data || []);
+          setShowDropdown((response?.data || []).length > 0);
+        } catch (error) {
+          setSuggestions([]);
+          setShowDropdown(false);
+        }
+      };
+      fetchSuggestions();
+    }, 400);
+    return () => clearTimeout(debounceRef.current);
+  }, [searchText, api]);
 
-  async function getDoctor() {
-    const url = `https://raushan736834.github.io/host_api/DoctorData.json`;
-    const data = await fetch(url);
-    const json = await data.json();
-    setDoctorData(json);
-  }
+  const handleSuggestionClick = (doctor) => {
+    onChange({ target: { value: doctor.doctorName } });
+    setShowDropdown(false);
+    navigate(`/specialist/${doctor.specialization}`, { state: { doctor } });
+  };
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
-      <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 items-center">
-        <input
-          type="text"
-          className="w-full sm:w-80 px-4 py-2 border-2 rounded-lg border-gray-500"
-          placeholder="Search doctors, clinics, hospitals"
-          value={searchText}
-          onChange={onChange}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              onSearch();
-            }
-          }}
-        />
-        <button
-          className="w-full sm:w-auto px-6 py-2 bg-gray-500 text-gray-200 font-medium rounded-md hover:bg-gray-800 hover:text-white focus:outline-none focus:ring-2 focus:ring-gray-300"
-          onClick={onSearch}
-        >
-          Search
-        </button>
+    <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8 relative">
+      <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 items-center relative">
+        <div className="w-full sm:w-80 relative">
+          <input
+            type="text"
+            className="w-full px-4 py-2 border-2 rounded-lg border-gray-500"
+            placeholder="Search doctors, clinics, hospitals"
+            value={searchText}
+            onChange={onChange}
+            onFocus={() => setShowDropdown(suggestions.length > 0)}
+            onBlur={() => setTimeout(() => setShowDropdown(false), 150)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                setShowDropdown(false);
+              }
+            }}
+          />
+          <AutoSuggestion
+            suggestions={searchText.trim() === "" ? [] : suggestions}
+            onSuggestionClick={handleSuggestionClick}
+            showDropdown={showDropdown && searchText.trim() !== ""}
+          />
+        </div>
       </div>
     </div>
   );

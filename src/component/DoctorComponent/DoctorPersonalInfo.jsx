@@ -1,81 +1,109 @@
 import { useState, useRef, useEffect } from "react";
 import { Formik, Field, Form, ErrorMessage, FieldArray } from "formik";
 import * as Yup from "yup";
-import useAxios from "../../hooks/useAxios";
-
 import "react-datepicker/dist/react-datepicker.css";
+import api from "../../hooks/useAxios";
+import OverlayLoader from "../Common/Loader";
+import useAuth from "../../hooks/useAuth";
 
+const ADD_DOCTOR_DATA = "api/user/addDoctor";
 const ALL_SPECIALIST_URL = "api/user/allSpecialist";
+
+function uuid() {
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
 
 const DoctorPersonalInfo = () => {
   const errRef = useRef();
   const [errMsg, setErrMsg] = useState("");
-  const [success, setSuccess] = useState(false);
   const [specialist, setSpecialist] = useState([]);
-  const [name, setName] = useState(localStorage.getItem("name") || "");
+  const name = localStorage.getItem("name");
+  const { setIsLoading, isLoading } = useAuth();
   const email = localStorage.getItem("email");
-  const { fetchData } = useAxios();
-
+  const [doctorId, setDoctorId] = useState("");
+  const [fetchData, setFetchData] = useState([]);
   const currentYear = new Date().getFullYear();
   const years = Array.from(new Array(60), (val, index) => currentYear - index);
 
-  // const fetchUserData = async () => {
-  //   try {
-  //     const response = await axios.get(`http://localhost:8080/doctor/${email}`);
-  //     setFetchName(response.data);
-  //     console.log(response);
+  const FETCH_URL = `/api/user/${email}`;
 
-  //     setLoading(false); // Set loading to false after data is fetched
-  //   } catch (err) {
-  //     setLoading(false);
-  //   }
-  // };
-
+  const fetchUserData = async () => {
+    setIsLoading(true);
+    try {
+      const response = await api.get(FETCH_URL);
+      console.log(response);
+      setFetchData(response.data);
+      setDoctorId(response.data?.id);
+      console.log(response.data); // Set loading to false after data is fetched
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  console.log(fetchData);
   useEffect(() => {
+    fetchUserData();
     fetchSpecialist();
-  }, []);
+  }, [email]);
 
   const fetchSpecialist = async () => {
+    setIsLoading(true);
     try {
-      const response = await fetchData({
-        url: ALL_SPECIALIST_URL,
-      });
-      console.log(response);
+      const response = await api.get(ALL_SPECIALIST_URL);
       setSpecialist(response?.data);
-      console.log(response.data);
-    } catch (err) {}
+    } catch (err) {
+      console.log(err);
+    } finally{
+      setIsLoading(false);
+    }
   };
+
+  if(isLoading){
+    <OverlayLoader/>
+  }
 
   return (
     <>
       <Formik
+        enableReinitialize={true}
         initialValues={{
-          name: name || "",
-          image: null || "",
-          phone: "",
-          email: email || "",
-          gender: "",
-          locality: "",
-          city: "",
-          state: "",
-          pincode: "",
-          specialization: "",
-          qualifications: [
-            { qualification: "", college: "", completionYear: "" },
-          ],
-          experience: "",
-          fees: "",
+          doctorName: name || fetchData.doctorName,
+          image: fetchData.profilePhoto,
+          phoneNumber: fetchData?.phoneNumber,
+          email: email || fetchData.email,
+          gender: fetchData?.gender,
+          locality: fetchData?.locality,
+          city: fetchData?.city,
+          state: fetchData?.state,
+          pincode: fetchData?.pincode,
+          specialization: fetchData?.specialization,
+          qualifications:
+      fetchData?.qualifications?.length > 0
+        ? fetchData.qualifications.map((q) => ({
+            qualification: q.qualification || "",
+            college: q.college || "",
+            completionYear: q.completionYear || "",
+          }))
+        : [{ qualification: "", college: "", completionYear: "" }],
+          experience: fetchData?.experienceYears,
+          fees: fetchData?.consultationFees,
+          clinic: fetchData?.clinicName,
         }}
         validationSchema={Yup.object({
           image: Yup.string().required("Required"),
-          name: Yup.string()
+          doctorName: Yup.string()
             .required("Required")
             .max(40, "Must be less than 40 letters"),
-          phone: Yup.string()
+          phoneNumber: Yup.string()
             .required("Required")
             .matches(
               /^\d{10}$/,
-              "Phone number must be 10 digits and Only Number"
+              "phoneNumber number must be 10 digits and Only Number"
             ),
           gender: Yup.string().required("Required"),
           locality: Yup.string().required("Required"),
@@ -109,18 +137,34 @@ const DoctorPersonalInfo = () => {
           experience: Yup.number()
             .required("Required")
             .min(0, "Experience must be non-negative"),
+          clinic: Yup.string().required("Required"),
         })}
         onSubmit={async (values, actions) => {
+          if (doctorId == null) {
+            const id = uuid();
+            setDoctorId(id);
+          }
           setErrMsg("");
-          console.log(values);
           try {
-            const response = await fetchData({
-              url: url,
-              data: JSON.stringify(values),
-              method: "PUT",
-            });
+            const formData = {
+              id: doctorId,
+              name: values.name,
+              email : email,
+              profilePhoto: values.image,
+              phoneNumber: values.phoneNumber,
+              gender: values.gender,
+              locality: values.locality,
+              city: values.city,
+              state: values.state,
+              pincode: values.pincode,
+              specialization: values.specialization,
+              consultationFees: values.fees,
+              experienceYears: values.experience,
+              qualifications: values.qualifications,
+              clinicName: values.clinic,
+            };
+            const response = await api.put(ADD_DOCTOR_DATA, formData);
             console.log(response.data);
-            setSuccess(true);
           } catch (err) {
             if (!err?.response) {
               // No response from server
@@ -186,7 +230,7 @@ const DoctorPersonalInfo = () => {
                         </div>
                         <div className="flex flex-col">
                           <label
-                            htmlFor="name"
+                            htmlFor="doctorName"
                             className="text-xs font-normal text-gray-500"
                           >
                             Name
@@ -202,14 +246,14 @@ const DoctorPersonalInfo = () => {
                               <option value="Ms.">Ms.</option>
                             </Field>
                             <Field
-                              id="name"
-                              name="name"
+                              id="doctorName"
+                              name="doctorName"
                               autoComplete="off"
                               className="border-y-[1px] px-2 rounded-r border-gray-400 border-r sm:w-[192px] focus:outline-none"
                             />
                           </div>
                           <div className="text-xs text-red-700">
-                            <ErrorMessage name="name" />
+                            <ErrorMessage name="doctorName" />
                           </div>
                         </div>
                       </div>
@@ -217,20 +261,20 @@ const DoctorPersonalInfo = () => {
                       <div className="flex flex-wrap gap-x-11 border-t-[1px] border-b-[1px] py-2">
                         <div className="flex flex-col gap-y-2">
                           <label
-                            htmlFor="phone"
+                            htmlFor="phoneNumber"
                             className="text-xs font-normal text-gray-500"
                           >
                             Phone Number
                           </label>
                           <Field
-                            id="phone"
-                            name="phone"
+                            id="phoneNumber"
+                            name="phoneNumber"
                             type="tel"
                             className="border border-gray-300 rounded p-2 w-full text-sm sm:w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            placeholder="Enter your phone number"
+                            placeholder="Enter your Phone number"
                           />
                           <div className="text-xs text-red-700">
-                            <ErrorMessage name="phone" />
+                            <ErrorMessage name="phoneNumber" />
                           </div>
                         </div>
                         <div className="flex flex-col gap-y-2">
@@ -501,6 +545,23 @@ const DoctorPersonalInfo = () => {
                         htmlFor="fees"
                         className="text-xs font-normal text-gray-500"
                       >
+                        Clinic Name
+                      </label>
+                      <Field
+                        id="clinic"
+                        name="clinic"
+                        type="text"
+                        className="border border-gray-300 rounded p-2 w-full text-sm sm:w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                      <div className="text-xs text-red-700">
+                        <ErrorMessage name="clinic" />
+                      </div>
+                    </div>
+                    <div className="flex flex-col gap-y-2">
+                      <label
+                        htmlFor="fees"
+                        className="text-xs font-normal text-gray-500"
+                      >
                         Consulation Fees
                       </label>
                       <Field
@@ -537,7 +598,7 @@ const DoctorPersonalInfo = () => {
                 <button
                   type="submit"
                   disabled={!isValid || isSubmitting}
-                  className="rounded-md bg-indigo-600 px-3 py-2 text-base font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 w-24"
+                  className="rounded-md bg-indigo-600 px-3 py-2 text-base font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 w-24 cursor-pointer"
                 >
                   Save
                 </button>

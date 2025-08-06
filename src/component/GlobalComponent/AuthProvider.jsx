@@ -20,7 +20,6 @@
 
 // export default AuthContext;
 import { createContext, useState, useEffect } from "react";
-import OverlayLoader from "../Common/Loader";
 
 // Create AuthContext with clear structure
 const AuthContext = createContext({});
@@ -32,7 +31,6 @@ export const AuthProvider = ({ children }) => {
 
   const [isLoading, setIsLoading] = useState(false);
 
-  // Auto-sync accessToken with localStorage for persistent login
   useEffect(() => {
     if (auth.accessToken) {
       localStorage.setItem("token", auth.accessToken);
@@ -44,7 +42,6 @@ export const AuthProvider = ({ children }) => {
   return (
     <AuthContext.Provider value={{ auth, setAuth, isLoading, setIsLoading }}>
       {children}
-      {/* {isLoading && <OverlayLoader />} */}
     </AuthContext.Provider>
   );
 };

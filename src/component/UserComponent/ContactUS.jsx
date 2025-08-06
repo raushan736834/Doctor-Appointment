@@ -24,7 +24,7 @@ const ContactUs = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-500 to-purple-600 p-5 flex items-center justify-center">
+    <div className="min-h-screen bg-gradient-to-br from-slate-100 to-gray-300 p-5 flex items-center justify-center">
       <div className="max-w-6xl w-full bg-white/90 backdrop-blur rounded-3xl shadow-2xl overflow-hidden animate-fade-in-up">
         <div className="bg-gradient-to-br from-blue-900 to-blue-700 text-white text-center py-16 relative overflow-hidden">
           <h1 className="text-4xl font-bold mb-4 relative z-10">Get In Touch</h1>
@@ -106,7 +106,7 @@ const ContactUs = () => {
               <div className="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center text-2xl">📧</div>
               <div>
                 <h3 className="font-semibold text-lg">Email</h3>
-                <p className="text-sm opacity-90">hello@company.com</p>
+                <p className="text-sm opacity-90">try.harsh95@gmail.com</p>
               </div>
             </div>
 
@@ -114,7 +114,7 @@ const ContactUs = () => {
               <div className="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center text-2xl">📞</div>
               <div>
                 <h3 className="font-semibold text-lg">Phone</h3>
-                <p className="text-sm opacity-90">+1 (555) 123-4567</p>
+                <p className="text-sm opacity-90">+91 9693419646</p>
               </div>
             </div>
 

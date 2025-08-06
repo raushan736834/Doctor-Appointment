@@ -84,8 +84,8 @@ const AppointmentForm = React.memo(
 
 
     return (
-      <section className="flex flex-col items-center py-4 px-4">
-        <form className="w-full max-w-md space-y-6">
+      <section className="flex flex-col items-center py-4 px-3">
+        <form className="w-full max-w-md space-y-3">
           <DateSelector selectedDate={selectedDate} onDateChange={handleDateChange} today={today} />
           <PeriodSelector selectedPeriod={selectedPeriod} onPeriodChange={handlePeriodChange} />
           {error && <p className="text-center text-red-500">{error}</p>}
@@ -103,7 +103,7 @@ const AppointmentForm = React.memo(
 );
 
 const DateSelector = ({ selectedDate, onDateChange, today }) => (
-  <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4">
+  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center sm:space-x-4">
     <label className="mb-2 sm:mb-0 font-semibold w-32 text-gray-700">Select Date:</label>
     <DatePicker
       selected={selectedDate}
@@ -117,7 +117,7 @@ const DateSelector = ({ selectedDate, onDateChange, today }) => (
 );
 
 const PeriodSelector = ({ selectedPeriod, onPeriodChange }) => (
-  <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4">
+  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center sm:space-x-4">
     <label className="mb-2 sm:mb-0 font-semibold w-32 text-gray-700">Select Period:</label>
     <select
       value={selectedPeriod}
@@ -135,7 +135,7 @@ const PeriodSelector = ({ selectedPeriod, onPeriodChange }) => (
 const SlotSelector = ({ availableSlots, selectedSlot, handleSlotChange }) => (
   <div>
     <label className="block mb-2 font-semibold text-gray-700">Select Time Slot:</label>
-    <div className="flex flex-wrap gap-3 justify-center">
+    <div className="flex flex-wrap gap-1 justify-center">
       {availableSlots.length > 0 ? (
         availableSlots.map((slot) => (
           <button

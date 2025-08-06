@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 // Simple SVG icon components
 const Heart = ({ className }) => (
@@ -70,9 +71,9 @@ const Stethoscope = ({ className }) => (
 
 const AboutUs = () => {
   const stats = [
-    { icon: Users, number: "50,000+", label: "Patients Served" },
+    { icon: Users, number: "500+", label: "Patients Served" },
     { icon: Award, number: "15+", label: "Years of Excellence" },
-    { icon: Stethoscope, number: "200+", label: "Medical Professionals" },
+    { icon: Heart, number: "200+", label: "Medical Professionals" },
     { icon: Star, number: "4.9", label: "Patient Rating" }
   ];
 
@@ -165,7 +166,7 @@ const AboutUs = () => {
             <div>
               <h2 className="text-4xl font-bold text-gray-900 mb-6">Our Story</h2>
               <p className="text-lg text-gray-700 mb-6">
-                Founded in 2009, MedConnect began with a simple mission: to make quality healthcare 
+                Founded in 2025, HeyDoctor began with a simple mission: to make quality healthcare 
                 accessible to everyone. What started as a small clinic has grown into a comprehensive 
                 healthcare platform serving thousands of patients across the region.
               </p>
@@ -181,7 +182,7 @@ const AboutUs = () => {
             </div>
             <div className="relative">
               <img 
-                src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=600&h=400&fit=crop" 
+                src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=300&h=300&fit=crop&crop=face" 
                 alt="Medical team"
                 className="rounded-lg shadow-2xl"
               />
@@ -267,7 +268,7 @@ const AboutUs = () => {
                 <Phone className="w-6 h-6" />
               </div>
               <h3 className="text-lg font-semibold mb-2">Call Us</h3>
-              <p className="text-blue-100">+1 (555) 123-4567</p>
+              <p className="text-blue-100">+91 9693419646</p>
             </div>
             
             <div className="text-center">
@@ -275,7 +276,7 @@ const AboutUs = () => {
                 <Mail className="w-6 h-6" />
               </div>
               <h3 className="text-lg font-semibold mb-2">Email Us</h3>
-              <p className="text-blue-100">info@medconnect.com</p>
+              <p className="text-blue-100">try.harsh95@gmail.com</p>
             </div>
             
             <div className="text-center">
@@ -288,9 +289,9 @@ const AboutUs = () => {
           </div>
           
           <div className="text-center">
-            <button className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors shadow-lg">
+            <Link to={"/"} className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors shadow-lg">
               Book Your Appointment Today
-            </button>
+            </Link>
           </div>
         </div>
       </section>

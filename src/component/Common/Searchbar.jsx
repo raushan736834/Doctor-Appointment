@@ -3,14 +3,13 @@ import AutoSuggestion from "./AutoSuggestion";
 import { useNavigate } from "react-router-dom";
 import api from "../../hooks/useAxios";
 
-const Searchbar = ({ searchText, onChange }) => {
+const Searchbar = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
+  const [searchText, setSearchText] = useState('');
   const navigate = useNavigate();
   const debounceRef = useRef();
-  
 
-  // Fetch suggestions as user types
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
     if (searchText.trim() === "") {
@@ -22,9 +21,6 @@ const Searchbar = ({ searchText, onChange }) => {
       const fetchSuggestions = async () => {
         try {
           const response = await api.get(`/api/public/search?keyword=${searchText}`);
-          // fetchData({
-          //   url: `/api/public/search?keyword=${searchText}`,
-          // });
           setSuggestions(response?.data || []);
           setShowDropdown((response?.data || []).length > 0);
         } catch (error) {
@@ -49,10 +45,10 @@ const Searchbar = ({ searchText, onChange }) => {
         <div className="w-full sm:w-80 relative">
           <input
             type="text"
-            className="w-full px-4 py-2 border-2 rounded-lg border-gray-500"
+            className="w-full px-4 py-2 border-2 rounded-full border-gray-500"
             placeholder="Search doctors, clinics, hospitals"
             value={searchText}
-            onChange={onChange}
+            onChange={(e) => setSearchText(e.target.value)}
             onFocus={() => setShowDropdown(suggestions.length > 0)}
             onBlur={() => setTimeout(() => setShowDropdown(false), 150)}
             onKeyDown={(e) => {

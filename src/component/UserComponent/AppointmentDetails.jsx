@@ -1,7 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
-import clock from "../../assets/img/clock.png";
-import calender from "../../assets/img/calendar.png";
+import { Calendar, Clock } from "lucide-react";
 import defaultImage from "../../assets/img/defaultClinicImage.jpg";
 import useAuth from "../../hooks/useAuth";
 import * as Yup from "yup";
@@ -10,6 +9,7 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import { format } from "date-fns";
 import useRazorpayScript from "../../hooks/useRazorpayScript";
 import api from "../../hooks/useAxios";
+import { AppointmentStatus } from "../../constants/slots";
 
 const BOOKED_URL = "/appointment/book-appointment";
 const FETCH_DOCTOR_DATA = "/api/user/getDoctor";
@@ -17,7 +17,6 @@ const FETCH_DOCTOR_DATA = "/api/user/getDoctor";
 const AppointmentDetails = () => {
   const errRef = useRef();
   const [errMsg, setErrMsg] = useState("");
-  const [success, setSuccess] = useState(false);
   const { auth, setIsLoading } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -91,6 +90,7 @@ const AppointmentDetails = () => {
       const appointmentBooking = {
         appointmentId,
         email,
+        status: AppointmentStatus.BOOKED,
         time,
         period,
         doctorName: doctorDetails?.doctor_name,
@@ -168,15 +168,13 @@ const AppointmentDetails = () => {
                 receiptId: receipt,
                 paymentId: razorpay_payment_id,
                 orderId: razorpay_order_id,
-                doctorId: id ,
+                doctorId: id,
               },
             };
 
             console.log("Sending payload:", body);
             const res = await api.post(BOOKED_URL, body);
             console.log("Booking response:", res);
-
-            setSuccess(true);
             Navigate("/thankyou", {
               state: {
                 date,
@@ -212,8 +210,6 @@ const AppointmentDetails = () => {
         console.log("Sending payload:", body);
         const res = await api.post(BOOKED_URL, body);
         console.log("Booking response:", res);
-
-        setSuccess(true);
         Navigate("/thankyou", {
           state: {
             date,
@@ -294,7 +290,9 @@ function DoctorDetailsSection({
       </div>
       <div className="flex justify-between mt-2">
         <div className="flex mx-3">
-          <img src={calender} className="w-4 h-4 mt-1" />
+          <div className="w-4 h-4 mt-1">
+            <Calendar />
+          </div>
           <span className="ml-1 text-gray-700">On </span>
           <span className="mx-1 font-semibold text-gray-700">
             {date &&
@@ -306,7 +304,9 @@ function DoctorDetailsSection({
           </span>
         </div>
         <div className="flex mx-3">
-          <img src={clock} className="w-4 h-4 mt-1" />
+          <div className="w-4 h-4 mt-1">
+            <Clock />
+          </div>
           <span className="ml-1 text-gray-700">At</span>
           <span className="mx-1 font-semibold text-gray-700">{time}</span>
         </div>
@@ -324,7 +324,10 @@ function DoctorDetailsSection({
         {doctorDetails && (
           <div className="flex m-3">
             <div>
-              <img src={doctorProfileLink || defaultImage} className="w-24 rounded-sm h-28" />
+              <img
+                src={doctorProfileLink || defaultImage}
+                className="w-24 rounded-sm h-28"
+              />
             </div>
             <div className="mx-2 flex flex-col mb-3">
               <span className="font-medium text-gray-500 text-[17px]">

@@ -1,48 +1,52 @@
-import { Tab, TabList, Tabs, TabPanels, TabPanel } from "@chakra-ui/react";
 import React from "react";
-import DoctorPersonalInfo from "./DoctorPersonalInfo";
+import { Link, useLocation, Outlet } from "react-router-dom";
 
-function DataTabs({ data }) {
-  return (
-    <Tabs>
-      <TabList>
-        {data.map((tab, index) => (
-          <Tab key={index} className="font-semibold">{tab.label}</Tab>
-        ))}
-      </TabList>
-      <TabPanels>
-        {data.map((tab, index) => (
-          <TabPanel p={4} key={index}>
-            {tab.content}
-          </TabPanel>
-        ))}
-      </TabPanels>
-    </Tabs>
-  );
-}
-
-const tabData = [
+const tabs = [
   {
-    label: 'Doctor Profile',
-    content: <DoctorPersonalInfo/>,
+    name: "Your Profile",
+    path: "doctor-profile"
   },
   {
-    label: 'Password',
-    content:
-      'Perhaps the surest dish ever invented but fills the stomach more than rice.',
+    name: "Security & Password",
+    path: "security"
   }
 ];
 
 const DoctorSetting = () => {
+  const { pathname } = useLocation();
+  const isActive = (path) => {
+    if (path === "doctor-profile" && pathname === "/doctor/settings") {
+      return true;
+    }
+    return pathname.endsWith(`/settings/${path}`);
+  };
+
   return (
-    <main>
-      <div className="m-2 flex justify-start">
-        <span className="font-semibold text-lg">Setting</span>
+    <div className="p-6 space-y-6 min-h-screen bg-gradient-to-b from-[#f0f4ff] to-[#ffffff]">
+      {/* Header */}
+      <div className="bg-white rounded-2xl shadow-lg p-6 space-y-4">
+        <h2 className="text-2xl font-bold text-indigo-700">Settings</h2>
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="flex gap-2 flex-wrap">
+            {tabs.map((tab) => (
+              <Link
+                key={tab.path}
+                to={tab.path}
+                aria-current={isActive(tab.path) ? "page" : undefined}
+                className={`px-3 py-2 rounded-full text-sm font-medium transition shadow ${
+                  isActive(tab.path)
+                    ? "bg-gradient-to-r from-indigo-500 to-purple-500 text-white ring-2 ring-indigo-300"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                }`}
+              >
+                {tab.name}
+              </Link>
+            ))}
+          </div>
+        </div>
       </div>
-      <div className="m-4">
-        <DataTabs data={tabData} />
-      </div>
-    </main>
+      <Outlet />
+    </div>
   );
 };
 

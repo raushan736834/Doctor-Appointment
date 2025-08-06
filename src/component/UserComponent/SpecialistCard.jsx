@@ -3,7 +3,7 @@ import React from "react";
 const SpecialistCard = ({ specialist, specialistOf, description, image }) => {
   return (
     <div className="h-[18rem] flex items-center justify-center p-4">
-      <style jsx>{`
+      <style>{`
         .card-container {
           perspective: 1000px;
         }
@@ -39,7 +39,8 @@ const SpecialistCard = ({ specialist, specialistOf, description, image }) => {
           </div>
 
           {/* Back Side */}
-          <div className="card-back absolute inset-0 w-full h-full bg-gradient-to-br from-slate-700 to-slate-800 rounded-2xl shadow-2xl flex flex-col justify-center p-8 text-white">
+          <div className="card-back absolute inset-0 w-full h-full bg-gradient-to-br from-slate-700 to-slate-800 rounded-2xl 
+          shadow-2xl flex flex-col justify-center p-8 text-white">
             <div className="text-center">
               <div className="">
                 <h3 className="text-xl font-bold text-blue-400">

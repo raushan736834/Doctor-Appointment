@@ -1,10 +1,12 @@
 import axios from "axios";
 
-const baseUrl = "http://localhost:8080"; // your backend
+// const baseUrl = "http://localhost:8080"; // your backend
+const baseUrl =
+  "https://hey-doctor-hdgbaaawfmhbbegq.eastus2-01.azurewebsites.net;" // your backend
 
 const api = axios.create({
   baseURL: baseUrl,
-  withCredentials: true, 
+  withCredentials: true,
   headers: {
     "Content-Type": "application/json",
   },
@@ -36,8 +38,10 @@ api.interceptors.response.use(
       originalRequest._retry = true;
       try {
         const refreshToken = localStorage.getItem("refreshToken");
-        const { data } = await axios.post(`${baseUrl}/auth/refresh-token`, { refreshToken });
-        console.log("Refresh token called")
+        const { data } = await axios.post(`${baseUrl}/auth/refresh-token`, {
+          refreshToken,
+        });
+        console.log("Refresh token called");
         const newAccessToken = data.accessToken;
         localStorage.setItem("token", newAccessToken);
 

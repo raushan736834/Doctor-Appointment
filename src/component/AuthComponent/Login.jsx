@@ -16,7 +16,6 @@ const Login = () => {
   const location = useLocation();
   const from = location.state?.from?.pathname || "/";
   const errRef = useRef();
-  const { fetchData } = useAxios();
   const toast = useToast();
 
   const validationSchema = Yup.object({
@@ -32,16 +31,7 @@ const Login = () => {
           email: values.email,
           password: values.password,
         }
-      const json = await api.post(LOGIN_URL, data)
-      // fetchData({
-      //   url: LOGIN_URL,
-      //   method: "POST",
-      //   data: {
-      //     email: values.email,
-      //     password: values.password,
-      //   },
-      // });
-
+      const json = await api.post(LOGIN_URL, data);
 
       const token = json.data?.token;
       const email = json.data?.email;
@@ -55,6 +45,11 @@ const Login = () => {
       localStorage.setItem("role", JSON.stringify(roleArray));
       localStorage.setItem("name", fullname);
       localStorage.setItem("refreshToken",refreshToken);
+      
+      if(roleString === "ROLE_USER,ROLE_DOCTOR"){
+        const doctorId = json.data?.doctorId;
+        localStorage.setItem("doctorId",doctorId);
+      }
 
       setAuth({ email, accessToken: token, role: roleArray, fullname });
 
@@ -62,7 +57,7 @@ const Login = () => {
         toast({
           position: "top-right",
           title: "Login successful!",
-          description: "Welcome back, Doctor.",
+          description: `Welcome back, Doctor. ${fullname}`,
           status: "success",
           duration: 2000,
           isClosable: true,
@@ -77,7 +72,7 @@ const Login = () => {
           status: "success",
           duration: 2000,
           isClosable: true,
-          containerStyle: { marginTop: 20, marginRight: 5 },
+          containerStyle: { marginTop: 20, marginRight: 5,color: "whiteAlpha.50" },
         });
         if (from.includes("ROLE_DOCTOR")) {
           navigate("/");

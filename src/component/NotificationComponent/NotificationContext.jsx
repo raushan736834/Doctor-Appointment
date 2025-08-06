@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
-import SocketService from './socketService';
 import { notificationAPI, authNotificationAPI } from './NotificationAPI';
+import SocketService from './SocketService';
 
 const NotificationContext = createContext();
 

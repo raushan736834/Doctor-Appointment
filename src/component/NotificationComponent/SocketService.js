@@ -1,4 +1,4 @@
-import { io } from 'socket.io-client';
+import { io } from "socket.io-client";
 
 class SocketService {
   constructor() {
@@ -12,67 +12,71 @@ class SocketService {
     }
 
     // Get the access token for authentication
-    const accessToken = localStorage.getItem('token');
+    const accessToken = localStorage.getItem("token");
 
-    const isProd = process.env.NODE_ENV === 'production'
+    const isProd = process.env.NODE_ENV === "production";
 
-    
-
-    const url = isProd ? import.meta.env.VITE_BASE_URL : "http://localhost:8081"
+    const url = isProd
+      ? import.meta.env.VITE_BASE_URL
+      : "http://localhost:8081";
 
     // Connect to Socket.io server with authentication
     this.socket = io(url, {
-      transports: ['websocket', 'polling'],
+      transports: ["websocket", "polling"],
       upgrade: true,
       rememberUpgrade: true,
       timeout: 20000,
       forceNew: true,
       auth: {
         token: accessToken,
-        userEmail: userEmail
+        userEmail: userEmail,
       },
       query: {
-        userEmail: userEmail
-      }
+        userEmail: userEmail,
+      },
     });
 
     // Connection events
-    this.socket.on('connect', () => {
-      console.log('Connected to Socket.io server:', this.socket.id);
+    this.socket.on("connect", () => {
+      console.log("Connected to Socket.io server:", this.socket.id);
       this.connected = true;
-      
+
       // Join user-specific room
-      this.socket.emit('join', userEmail);
+      this.socket.emit("join", userEmail);
     });
 
-    this.socket.on('disconnect', (reason) => {
-      console.log('Disconnected from Socket.io server:', reason);
+    this.socket.on("disconnect", (reason) => {
+      console.log("Disconnected from Socket.io server:", reason);
       this.connected = false;
     });
 
-    this.socket.on('connect_error', (error) => {
-      console.error('Socket.io connection error:', error);
+    this.socket.on("connect_error", (error) => {
+      console.error("Socket.io connection error:", error);
       this.connected = false;
-      
+
       // Handle authentication errors
-      if (error.message === 'Authentication failed') {
-        console.log('Socket authentication failed, token may be expired');
+      if (error.message === "Authentication failed") {
+        console.log("Socket authentication failed, token may be expired");
         // You could trigger a token refresh here if needed
       }
     });
 
     // Listen for notifications
-    this.socket.on('notification', (notification) => {
-      console.log('Received notification:', notification);
+    this.socket.on("notification", (notification) => {
+      console.log("Received notification:", notification);
       onNotificationReceived(notification);
     });
 
     // Handle reconnection
-    this.socket.on('reconnect', (attemptNumber) => {
-      console.log('Reconnected to Socket.io server after', attemptNumber, 'attempts');
+    this.socket.on("reconnect", (attemptNumber) => {
+      console.log(
+        "Reconnected to Socket.io server after",
+        attemptNumber,
+        "attempts"
+      );
       this.connected = true;
       // Rejoin user room after reconnection
-      this.socket.emit('join', userEmail);
+      this.socket.emit("join", userEmail);
     });
   }
 

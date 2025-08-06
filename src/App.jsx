@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import ReactDOM from "react-dom/client";
 import {
-  HashRouter as Router,
+  BrowserRouter as Router,
   Routes,
   Route,
   Outlet,
@@ -83,7 +83,7 @@ const App = () => {
   return (
     <NotificationProvider userEmail={email}>
       <Router future={{ v7_relativeSplatPath: true }}>
-      <Routes>
+        <Routes>
           <Route path="/" element={<AppLayout />}>
             <Route element={<RequireOnline />}>
               <Route index element={<Body />} />
@@ -112,11 +112,20 @@ const App = () => {
                   <Route path="personalInfo" element={<DoctorPersonalInfo />} />
                   <Route path="appointments" element={<Appointments />} />
                   <Route path="settings" element={<DoctorSetting />}>
-                    <Route index element={<Navigate to="doctor-profile" replace />} />
-                    <Route path="doctor-profile" element={<DoctorPersonalInfo />} />
+                    <Route
+                      index
+                      element={<Navigate to="doctor-profile" replace />}
+                    />
+                    <Route
+                      path="doctor-profile"
+                      element={<DoctorPersonalInfo />}
+                    />
                     <Route path="security" element={<SecurityPassword />} />
                   </Route>
-                  <Route path="notifications" element={<NotificationDashboard />} />
+                  <Route
+                    path="notifications"
+                    element={<NotificationDashboard />}
+                  />
                 </Route>
               </Route>
             </Route>

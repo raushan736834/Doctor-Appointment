@@ -2,7 +2,7 @@ import axios from "axios";
 
 // const baseUrl = "http://localhost:8080"; // your backend
 const baseUrl =
-  "https://hey-doctor-hdgbaaawfmhbbegq.eastus2-01.azurewebsites.net;" // your backend
+  import.meta.env.VITE_BASE_URL // your backend
 
 const api = axios.create({
   baseURL: baseUrl,

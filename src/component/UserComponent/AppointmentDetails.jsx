@@ -1,26 +1,22 @@
 import React, { useRef, useState, useEffect } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
-import clock from "../../assets/img/clock.png";
-import calender from "../../assets/img/calendar.png";
+import { Calendar, Clock } from "lucide-react";
 import defaultImage from "../../assets/img/defaultClinicImage.jpg";
 import useAuth from "../../hooks/useAuth";
 import * as Yup from "yup";
 import useDate from "../../hooks/useDate";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { format } from "date-fns";
-import useAxios from "@/hooks/useAxios";
-
-// function filterData(id, data) {
-//   return data.filter((ele) => ele.id === parseInt(id));
-// }
+import useRazorpayScript from "../../hooks/useRazorpayScript";
+import api from "../../hooks/useAxios";
+import { AppointmentStatus } from "../../constants/slots";
 
 const BOOKED_URL = "/appointment/book-appointment";
-const FETCH_DOCTOR_DATA = "/api/doctors/getDoctor";
+const FETCH_DOCTOR_DATA = "/api/user/getDoctor";
 
 const AppointmentDetails = () => {
   const errRef = useRef();
   const [errMsg, setErrMsg] = useState("");
-  const [success, setSuccess] = useState(false);
   const { auth, setIsLoading } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -30,20 +26,21 @@ const AppointmentDetails = () => {
   const period = data.selectedPeriod;
   const specialization = data.specialization;
   const { id } = useParams();
-  console.log(id);
   const [filteredSpecialist, setFilteredSpecialist] = useState();
   const email = localStorage.getItem("email");
   const accessToken = auth.accessToken;
-  const [fetchName, setFetchName] = useState("");
+  const [fetchName, setFetchName] = useState(
+    localStorage.getItem("name") || ""
+  );
   const [doctorProfileLink, setDoctorProfileLink] = useState("");
   const [error, setError] = useState(null);
   const Navigate = useNavigate();
-  const { fetchData } = useAxios();
+
+  useRazorpayScript();
 
   const doctorDetails = filteredSpecialist || {};
   useEffect(() => {
     getDoctorDetails();
-    fetchUserData();
   }, []);
 
   useEffect(() => {
@@ -55,16 +52,13 @@ const AppointmentDetails = () => {
   }, [doctorDetails]);
 
   async function getDoctorDetails() {
+    const save = {
+      specialization,
+      id,
+    };
     setIsLoading(true);
     try {
-      const response = await fetchData({
-        url: FETCH_DOCTOR_DATA,
-        method: "post",
-        data: {
-          specialization,
-          id,
-        },
-      });
+      const response = await api.post(FETCH_DOCTOR_DATA, save);
       const data = response?.data;
       console.log(data);
       setFilteredSpecialist(data);
@@ -74,19 +68,6 @@ const AppointmentDetails = () => {
       setIsLoading(false);
     }
   }
-
-  const fetchUserData = async () => {
-    try {
-      const response = await fetchData({
-        url: `/user/${email}`,
-      });
-      setFetchName(response.data);
-      setIsLoading(false);
-    } catch (err) {
-      setError(err.message);
-      setIsLoading(false);
-    }
-  };
 
   function uuid() {
     return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
@@ -100,13 +81,16 @@ const AppointmentDetails = () => {
     setIsLoading(true);
     setErrMsg("");
     setIsSubmitting(true);
+
     try {
+      const receipt = uuid();
       const formattedDate = format(new Date(date), "yyyy-MM-dd");
       const appointmentId = uuid();
-      console.log(appointmentId)
-      const formData = {
-        appointmentId, // send generated appointmentId
+
+      const appointmentBooking = {
+        appointmentId,
         email,
+        status: AppointmentStatus.BOOKED,
         time,
         period,
         doctorName: doctorDetails?.doctor_name,
@@ -116,9 +100,7 @@ const AppointmentDetails = () => {
           values.selectedPatient === "option1"
             ? values.fullName
             : values.patientFullName,
-        doctor: {
-          id: id,
-        },
+        doctor: { id },
         patientEmail:
           values.selectedPatient === "option2" ? values.patientEmail : "",
         selectedPayment:
@@ -129,33 +111,125 @@ const AppointmentDetails = () => {
         selectedPatient:
           values.selectedPatient === "option1" ? fetchName : "someone else",
       };
-      await fetchData({
-        url: BOOKED_URL,
-        method: "post",
-        data: formData,
-      });
-      setSuccess(true);
-      setIsLoading(false);
-      Navigate("/thankyou", {
-        state: {
-          date,
-          time,
-          doctorName: doctorDetails?.doctorName,
-          appointmentLocation: doctorDetails?.clinicName,
-        },
-      });
-    } catch (err) {
-      console.log(err);
-      if (!err?.response) {
-        setErrMsg("No Server Response");
-      } else if (err.response?.status === 500) {
-        setErrMsg("Internal Server Error");
+
+      if (values.selectedPayment === "option3") {
+        // Online Payment with Razorpay
+        const paymentInitData = {
+          amount: doctorDetails.consultationFees * 100, // paise
+          currency: "INR",
+          receipt: receipt,
+        };
+
+        const razorResponse = await api.post(
+          "/api/payment/create-order",
+          paymentInitData
+        );
+        const { orderId, amount, currency, key } = razorResponse.data;
+
+        if (!window.Razorpay) {
+          alert("Razorpay SDK not loaded");
+          return;
+        }
+
+        const options = {
+          key,
+          amount,
+          currency,
+          name: "AppointDoctor",
+          description: "Consultation Fee",
+          image: "/logo.png",
+          order_id: orderId,
+          handler: async function (response) {
+            const {
+              razorpay_payment_id,
+              razorpay_order_id,
+              razorpay_signature,
+            } = response;
+
+            const verificationData = {
+              razorpay_payment_id,
+              razorpay_order_id,
+              razorpay_signature,
+            };
+
+            const verifyResponse = await api.post(
+              "/api/payment/verify",
+              verificationData
+            );
+
+            if (verifyResponse.data.status !== "success") {
+              alert("Payment verification failed!");
+              return;
+            }
+
+            const body = {
+              formData: appointmentBooking,
+              payment: {
+                receiptId: receipt,
+                paymentId: razorpay_payment_id,
+                orderId: razorpay_order_id,
+                doctorId: id,
+              },
+            };
+
+            console.log("Sending payload:", body);
+            const res = await api.post(BOOKED_URL, body);
+            console.log("Booking response:", res);
+            Navigate("/thankyou", {
+              state: {
+                date,
+                time,
+                doctorName: doctorDetails?.doctorName,
+                appointmentLocation: doctorDetails?.clinicName,
+              },
+            });
+          },
+          prefill: {
+            name: appointmentBooking.fullName,
+            email: email,
+            contact: values.phone,
+          },
+          notes: {
+            appointmentId,
+            doctorId: id,
+          },
+          theme: {
+            color: "#6B46C1",
+          },
+        };
+
+        const rzp = new window.Razorpay(options);
+        rzp.open();
       } else {
-        setErrMsg("Booking Failed");
+        // Pay at Clinic flow
+        const body = {
+          formData: appointmentBooking,
+          payment: null, // if your backend expects null
+        };
+
+        console.log("Sending payload:", body);
+        const res = await api.post(BOOKED_URL, body);
+        console.log("Booking response:", res);
+        Navigate("/thankyou", {
+          state: {
+            date,
+            time,
+            doctorName: doctorDetails?.doctorName,
+            appointmentLocation: doctorDetails?.clinicName,
+          },
+        });
       }
+    } catch (err) {
+      console.error(err);
+      setErrMsg(
+        err?.response?.status === 500
+          ? "Internal Server Error"
+          : "Booking Failed"
+      );
       errRef.current.focus();
     } finally {
       setIsSubmitting(false);
+      setIsLoading(false);
     }
   };
 
@@ -216,7 +290,9 @@ function DoctorDetailsSection({
       </div>
       <div className="flex justify-between mt-2">
         <div className="flex mx-3">
-          <img src={calender} className="w-4 h-4 mt-1" />
+          <div className="w-4 h-4 mt-1">
+            <Calendar />
+          </div>
           <span className="ml-1 text-gray-700">On </span>
           <span className="mx-1 font-semibold text-gray-700">
             {date &&
@@ -228,7 +304,9 @@ function DoctorDetailsSection({
           </span>
         </div>
         <div className="flex mx-3">
-          <img src={clock} className="w-4 h-4 mt-1" />
+          <div className="w-4 h-4 mt-1">
+            <Clock />
+          </div>
           <span className="ml-1 text-gray-700">At</span>
           <span className="mx-1 font-semibold text-gray-700">{time}</span>
         </div>
@@ -246,7 +324,10 @@ function DoctorDetailsSection({
         {doctorDetails && (
           <div className="flex m-3">
             <div>
-              <img src={doctorProfileLink} className="w-24 rounded-sm h-28" />
+              <img
+                src={doctorProfileLink || defaultImage}
+                className="w-24 rounded-sm h-28"
+              />
             </div>
             <div className="mx-2 flex flex-col mb-3">
               <span className="font-medium text-gray-500 text-[17px]">

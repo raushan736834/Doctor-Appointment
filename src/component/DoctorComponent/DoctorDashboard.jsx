@@ -1,254 +1,283 @@
-import React, { useState, useRef, useEffect } from "react";
-
-const appointments = [
-  {
-    id: 1,
-    date: "Apr 24, 2024",
-    time: "9:00 AM",
-    patient: "John Smith",
-    reason: "General Consultation",
-    status: "Confirmed",
-  },
-  {
-    id: 2,
-    date: "Apr 24, 2024",
-    time: "10:30 AM",
-    patient: "Emily Johnson",
-    reason: "Follow-up",
-    status: "Pending",
-  },
-  {
-    id: 3,
-    date: "Apr 24, 2024",
-    time: "1:00 PM",
-    patient: "Michael Brown",
-    reason: "General Consultation",
-    status: "Confirmed",
-  },
-  {
-    id: 4,
-    date: "Apr 25, 2024",
-    time: "11:00 AM",
-    patient: "Sarah Davis",
-    reason: "Pediatric Checkup",
-    status: "Confirmed",
-  },
-  {
-    id: 5,
-    date: "Apr 25, 2024",
-    time: "2:00 PM",
-    patient: "James Wilson",
-    reason: "Annual Physical",
-    status: "Confirmed",
-  },
-  {
-    id: 6,
-    date: "Apr 26, 2024",
-    time: "3:00 PM",
-    patient: "Olivia Smith",
-    reason: "Dental Checkup",
-    status: "Confirmed",
-  },
-  {
-    id: 7,
-    date: "Apr 27, 2024",
-    time: "4:00 PM",
-    patient: "Liam Johnson",
-    reason: "Eye Test",
-    status: "Pending",
-  },
-];
-
-const statusStyles = {
-  Confirmed: "bg-blue-100 text-blue-800",
-  Pending: "bg-yellow-100 text-yellow-800",
-};
+import { useEffect, useState } from "react";
+import DoctorDashboardStats from "./DoctorDashboardStats";
+import api from "../../hooks/useAxios";
+import { Link } from "react-router-dom";
+import NotificationBell from "../NotificationComponent/NotificationBell";
+import useAuth from "../../hooks/useAuth";
+import { CalendarX, ChevronLeft, ChevronRight } from "lucide-react";
+import OverlayLoader from "../Common/Loader";
 
 const ITEMS_PER_PAGE = 5;
 
-const AppointmentDashboard = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const sidebarRef = useRef(null);
+const DoctorDashboard = () => {
+  const [currentPage, setCurrentPage] = useState(0);
+  const [pageSize] = useState(ITEMS_PER_PAGE);
+  const { setIsLoading, isLoading } = useAuth();
+  const name = localStorage.getItem("name")?.split(" ")[0];
+  const doctorId = localStorage.getItem("doctorId");
+  const [todayAppointments, setTodayAppointments] = useState([]);
+  const [totalAppointmentsLength, setTotalAppointmentsLength] = useState(0);
+  const [paginationInfo, setPaginationInfo] = useState({
+    totalElements: 0,
+    totalPages: 0,
+    number: 0,
+    size: ITEMS_PER_PAGE,
+    first: true,
+    last: true,
+  });
 
-  const totalPages = Math.ceil(appointments.length / ITEMS_PER_PAGE);
-  const paginatedAppointments = appointments.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  );
+  const fetchAllAppointment = async () => {
+    try {
+      const response = await api.get(
+        `/appointment/doctorAllAppointment/${doctorId}`
+      );
+      setTotalAppointmentsLength(response.data || 0);
+    } catch (error) {
+      console.error("Error fetching total appointments:", error);
+      setTotalAppointmentsLength(0);
+    }
+  };
+
+  const fetchTodayAppointment = async (
+    currentPage = 0,
+    size = ITEMS_PER_PAGE
+  ) => {
+    setIsLoading(true);
+
+    try {
+      const response = await api.get(
+        `/appointment/doctorAppointment/${doctorId}?page=${currentPage}&size=${size}`
+      );
+
+      const { content, totalElements, totalPages, number, first, last } =
+        response.data;
+
+      setTodayAppointments(content || []);
+      setPaginationInfo({
+        totalElements: totalElements || 0,
+        totalPages: totalPages || 0,
+        number: number || 0,
+        size: size,
+        first: first ?? true,
+        last: last ?? true,
+      });
+    } catch (error) {
+      console.error("Error fetching today's appointments:", error);
+      setTodayAppointments([]);
+      setPaginationInfo({
+        totalElements: 0,
+        totalPages: 0,
+        number: 0,
+        size: ITEMS_PER_PAGE,
+        first: true,
+        last: true,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    function handleClickOutside(event) {
-      if (
-        sidebarRef.current &&
-        !sidebarRef.current.contains(event.target) &&
-        sidebarOpen
-      ) {
-        setSidebarOpen(false);
-      }
+    if (doctorId) {
+      fetchAllAppointment();
+      fetchTodayAppointment(0, pageSize);
     }
+  }, [doctorId, pageSize]);
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [sidebarOpen]);
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+    fetchTodayAppointment(newPage, pageSize);
+  };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col md:flex-row">
-      {/* Hamburger Icon */}
-      <div className="bg-white px-4 py-3 shadow md:hidden flex justify-between items-center fixed top-0 left-0 right-0 z-50 h-14">
-        <button
-          onClick={() => setSidebarOpen(!sidebarOpen)}
-          aria-label={sidebarOpen ? "Close sidebar" : "Open sidebar"}
-        >
-          <svg
-            className="w-6 h-6 text-gray-700"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d={
-                sidebarOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"
-              }
-            />
-          </svg>
-        </button>
+    <div className="p-4 space-y-6 bg-gradient-to-b from-[#f0f4ff] to-[#ffffff] min-h-full">
+      {/* Header */}
+      <div className="bg-white rounded-2xl shadow-lg p-6 space-y-2 flex justify-between">
+        <div className="">
+          <h2 className="text-xl font-semibold text-indigo-700">
+            Good Morning, Dr. {name}!
+          </h2>
+          <p className="text-sm text-gray-500">
+            You have {paginationInfo?.totalElements} patients waiting today.
+          </p>
+        </div>
+        <Link to={"/doctor/notifications"}>
+          <div>
+            <NotificationBell />
+          </div>
+        </Link>
       </div>
 
-      {/* Sidebar */}
-      <aside
-        ref={sidebarRef}
-        className={`
-    fixed top-14 left-0 bottom-0 w-48 z-40 bg-white p-6 transform
-    transition-transform duration-300 ease-in-out
-    ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
-    md:relative md:top-0 md:translate-x-0 md:w-64 md:block md:shadow-none
-  `}
-      >
-        <div className="flex items-center space-x-2 mb-2">
-          <div className="text-3xl hidden md:block">🩺</div>
-          <h1 className="text-xl font-semibold hidden md:block">
-            Doctor Panel
-          </h1>
+      {/* Dashboard Stats */}
+      <DoctorDashboardStats
+        totalBookings={totalAppointmentsLength}
+        todayBookings={todayAppointments.length}
+      />
+
+      {/* Appointments */}
+      <div className="bg-white rounded-2xl shadow-lg p-6 space-y-4">
+        <div className="border-b pb-2">
+          <h2 className="text-xl font-semibold text-indigo-700">
+            Upcoming Appointments
+          </h2>
+          <p className="text-sm text-gray-500">
+            These are your appointments for today.
+          </p>
         </div>
-        <nav className="space-y-4">
-          <a
-            href="#"
-            onClick={() => setSidebarOpen(false)}
-            className="flex items-center space-x-2 text-blue-600 font-medium"
-          >
-            <span>🏠</span>
-            <span>Home</span>
-          </a>
-          <a
-            href="#"
-            onClick={() => setSidebarOpen(false)}
-            className="flex items-center space-x-2 text-gray-600 hover:text-blue-600"
-          >
-            <span>📅</span>
-            <span>Appointments</span>
-          </a>
-          <a
-            href="#"
-            onClick={() => setSidebarOpen(false)}
-            className="flex items-center space-x-2 text-gray-600 hover:text-blue-600"
-          >
-            <span>👥</span>
-            <span>Patients</span>
-          </a>
-          <a
-            href="#"
-            onClick={() => setSidebarOpen(false)}
-            className="flex items-center space-x-2 text-gray-600 hover:text-blue-600"
-          >
-            <span>⚙️</span>
-            <span>Settings</span>
-          </a>
-        </nav>
-      </aside>
+        {!isLoading && paginationInfo.totalElements > 0 && (
+          <div className="hidden md:grid grid-cols-5 gap-4 px-4 py-2 text-sm font-semibold text-black text-center">
+            <div>Date</div>
+            <div>Time</div>
+            <div>Patient</div>
+            <div>Payment</div>
+            <div>Status</div>
+          </div>
+        )}
+        <div className="space-y-3">
+          {/* loader till the appointment is loading */}
+          {isLoading && <OverlayLoader />}
 
-      {/* Main Content */}
-      <main className="flex-1 p-4 md:p-8">
-        <h2 className="text-2xl font-semibold mb-6">Upcoming Appointments</h2>
+          {/* if no appointment for today */}
+          {!isLoading && paginationInfo.totalElements === 0 && (
+            <div className="p-12 text-center">
+              <div className="bg-gray-50 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
+                <CalendarX className="h-10 w-10 text-gray-400" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                No Appointments Today
+              </h3>
+              <p className="text-gray-500 mb-4">
+                You don't have any appointments scheduled for today. Enjoy your
+                day!
+              </p>
+              <div className="flex justify-center gap-4">
+                <Link
+                  className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
+                  to={"/doctor/appointments"}
+                >
+                  View All Appointments
+                </Link>
+                <Link className="border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors">
+                  Schedule New
+                </Link>
+              </div>
+            </div>
+          )}
 
-        <div className="hidden md:grid grid-cols-5 gap-4 px-4 py-2 text-sm font-semibold text-gray-600 bg-gray-100 rounded-t-md">
-          <div>Date</div>
-          <div>Time</div>
-          <div>Patient</div>
-          <div>Reason</div>
-          <div>Status</div>
+          {/* if appointment found for today */}
+          {!isLoading &&
+            paginationInfo.totalElements > 0 &&
+            todayAppointments.map((appt, index) => (
+              <div
+                key={appt?.appointmentId || index}
+                className="bg-gray-100 rounded-2xl shadow-md hover:shadow-xl hover:scale-[1.01] transition transform p-4 grid grid-cols-1 md:grid-cols-5 gap-2 text-sm text-gray-800 items-center text-center"
+              >
+                <div className="font-medium">
+                  <span className="md:hidden font-semibold">Date: </span>
+                  {appt?.date}
+                </div>
+                <div>
+                  <span className="md:hidden font-semibold">Time: </span>
+                  {appt?.time}
+                </div>
+                <div>
+                  <span className="md:hidden font-semibold">Patient: </span>
+                  {appt?.fullName}
+                </div>
+                <div className="text-purple-600 font-medium">
+                  <span className="md:hidden font-semibold">Reason: </span>
+                  {appt?.selectedPayment}
+                </div>
+                <div>
+                  <span className="md:hidden font-semibold">Status: </span>
+                  <span
+                    className={`px-2 py-0.5 inline-flex text-xs leading-5 font-medium rounded-full ${
+                      appt?.status === "BOOKED"
+                        ? "bg-emerald-100 text-emerald-800"
+                        : "bg-yellow-100 text-yellow-800"
+                    }`}
+                  >
+                    {appt?.status}
+                  </span>
+                </div>
+              </div>
+            ))}
         </div>
+      </div>
 
-        {paginatedAppointments.map((appt) => (
-          <div
-            key={appt.id}
-            className="grid grid-cols-1 md:grid-cols-5 gap-2 md:gap-4 px-4 py-4 bg-white border-b text-sm text-gray-700 md:items-center"
-          >
-            <div>
-              <span className="md:hidden font-semibold">Date: </span>
-              {appt.date}
+      {/* Pagination */}
+      {paginationInfo.totalPages > 1 && (
+        <div className="px-6 py-4 bg-gray-50 border-t border-gray-100">
+          <div className="flex items-center justify-between">
+            <div className="text-sm text-gray-700">
+              Showing{" "}
+              <span className="font-medium">{currentPage * pageSize + 1}</span>{" "}
+              to{" "}
+              <span className="font-medium">
+                {Math.min(
+                  (currentPage + 1) * pageSize,
+                  paginationInfo.totalElements
+                )}
+              </span>{" "}
+              of{" "}
+              <span className="font-medium">
+                {paginationInfo.totalElements}
+              </span>{" "}
+              appointments
             </div>
-            <div>
-              <span className="md:hidden font-semibold">Time: </span>
-              {appt.time}
-            </div>
-            <div>
-              <span className="md:hidden font-semibold">Patient: </span>
-              {appt.patient}
-            </div>
-            <div>
-              <span className="md:hidden font-semibold">Reason: </span>
-              {appt.reason}
-            </div>
-            <div>
-              <span className="md:hidden font-semibold">Status: </span>
-              <span
-                className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                  statusStyles[appt.status]
+
+            <div className="flex items-center gap-2">
+              <button
+                disabled={paginationInfo.first}
+                onClick={() => handlePageChange(currentPage - 1)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
+                  paginationInfo.first
+                    ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                    : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400"
                 }`}
               >
-                {appt.status}
-              </span>
+                <ChevronLeft className="h-4 w-4" />
+                Previous
+              </button>
+              <div className="flex items-center gap-1">
+                {Array.from(
+                  { length: Math.min(5, paginationInfo.totalPages) },
+                  (_, i) => {
+                    const pageNum = i;
+                    return (
+                      <button
+                        key={pageNum}
+                        onClick={() => handlePageChange(pageNum)}
+                        className={`w-10 h-10 rounded-lg font-medium transition-all ${
+                          currentPage === pageNum
+                            ? "bg-indigo-600 text-white"
+                            : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
+                        }`}
+                      >
+                        {pageNum + 1}
+                      </button>
+                    );
+                  }
+                )}
+              </div>
+              <button
+                disabled={paginationInfo.last}
+                onClick={() => handlePageChange(currentPage + 1)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
+                  paginationInfo.last
+                    ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                    : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400"
+                }`}
+              >
+                Next
+                <ChevronRight className="h-4 w-4" />
+              </button>
             </div>
           </div>
-        ))}
-
-        {/* Pagination */}
-        <div className="flex justify-between items-center mt-6">
-          <button
-            disabled={currentPage === 1}
-            onClick={() => setCurrentPage((prev) => prev - 1)}
-            className={`px-4 py-2 rounded ${
-              currentPage === 1
-                ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-                : "bg-blue-500 text-white hover:bg-blue-600"
-            }`}
-          >
-            Previous
-          </button>
-          <span className="text-gray-600">
-            Page {currentPage} of {totalPages}
-          </span>
-          <button
-            disabled={currentPage === totalPages}
-            onClick={() => setCurrentPage((prev) => prev + 1)}
-            className={`px-4 py-2 rounded ${
-              currentPage === totalPages
-                ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-                : "bg-blue-500 text-white hover:bg-blue-600"
-            }`}
-          >
-            Next
-          </button>
         </div>
-      </main>
+      )}
     </div>
   );
 };
 
-export default AppointmentDashboard;
+export default DoctorDashboard;

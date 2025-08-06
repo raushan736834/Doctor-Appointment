@@ -1,36 +1,32 @@
-import React from "react";
 import user_logo from "../../assets/img/user_icon.png";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { Link } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
+import { ROLES } from "../../constants/slots";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
 const ProfileButton = ({handleLogout}) => {
-  const { auth, setAuth } = useAuth();
+  const { auth } = useAuth();
   const role = localStorage.getItem("role");
-
-
   return (
     <div className="flex w-full items-center">
       <Menu as="div" className="relative">
         {auth?.accessToken ? (
           <>
-            <MenuButton className="flex items-center p-1 hover:bg-gray-800 hover:text-white rounded-full focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+            <MenuButton className="flex items-center p-1 hover:bg-gray-800 hover:text-white rounded-full
+             focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
               <img
                 className="h-11 w-11 rounded-full"
                 src={user_logo}
                 alt="User"
               />
-              {/* Text only on small screens (mobile), hidden on md+ */}
-              {/* <div className="ml-2 text-sm text-white font-bold sm:hidden">
-                Account Setting
-              </div> */}
             </MenuButton>
 
-            <MenuItems className="absolute right-0 mt-2 w-56 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
+            <MenuItems className="absolute right-0 mt-2 w-56 origin-top-right rounded-md bg-white py-1 
+            shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
               <MenuItem>
                 {({ focus }) => (
                   <Link
@@ -44,7 +40,7 @@ const ProfileButton = ({handleLogout}) => {
                   </Link>
                 )}
               </MenuItem>
-              {role === "doctor" && (
+              {role.includes(ROLES.doctor) && (
                 <MenuItem>
                   {({ focus }) => (
                     <Link

@@ -1,32 +1,31 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import Shimmer from "./Shimmer";
 import DoctorCard from "./DoctorCard";
-import Searchbar from "../Common/Searchbar";
-import useAxios from "@/hooks/useAxios";
+import api from "../../hooks/useAxios";
 
 const DoctorDetails = () => {
   const param = useParams();
   const id = param.id;
-
-  const [searchText, setSearchText] = useState("");
-  const [doctor, setDoctor] = useState([]);
+  const location = useLocation();
+  const doctorFromState = location.state && location.state.doctor;
+  const [doctor, setDoctor] = useState(doctorFromState ? [doctorFromState] : []);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const {fetchData} = useAxios();
 
   useEffect(() => {
-    getDoctorDetails();
-  }, []);
+    if (!doctorFromState) {
+      getDoctorDetails();
+    }
+  }, [id]);
 
   async function getDoctorDetails() {
     setLoading(true);
     try {
-      const url = `/api/doctors/search?keyword=${id}`;
-      const response = await fetchData({
-        url : url,
-      })
+      const url = `/api/public/search?keyword=${id}`;
+      const response = await api.get(url);
       const json = response?.data;
+      console.log(json)
       setDoctor(json);
     } catch (error) {
       setError(error);
@@ -46,12 +45,6 @@ const DoctorDetails = () => {
 
   return (
     <main className="flex flex-col">
-      <header className="bg-white shadow flex">
-        <Searchbar
-          value={searchText}
-          onChange={(e) => setSearchText(e.target.value)}
-        />
-      </header>
       <div className="flex justify-center my-2">
         <span className="text-gray-600 text-xl sm:text-2xl text-wrap">Doctor Specialized in {id}</span>
       </div>
@@ -60,7 +53,7 @@ const DoctorDetails = () => {
           <h1>No Doctor Found!!</h1>
         ) : (
           doctor?.map((doc) => {
-            return <DoctorCard {...doc} key={doc.id} />;
+            return <div key={doc.id} className="p-2"><DoctorCard {...doc} /></div>;
           })
         )}
       </div>

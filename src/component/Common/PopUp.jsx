@@ -1,4 +1,4 @@
-import useClickOutside from "@/hooks/useClickOutside";
+import useClickOutside from "../..//hooks/useClickOutside";
 import React, { useEffect, useRef } from "react";
 import { CgCloseO } from "react-icons/cg";
 
@@ -13,6 +13,7 @@ const Popup = ({
   handleRescheduleAppointment,
 }) => {
   const ref = useRef();
+  
   useClickOutside(ref, () => {
     console.log("Clicked");
     onClose()
@@ -40,16 +41,16 @@ const Popup = ({
         <p className="text-gray-600">{message}</p>
         <div className="items-center justify-center flex gap-3">
           <button
+            onClick={handleRescheduleAppointment}
+            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+          >
+            Back
+          </button>
+          <button
             onClick={handleCancelAppointment}
             className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
           >
             Cancel Appointment
-          </button>
-          <button
-            onClick={handleRescheduleAppointment}
-            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
-          >
-            Reschedule Appointment
           </button>
         </div>
       </div>

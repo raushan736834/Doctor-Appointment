@@ -1,19 +1,19 @@
-import React, { lazy, useEffect } from "react";
+import { useEffect } from "react";
 import ReactDOM from "react-dom/client";
 import {
-  BrowserRouter as Router,
+  HashRouter as Router,
   Routes,
   Route,
   Outlet,
   useNavigate,
+  useLocation,
 } from "react-router-dom";
-import { Provider } from "@/components/ui/provider";
+import { ChakraProvider } from "@chakra-ui/react";
 import Header from "./component/UserComponent/Header";
 import Body from "./component/UserComponent/Body";
 import Footer from "./component/UserComponent/Footer";
 import AboutUs from "./component/UserComponent/AboutUs";
 import ContactUs from "./component/UserComponent/ContactUS";
-import Error from "./component/UserComponent/Error";
 import DoctorDetails from "./component/UserComponent/DoctorDetails";
 import Login from "./component/AuthComponent/Login";
 import SignUp from "./component/AuthComponent/SignUp";
@@ -23,32 +23,44 @@ import AppointmentDetails from "./component/UserComponent/AppointmentDetails";
 import RequireAuth from "./component/GlobalComponent/RequireAuth";
 import RequireOnline from "./component/GlobalComponent/RequireOnline";
 import DoctorPersonalInfo from "./component/DoctorComponent/DoctorPersonalInfo";
-import DoctorProfile1 from "./component/DoctorComponent/DoctorProfile1";
 import { DateTimeProvider } from "./component/GlobalComponent/DateTimeProvider";
 import UserProfile from "./component/UserComponent/UserProfile";
 import ThankYou from "./component/UserComponent/ThankYou";
 import BookingDetails from "./component/UserComponent/BookingDetails";
 import DoctorDashboard from "./component/DoctorComponent/DoctorDashboard";
-import useAuth from "./hooks/useAuth";
-
-// const AppointmentDetails = lazy(() => import("./component/AppointmentDetails"));
+import DoctorCard from "./component/UserComponent/DoctorCard";
+import { ROLES } from "./constants/slots";
+import Appointments from "./component/DoctorComponent/Appointments";
+import DoctorLayout from "./component/DoctorComponent/DoctorLayout";
+import DoctorSetting from "./component/DoctorComponent/DoctorSetting";
+import { Navigate } from "react-router-dom";
+import PageNotFound from "./component/Common/PageNotFound";
+import { NotificationProvider } from "./component/NotificationComponent/NotificationContext";
+import NotificationDashboard from "./component/NotificationComponent/NotificationDashboard";
+import SecurityPassword from "./component/DoctorComponent/SecurityPassword";
 
 const AppLayout = () => {
   const navigate = useNavigate();
   const role = localStorage.getItem("role");
+  const { pathname } = useLocation();
 
-  // useEffect(() => {
-  //   if (role === "doctor") {
-  //     navigate("/doctor-dashboard");
-  //   }
-  // }, [role, navigate]);
+  const accessToken = localStorage.getItem("token");
+
+  useEffect(() => {
+    const cond =
+      pathname === "auth/login" ||
+      pathname === "auth/signup" ||
+      pathname === "/forget";
+    if (accessToken && cond) {
+      navigate("/", { redirect: true });
+    }
+  }, [pathname]);
 
   return (
     <>
-      <Provider>
+      <ChakraProvider>
         <AuthProvider>
-          {/* {role !== "doctor" && <Header />} */}
-          <Header />
+          {(!role || role.includes(ROLES.doctor) === false) && <Header />}
           <DateTimeProvider>
             <div
               style={{
@@ -57,48 +69,62 @@ const AppLayout = () => {
             >
               <Outlet />
             </div>
+            {/* <ToastContainer /> */}
           </DateTimeProvider>
-          {role !== "doctor" && <Footer />}
+          {(!role || role.includes(ROLES.doctor) === false) && <Footer />}
         </AuthProvider>
-      </Provider>
+      </ChakraProvider>
     </>
   );
 };
 
+const email = localStorage.getItem("email");
 const App = () => {
-  const role = localStorage.getItem("role");
   return (
-    <Router future={{ v7_relativeSplatPath: true }}>
+    <NotificationProvider userEmail={email}>
+      <Router future={{ v7_relativeSplatPath: true }}>
       <Routes>
-        <Route path="/" element={<AppLayout />}>
-          <Route element={<RequireOnline />}>
-            <Route index element={<Body />} />
-            <Route path="about" element={<AboutUs />} />
-            <Route path="contact" element={<ContactUs />} />
-            <Route path="specialist/:id" element={<DoctorDetails />} />
-            <Route path="auth/login" element={<Login />} />
-            <Route path="forget" element={<ForgetPassword />} />
-            <Route path="auth/signup" element={<SignUp />} />
-            <Route element={<RequireAuth />}>
-              <Route path="thankyou" element={<ThankYou />} />
-              <Route path="/profile" element={<UserProfile />} />
-              <Route
-                path="appointment-details/:id"
-                element={<AppointmentDetails />}
-              />
-              <Route path="booking-details" element={<BookingDetails />} />
-              <Route path="/doctor-dashboard" element={<DoctorDashboard />} />
-              <Route
-                path="/doctor-personalInfo"
-                element={<DoctorPersonalInfo />}
-              />
-              <Route path="/doctor-profile1" element={<DoctorProfile1 />} />
+          <Route path="/" element={<AppLayout />}>
+            <Route element={<RequireOnline />}>
+              <Route index element={<Body />} />
+              <Route path="about" element={<AboutUs />} />
+              <Route path="contact" element={<ContactUs />} />
+              <Route path="specialist/:id" element={<DoctorDetails />} />
+              <Route path="auth/login" element={<Login />} />
+              <Route path="forget" element={<ForgetPassword />} />
+              <Route path="/search/doctor" element={<DoctorCard />} />
+              <Route path="auth/signup" element={<SignUp />} />
+              <Route element={<RequireAuth />}>
+                <Route
+                  path="/notifications"
+                  element={<NotificationDashboard userEmail={email} />}
+                />
+                <Route path="thankyou" element={<ThankYou />} />
+                <Route path="/profile" element={<UserProfile />} />
+                <Route
+                  path="appointment-details/:id"
+                  element={<AppointmentDetails />}
+                />
+                <Route path="booking-details" element={<BookingDetails />} />
+                <Route path="doctor" element={<DoctorLayout />}>
+                  <Route index element={<Navigate to="dashboard" replace />} />
+                  <Route path="dashboard" element={<DoctorDashboard />} />
+                  <Route path="personalInfo" element={<DoctorPersonalInfo />} />
+                  <Route path="appointments" element={<Appointments />} />
+                  <Route path="settings" element={<DoctorSetting />}>
+                    <Route index element={<Navigate to="doctor-profile" replace />} />
+                    <Route path="doctor-profile" element={<DoctorPersonalInfo />} />
+                    <Route path="security" element={<SecurityPassword />} />
+                  </Route>
+                  <Route path="notifications" element={<NotificationDashboard />} />
+                </Route>
+              </Route>
             </Route>
+            <Route path="*" element={<PageNotFound />} />
           </Route>
-          <Route path="*" element={<Error />} />
-        </Route>
-      </Routes>
-    </Router>
+        </Routes>
+      </Router>
+    </NotificationProvider>
   );
 };
 

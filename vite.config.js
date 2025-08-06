@@ -1,10 +1,12 @@
-import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import jsconfigPaths from "vite-jsconfig-paths";
+import { defineConfig } from "vite";
+
+const isProd = process.env.NODE_ENV === 'production'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react(), jsconfigPaths()],
+  base: isProd ? '/Doctor-Appointment/' : '/',
+  plugins: [react()],
   server: {
     watch: {
       usePolling: true,

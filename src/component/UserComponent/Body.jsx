@@ -4,22 +4,16 @@ import Shimmer from "./Shimmer";
 import { Link } from "react-router-dom";
 import Searchbar from "../Common/Searchbar";
 import useOnline from "../../hooks/useOnline";
-import useAxios from "@/hooks/useAxios";
+import useAuth from "../../hooks/useAuth";
+import api from "../../hooks/useAxios";
 
-function filterData(searchText, data) {
-  const filterData = data.filter((ele) =>
-    ele?.text?.toLowerCase()?.includes(searchText.toLowerCase())
-  );
-  return filterData;
-}
-
-const SPECIALIST_URL = "/getSpecialist";
+const SPECIALIST_URL = "api/public/getSpecialist";
 
 const Body = () => {
-  const [searchText, setSearchText] = useState("");
+  const [searchText, setSearchText] = useState('');
   const [allSpecialist, setAllSpecialist] = useState([]);
   const isOnline = useOnline();
-  const { fetchData, loading } = useAxios();
+  const {isLoading,setIsLoading} = useAuth();
 
   useEffect(() => {
     if (isOnline) {
@@ -28,38 +22,25 @@ const Body = () => {
   }, [isOnline]);
 
   async function getSpecialist() {
-    console.log("function called")
     try {
-      const response = await fetchData({
-        url: SPECIALIST_URL,
-      });
-      console.log("inside func")
+      setIsLoading(true);
+      const response = await api.get(SPECIALIST_URL);
       const json = response.data;
       setAllSpecialist(json);
     } catch (error) {
-      console.log(error)
-    } 
-    // finally {
-    // }
+      setIsLoading(false);
+      console.log(error);
+    } finally{
+      setIsLoading(false);
+    }
   }
-
-  const handleSearch = () => {
-    const filteredData = filterData(searchText, allSpecialist);
-  };
-
-
 
   if (!allSpecialist) return null;
 
-  return loading ? (
+  return isLoading ? (
     <Shimmer />
   ) : (
     <>
-      <HeaderSection
-        searchText={searchText}
-        setSearchText={setSearchText}
-        handleSearch={handleSearch}
-      />
       <CategoryTitle />
       <main className="flex justify-center">
         <SpecialistList allSpecialist={allSpecialist} />
@@ -68,17 +49,7 @@ const Body = () => {
   );
 };
 
-function HeaderSection({ searchText, setSearchText, handleSearch }) {
-  return (
-    <header className="bg-white shadow flex">
-      <Searchbar
-        searchText={searchText}
-        onChange={(e) => setSearchText(e.target.value)}
-        onSearch={handleSearch}
-      />
-    </header>
-  );
-}
+
 
 function CategoryTitle() {
   return (
@@ -92,7 +63,7 @@ function CategoryTitle() {
 
 function SpecialistList({ allSpecialist }) {
   return (
-    <div className="mx-5 px-4 py-6 mb-5 sm:px-6 lg:px-8 bg-gray-200 rounded-lg flex flex-wrap justify-evenly">
+    <div className="mx-5 px-4 mb-5 sm:px-6 lg:px-8 bg-white rounded-lg flex flex-wrap justify-evenly">
       {allSpecialist?.length === 0 ? (
         <h1>No Specialist Found!!</h1>
       ) : (

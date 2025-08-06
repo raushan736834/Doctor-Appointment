@@ -3,7 +3,6 @@
     "private": true,
     "version": "0.0.0",
     "type": "module",
-    "homepage": "https://raushan736834.github.io/Doctor-Appointment",
     "scripts": {
       "start": "vite --host",
       "build": "vite build",

@@ -286,13 +286,13 @@ function DoctorDetailsSection({
           <p className="font-semibold text-[17px]">In Clinic Appointment</p>
         </div>
       </div>
-      <div className="flex justify-between mt-2 items-center">
-        <div className="flex mx-3">
+      <div className="flex justify-between mt-2 justify-items-center">
+        <div className="flex mx-3 justify-items-center gap-1">
           <div className="w-4 h-4 mt-1">
             <Calendar />
           </div>
-          <span className="ml-1 text-gray-700">On </span>
-          <span className="mx-1 font-semibold text-gray-700">
+          <span className="ml-1 text-gray-700 pt-1">On </span>
+          <span className="font-semibold text-gray-700 pt-1">
             {date &&
               new Date(date).toLocaleDateString("en-US", {
                 year: "numeric",
@@ -301,12 +301,12 @@ function DoctorDetailsSection({
               })}
           </span>
         </div>
-        <div className="flex mx-3">
+        <div className="flex mx-3 justify-items-center gap-1">
           <div className="w-4 h-4 mt-1">
             <Clock />
           </div>
-          <span className="ml-1 text-gray-700">At</span>
-          <span className="mx-1 font-semibold text-gray-700">{time}</span>
+          <span className="ml-1 text-gray-700 pt-1">At</span>
+          <span className="font-semibold text-gray-700 pt-1">{time}</span>
         </div>
       </div>
       <div className="border-b-2 ">

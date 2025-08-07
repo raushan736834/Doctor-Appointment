@@ -579,7 +579,7 @@ function PatientDetailsSection({
                   className="mr-2"
                   onChange={() => setFieldValue("selectedPayment", "option3")}
                 />
-                ₹{doctorDetails.consultation_fees} Pay Online
+                ₹{doctorDetails.consultationFees} Pay Online
               </label>
             </div>
             <div className="border border-white/30 bg-white/50 backdrop-blur-sm p-2 mb-2 rounded-md">
@@ -591,7 +591,7 @@ function PatientDetailsSection({
                   className="mr-2"
                   onChange={() => setFieldValue("selectedPayment", "option4")}
                 />
-                ₹{doctorDetails.consultation_fees} Pay later at the clinic
+                ₹{doctorDetails.consultationFees} Pay later at the clinic
               </label>
             </div>
 

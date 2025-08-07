@@ -286,7 +286,7 @@ function DoctorDetailsSection({
           <p className="font-semibold text-[17px]">In Clinic Appointment</p>
         </div>
       </div>
-      <div className="flex justify-between mt-2">
+      <div className="flex justify-between mt-2 items-center">
         <div className="flex mx-3">
           <div className="w-4 h-4 mt-1">
             <Calendar />

@@ -244,10 +244,10 @@ const AppointmentDetails = () => {
           <div className="w-full sm:m-3 lg:m-4 p-4 flex flex-col bg-white/10 backdrop-blur-lg border border-white/20 shadow-lg rounded-xl">
             {/* Doctor Details Section */}
             <DoctorDetailsSection
-              calender={calender}
+              calender={<Calendar/>}
               date={date}
               time={time}
-              clock={clock}
+              clock={<Clock />}
               specialization={specialization}
               doctorDetails={doctorDetails}
               doctorProfileLink={doctorProfileLink}
@@ -273,10 +273,8 @@ const AppointmentDetails = () => {
 export default AppointmentDetails;
 
 function DoctorDetailsSection({
-  calender,
   date,
   time,
-  clock,
   specialization,
   doctorDetails,
   doctorProfileLink,

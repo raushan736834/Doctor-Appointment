@@ -5,6 +5,7 @@ import api from "../../hooks/useAxios";
 import RescheduleModal from "../DoctorComponent/RescheduleModal";
 import { cancelAppointment } from "../../constants/Method";
 import { useToast } from "@chakra-ui/react";
+import OverlayLoader from "../Common/Loader";
 
 const BookedAppointments = () => {
   const email = localStorage.getItem("email");
@@ -31,6 +32,12 @@ const BookedAppointments = () => {
   const goHome = () => {
     window.location.href = "/";
   };
+
+  // const photoUrl =
+  //     profilePhoto && profilePhoto.trim() !== ""
+  //       ? getDirectGoogleDriveLink(profilePhoto)
+  //       : defaultDoctorImage;
+    
 
   const handleConfirmCancel = async () => {
     if (!selectedAppointment) return;
@@ -115,6 +122,10 @@ const BookedAppointments = () => {
         setIsLoading(false);
       });
   };
+
+  if (isLoading) {
+    return <OverlayLoader />;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
@@ -222,7 +233,7 @@ const BookedAppointments = () => {
                     <div className="w-16 h-16 rounded-2xl overflow-hidden ring-4 ring-white shadow-lg">
                       <img
                         src={appointment?.doctor?.profilePhoto}
-                        alt={appointment.doctor.doctorName}
+                        alt={appointment?.doctor?.doctorName}
                         className="w-full h-full object-cover"
                       />
                     </div>
@@ -264,7 +275,7 @@ const BookedAppointments = () => {
                     </div>
                     <div className="text-right">
                       <div className="text-lg font-bold text-gray-800">
-                        ${appointment.doctor.consultationFees}
+                        ₹{appointment.doctor.consultationFees}
                       </div>
                       <div className="text-xs text-gray-500">
                         {appointment.selectedPayment}

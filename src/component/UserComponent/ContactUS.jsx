@@ -1,5 +1,9 @@
+import api from '../../hooks/useAxios';
 import React, { useState } from 'react';
+import OverlayLoader from '../Common/Loader';
+import useAuth from '../../hooks/useAuth';
 
+const CONTACT_URL = "api/public/contact-us";
 const ContactUs = () => {
   const [formData, setFormData] = useState({
     name: '',
@@ -8,6 +12,9 @@ const ContactUs = () => {
     message: ''
   });
   const [success, setSuccess] = useState(false);
+  const [error, setError] = useState(false);
+  const [errMsg,setErrMsg] = useState("");
+  const {isLoading, setIsLoading} = useAuth();
 
   const handleChange = (e) => {
     setFormData({
@@ -16,12 +23,28 @@ const ContactUs = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setSuccess(true);
-    setFormData({ name: '', email: '', subject: '', message: '' });
-    setTimeout(() => setSuccess(false), 5000);
+    setIsLoading(true);
+    setError(false);
+    setSuccess(false);
+    try {
+      const response = await api.post(CONTACT_URL, formData);
+      if (response.status === 202 || response.status === 200) {
+        setSuccess(true);
+        setFormData({ name: '', email: '', subject: '', message: '' });
+      }
+    } catch (err) {
+      setError(true);
+      setErrMsg(err.response?.data?.message || 'An error occurred while sending your message. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
+
+  if(isLoading){
+    return <OverlayLoader />
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-100 to-gray-300 p-5 flex items-center justify-center">
@@ -32,12 +55,17 @@ const ContactUs = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2">
-          <div className="p-10 bg-white">
+          <div className="p-10 bg-gray-100">
             <h2 className="text-3xl font-bold mb-8 text-gray-800 relative after:absolute after:bottom-[-10px] after:left-0 after:w-16 after:h-1 after:bg-gradient-to-r after:from-indigo-500 after:to-purple-600 after:rounded"></h2>
 
             {success && (
               <div className="bg-green-500 text-white text-center py-4 rounded-xl mb-6 font-semibold animate-fade-in">
                 Thank you for your message! We'll get back to you soon.
+              </div>
+            )}
+            {error && (
+              <div className="bg-red-500 text-white text-center py-4 rounded-xl mb-6 font-semibold animate-fade-in">
+                {errMsg}
               </div>
             )}
 

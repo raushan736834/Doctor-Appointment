@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { User2 } from 'lucide-react';
 
 // Simple SVG icon components
 const Heart = ({ className }) => (
@@ -20,11 +21,6 @@ const Clock = ({ className }) => (
   </svg>
 );
 
-const Users = ({ className }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a4 4 0 11-8 0 4 4 0 018 0z" />
-  </svg>
-);
 
 const Shield = ({ className }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -63,15 +59,10 @@ const CheckCircle = ({ className }) => (
   </svg>
 );
 
-const Stethoscope = ({ className }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0016.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 002 8.5c0 2.29 1.51 4.04 3 5.5l6 6 6-6z" />
-  </svg>
-);
 
 const AboutUs = () => {
   const stats = [
-    { icon: Users, number: "500+", label: "Patients Served" },
+    { icon: User2, number: "500+", label: "Patients Served" },
     { icon: Award, number: "15+", label: "Years of Excellence" },
     { icon: Heart, number: "200+", label: "Medical Professionals" },
     { icon: Star, number: "4.9", label: "Patient Rating" }

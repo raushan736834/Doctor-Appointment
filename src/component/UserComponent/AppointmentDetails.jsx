@@ -10,16 +10,25 @@ import { format } from "date-fns";
 import useRazorpayScript from "../../hooks/useRazorpayScript";
 import api from "../../hooks/useAxios";
 import { AppointmentStatus } from "../../constants/slots";
+import OverlayLoader from "../Common/Loader";
+import ErrorBoundary from "../Common/ErrorBoudary";
 
 const BOOKED_URL = "/appointment/book-appointment";
 const FETCH_DOCTOR_DATA = "/api/user/getDoctor";
 
+function getDirectGoogleDriveLink(url) {
+  const match = url.match(/\/d\/([^/]+)/);
+  if (match && match[1]) {
+    return `https://drive.google.com/uc?export=view&id=${match[1]}`;
+  }
+  return url;
+}
+
 const AppointmentDetails = () => {
   const errRef = useRef();
   const [errMsg, setErrMsg] = useState("");
-  const { auth, setIsLoading } = useAuth();
+  const { auth, setIsLoading, isLoading } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
-
   const { data } = useDate();
   const date = data.selectedDate;
   const time = data.slot;
@@ -49,7 +58,7 @@ const AppointmentDetails = () => {
     } else {
       setDoctorProfileLink(defaultImage);
     }
-  }, [doctorDetails]);
+  }, []);
 
   async function getDoctorDetails() {
     const save = {
@@ -76,6 +85,13 @@ const AppointmentDetails = () => {
       return v.toString(16);
     });
   }
+
+  const photoUrl =
+      doctorProfileLink && doctorProfileLink.trim() !== ""
+        ? getDirectGoogleDriveLink(doctorProfileLink)
+        : defaultImage;
+    
+  console.log(photoUrl)
 
   const handleSubmit = async (values) => {
     setIsLoading(true);
@@ -233,8 +249,12 @@ const AppointmentDetails = () => {
     }
   };
 
-  if (error) return <div>{error}</div>;
-
+  if (error) {
+    return <ErrorBoundary />
+  };
+  if(isLoading){
+    return <OverlayLoader />
+  }
   return (
     <>
       {!accessToken ? (
@@ -250,7 +270,7 @@ const AppointmentDetails = () => {
               clock={<Clock />}
               specialization={specialization}
               doctorDetails={doctorDetails}
-              doctorProfileLink={doctorProfileLink}
+              doctorProfileLink={photoUrl}
             />
           </div>
           <div className="w-full sm:m-3 lg:m-4 p-4 flex flex-col bg-white/10 backdrop-blur-lg border border-white/20 shadow-lg rounded-xl">
@@ -323,7 +343,7 @@ function DoctorDetailsSection({
           <div className="flex m-3">
             <div>
               <img
-                src={doctorProfileLink || defaultImage}
+                src={doctorProfileLink}
                 className="w-24 rounded-sm h-28"
               />
             </div>

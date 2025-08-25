@@ -1,6 +1,6 @@
 import axios from "axios";
 
-// const baseUrl = "http://localhost:8080"; // your backend
+// const baseUrl = "http://localh/ost:8080"; // your backend
 const baseUrl = import.meta.env.VITE_BASE_URL // your backend
 
 const api = axios.create({

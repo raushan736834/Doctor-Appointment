@@ -481,7 +481,7 @@ const ModernHeader = () => {
           </nav>
 
           {/* Search Bar - Hidden on mobile */}
-          <div className="hidden md:flex flex-1 max-w-2xl mx-8">
+          <div className="hidden md:flex flex-1 max-w-2xl">
             <Searchbar />
           </div>
 

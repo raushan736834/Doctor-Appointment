@@ -11,6 +11,7 @@ import {
 import { ChakraProvider } from "@chakra-ui/react";
 import Header from "./component/UserComponent/Header";
 import Body from "./component/UserComponent/Body";
+import ErrorBoundary from "./component/Common/ErrorBoudary";
 import Footer from "./component/UserComponent/Footer";
 import AboutUs from "./component/UserComponent/AboutUs";
 import ContactUs from "./component/UserComponent/ContactUS";
@@ -38,6 +39,7 @@ import PageNotFound from "./component/Common/PageNotFound";
 import { NotificationProvider } from "./component/NotificationComponent/NotificationContext";
 import NotificationDashboard from "./component/NotificationComponent/NotificationDashboard";
 import SecurityPassword from "./component/DoctorComponent/SecurityPassword";
+import Index from "./component/UserComponent";
 
 const AppLayout = () => {
   const navigate = useNavigate();
@@ -58,22 +60,24 @@ const AppLayout = () => {
 
   return (
     <>
-      <ChakraProvider>
-        <AuthProvider>
-          {(!role || role.includes(ROLES.doctor) === false) && <Header />}
-          <DateTimeProvider>
-            <div
-              style={{
-                minHeight: "calc(100vh - 196px)",
-              }}
-            >
-              <Outlet />
-            </div>
-            {/* <ToastContainer /> */}
-          </DateTimeProvider>
-          {(!role || role.includes(ROLES.doctor) === false) && <Footer />}
-        </AuthProvider>
-      </ChakraProvider>
+      <ErrorBoundary>
+        <ChakraProvider>
+          <AuthProvider>
+            {(!role || role.includes(ROLES.doctor) === false) && <Header />}
+            <DateTimeProvider>
+              <div
+                style={{
+                  minHeight: "calc(100vh - 196px)",
+                }}
+              >
+                <Outlet />
+              </div>
+              {/* <ToastContainer /> */}
+            </DateTimeProvider>
+            {(!role || role.includes(ROLES.doctor) === false) && <Footer />}
+          </AuthProvider>
+        </ChakraProvider>
+      </ErrorBoundary>
     </>
   );
 };
@@ -86,7 +90,7 @@ const App = () => {
         <Routes>
           <Route path="/" element={<AppLayout />}>
             <Route element={<RequireOnline />}>
-              <Route index element={<Body />} />
+              <Route index element={<Index />} />
               <Route path="about" element={<AboutUs />} />
               <Route path="contact" element={<ContactUs />} />
               <Route path="specialist/:id" element={<DoctorDetails />} />

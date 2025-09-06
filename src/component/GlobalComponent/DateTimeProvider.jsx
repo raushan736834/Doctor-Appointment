@@ -6,19 +6,18 @@ const dateContext = createContext({});
 export const DateTimeProvider = ({ children }) => {
   const [data, setData] = useState(() => {
     // Retrieve data from localStorage when the component mounts
-    const savedData = localStorage.getItem('myData');
+    const savedData = localStorage.getItem("myData");
     return savedData ? JSON.parse(savedData) : null;
   });
 
   useEffect(() => {
     // Save data to localStorage whenever it changes
-    if (data) {
-      localStorage.setItem('myData', JSON.stringify(data));
-    }
+
+    localStorage.setItem("myData", JSON.stringify(data));
   }, [data]);
 
   return (
-    <dateContext.Provider value={{ data,setData}}>
+    <dateContext.Provider value={{ data, setData }}>
       {children}
     </dateContext.Provider>
   );

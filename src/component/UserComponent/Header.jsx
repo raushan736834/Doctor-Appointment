@@ -448,7 +448,7 @@ const ModernHeader = () => {
                 rounded-2xl flex items-center justify-center group-hover:scale-105 
                 transition-all duration-200 shadow-lg"
               >
-                <span className="text-white font-bold text-xl">M</span>
+                <span className="text-white font-bold text-xl">H</span>
               </div>
               <div className="ml-3 hidden lg:block">
                 <span

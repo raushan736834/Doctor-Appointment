@@ -55,12 +55,12 @@ const LoadingSpinner = ({
  * Page Loading Spinner
  * Specifically for page transitions
  */
-export const PageLoader = () => (
+export const PageLoader = ({size, color, message, fullScreen}) => (
   <LoadingSpinner 
-    size="lg" 
-    color="blue" 
-    message="Loading page..." 
-    fullScreen={true}
+    size={size || "lg"} 
+    color={color || "blue" }
+    message= {message || "Loading page..."}
+    fullScreen={fullScreen || true}
   />
 );
 

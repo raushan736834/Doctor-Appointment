@@ -34,9 +34,9 @@ const Searchbar = () => {
   }, [searchText, api]);
 
   const handleSuggestionClick = (doctor) => {
-    onChange({ target: { value: doctor.doctorName } });
+    // onChange({ target: { value: doctor.doctorName } });
     setShowDropdown(false);
-    navigate(`/specialist/${doctor.specialization}`, { state: { doctor } });
+    navigate(`/specialist/${encodeURIComponent(doctor.specialization)}/${doctor.id}`, { state: { doctor }});
   };
 
   return (

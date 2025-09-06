@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 
-const CoolLoader = ({ isLoading = true, message = "Loading..." }) => {
+export const CoolLoader = ({ isLoading = true, message = "Loading..." }) => {
   if (!isLoading) return null;
 
   return (
-    <div className="flex flex-col items-center space-y-6 p-8">
-      {/* Hexagonal Pulse Loader */}
+    <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center">
+      <div className="flex flex-col items-center space-y-6 p-8">
+        {/* Hexagonal Pulse Loader */}
       <div className="relative">
         <div className="w-20 h-20 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full animate-pulse shadow-lg shadow-purple-500/50"></div>
         <div className="absolute inset-0 w-20 h-20 border-4 border-transparent border-t-cyan-400 border-r-cyan-400 rounded-full animate-spin"></div>
@@ -28,6 +29,7 @@ const CoolLoader = ({ isLoading = true, message = "Loading..." }) => {
         <div className="w-3 h-3 bg-gradient-to-r from-cyan-400 to-yellow-400 rounded-full animate-bounce shadow-lg shadow-cyan-400/50" style={{ animationDelay: '0.2s' }}></div>
         <div className="w-3 h-3 bg-gradient-to-r from-yellow-400 to-purple-500 rounded-full animate-bounce shadow-lg shadow-yellow-400/50" style={{ animationDelay: '0.3s' }}></div>
       </div>
+    </div>
     </div>
   );
 };

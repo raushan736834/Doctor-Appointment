@@ -6,6 +6,7 @@ import RescheduleModal from "../DoctorComponent/RescheduleModal";
 import { cancelAppointment } from "../../constants/Method";
 import { useToast } from "@chakra-ui/react";
 import OverlayLoader from "../Common/Loader";
+import { useNavigate } from "react-router-dom";
 
 const BookedAppointments = () => {
   const email = localStorage.getItem("email");
@@ -15,6 +16,7 @@ const BookedAppointments = () => {
   const [showRescheduleModal, setShowRescheduleModal] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const toast = useToast();
+  const navigate = useNavigate();
 
   const getStatusStyle = (status) => {
     switch (status) {
@@ -30,7 +32,7 @@ const BookedAppointments = () => {
   };
 
   const goHome = () => {
-    window.location.href = "/";
+    navigate("/");
   };
 
   // const photoUrl =
@@ -351,7 +353,7 @@ const BookedAppointments = () => {
                   </button>
 
                   <button
-                    onClick={() => (window.location.href = "/book-appointment")}
+                    onClick={goHome}
                     className="w-full px-8 py-4 bg-white border-2 border-blue-500 text-blue-500 hover:bg-blue-50 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-lg flex items-center justify-center gap-3"
                   >
                     <span className="text-xl">📅</span>

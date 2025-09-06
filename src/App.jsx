@@ -39,7 +39,9 @@ import PageNotFound from "./component/Common/PageNotFound";
 import { NotificationProvider } from "./component/NotificationComponent/NotificationContext";
 import NotificationDashboard from "./component/NotificationComponent/NotificationDashboard";
 import SecurityPassword from "./component/DoctorComponent/SecurityPassword";
-import Index from "./component/UserComponent";
+import Index from "./component/UserComponent/Homepage/Index";
+import ScrollToTop from "./component/Common/ScrollToTop";
+import DoctorProfile from "./component/UserComponent/DoctorProfile";
 
 const AppLayout = () => {
   const navigate = useNavigate();
@@ -87,6 +89,7 @@ const App = () => {
   return (
     <NotificationProvider userEmail={email}>
       <Router future={{ v7_relativeSplatPath: true }}>
+        <ScrollToTop />
         <Routes>
           <Route path="/" element={<AppLayout />}>
             <Route element={<RequireOnline />}>
@@ -98,6 +101,7 @@ const App = () => {
               <Route path="forget" element={<ForgetPassword />} />
               <Route path="/search/doctor" element={<DoctorCard />} />
               <Route path="auth/signup" element={<SignUp />} />
+              <Route path="specialist/:specialist/:doctorId" element={<DoctorProfile />} />
               <Route element={<RequireAuth />}>
                 <Route
                   path="/notifications"
@@ -106,7 +110,7 @@ const App = () => {
                 <Route path="thankyou" element={<ThankYou />} />
                 <Route path="/profile" element={<UserProfile />} />
                 <Route
-                  path="appointment-details/:id"
+                  path="/appointment-details/:id"
                   element={<AppointmentDetails />}
                 />
                 <Route path="booking-details" element={<BookingDetails />} />

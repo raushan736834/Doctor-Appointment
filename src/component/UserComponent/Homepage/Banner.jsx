@@ -1,15 +1,24 @@
 import React, { useEffect, useState } from "react";
 import { Search, MapPin, Building2, Stethoscope, Users } from "lucide-react";
-import api from "../../hooks/useAxios";
+import api from "../../../hooks/useAxios";
+import { useNavigate } from "react-router-dom";
 
 const SPECIALIST_URL = "api/public/getSpecialist";
+const CITIES_URL = "api/public/cities";
+const SEARCH_URL = "api/public/searchByCityAndSpecialist";
 
 const Banner = () => {
   const [specialists, setSpecialists] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const [err, setErr] = useState();
   const [selectedSpecialist, setSelectedSpecialist] = useState("");
-
+  const [selectedCity, setSelectedCity] = useState("");
+  const [cities, setCities] = useState([]);
+  const [doctors, setDoctors] = useState([]);
+  const [successFetch, setSuccessFetch] = useState(false);
+  const navigate = useNavigate();
   useEffect(() => {
+    fetchCities();
     fetchSpecialist();
   }, []);
 
@@ -22,6 +31,50 @@ const Banner = () => {
       setErr("Failed to load specialists. Please try again later.");
     }
   };
+
+  const fetchCities = async () => {
+    try {
+      const response = await api.get(CITIES_URL);
+      setCities(response.data);
+    } catch (error) {
+      console.log("Error fetching cities: ", error);
+      setErr("Failed to load cities. Please try again later.");
+    }
+  };
+
+  const handleSearch = async () => {
+    console.log(selectedCity);
+    console.log(selectedSpecialist);
+    if (!selectedCity || !selectedSpecialist) {
+      setErr("Please select both city and specialist");
+      return;
+    }
+    console.log(selectedSpecialist);
+
+    setIsLoading(true);
+    try {
+      const response = await api.get(SEARCH_URL, {
+        params: {
+          city: selectedCity,
+          specialist: selectedSpecialist,
+        },
+      });
+      console.log("Search results:", response);
+      setDoctors(response.data);
+      if (response.status === 200) setSuccessFetch(true);
+    } catch (error) {
+      console.error("Error searching doctors:", error);
+      setErr("Failed to search doctors. Please try again later.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (successFetch) {
+    navigate(`/specialist/${encodeURIComponent(selectedSpecialist)}`, {
+      state: { doctors: doctors, flag: true },
+    });
+  }
 
   return (
     <div className="flex justify-center bg-gradient-to-r from-white via-gray-100 to-white p-4 md:p-6">
@@ -112,33 +165,53 @@ const Banner = () => {
                 {/* City Input */}
                 <div className="relative flex-1">
                   <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                  <input
-                    type="text"
-                    placeholder="Your City"
-                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
-                  />
+                  <select
+                    value={selectedCity}
+                    onChange={(e) => setSelectedCity(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 
+    focus:border-transparent text-gray-700 appearance-none bg-white"
+                  >
+                    <option value="" disabled>
+                      City
+                    </option>
+                    {cities
+                      .filter((city) => city && city.trim() !== "") // ✅ skip null/empty
+                      .map((city) => (
+                        <option key={city} value={city}>
+                          {city}
+                        </option>
+                      ))}
+                  </select>
                 </div>
 
                 {/* Clinic Input */}
-                <div className="relative flex-1">
+                {/* <div className="relative flex-1">
                   <Building2 className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                   <input
                     type="text"
                     placeholder="Clinic"
                     className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
                   />
-                </div>
+                </div> */}
 
                 {/* Category Input */}
                 <div className="relative flex-1">
                   <Stethoscope className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                  <select className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700 appearance-none bg-white">
-                    {specialists.map((specialist, index) => (
-                      <option
-                        key={index}
-                        value={specialist.id || specialist.name}
-                      >
-                        {specialist.name}
+                  <select
+                    value={selectedSpecialist}
+                    onChange={(e) => {
+                      console.log(e.target);
+                      setSelectedSpecialist(e.target.value);
+                    }}
+                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 
+                    focus:border-transparent text-gray-700 appearance-none bg-white"
+                  >
+                    <option value="" disabled>
+                      Specialist
+                    </option>
+                    {specialists.map((specialist) => (
+                      <option key={specialist.id} value={specialist.specialist}>
+                        {specialist.specialist}
                       </option>
                     ))}
                   </select>
@@ -146,8 +219,16 @@ const Banner = () => {
 
                 {/* Search Button */}
                 <div className="flex-shrink-0">
-                  <button className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg transition-colors duration-200 shadow-lg flex items-center justify-center">
-                    <Search className="w-5 h-5" />
+                  <button
+                    onClick={handleSearch}
+                    disabled={isLoading || !selectedCity || !selectedSpecialist}
+                    className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg transition-colors duration-200 shadow-lg flex items-center justify-center disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  >
+                    {isLoading ? (
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    ) : (
+                      <Search className="w-5 h-5" />
+                    )}
                   </button>
                 </div>
               </div>
@@ -215,36 +296,53 @@ const Banner = () => {
                   {/* City Input */}
                   <div className="relative flex-1">
                     <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                    <input
-                      type="text"
-                      placeholder="Your City"
-                      className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
-                    />
+                    <select
+                      value={selectedCity}
+                      onChange={(e) => setSelectedCity(e.target.value)}
+                      className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 
+    focus:border-transparent text-gray-700 appearance-none bg-white"
+                    >
+                      <option value="" disabled>
+                        City
+                      </option>
+                      {cities
+                        .filter((city) => city && city.trim() !== "") // ✅ skip null/empty
+                        .map((city) => (
+                          <option key={city} value={city}>
+                            {city}
+                          </option>
+                        ))}
+                    </select>
                   </div>
 
                   {/* Clinic Input */}
-                  <div className="relative flex-1">
+                  {/* <div className="relative flex-1">
                     <Building2 className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                     <input
                       type="text"
                       placeholder="Clinic"
                       className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
                     />
-                  </div>
+                  </div> */}
 
                   {/* Category Input */}
                   <div className="relative flex-1">
                     <Stethoscope className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                     <select
                       value={selectedSpecialist}
-                      onChange={(e) => setSelectedSpecialist(e.target.value)}
+                      onChange={(e) => {
+                        setSelectedSpecialist(e.target.value);
+                      }}
                       className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700 appearance-none bg-white"
                     >
                       <option value="" disabled>
                         Specialist
                       </option>
                       {specialists.map((specialist) => (
-                        <option key={specialist.id} value={specialist.id}>
+                        <option
+                          key={specialist.id}
+                          value={specialist.specialist}
+                        >
                           {specialist.specialist}
                         </option>
                       ))}
@@ -253,8 +351,19 @@ const Banner = () => {
 
                   {/* Search Button */}
                   <div className="flex-shrink-0">
-                    <button className="w-full sm:w-auto bg-blue-900 hover:bg-blue-700 text-white px-4 py-3 rounded-lg transition-colors duration-200 shadow-lg flex items-center justify-center">
-                      <Search className="w-5 h-5" />
+                    <button
+                      onClick={handleSearch}
+                      disabled={
+                        isLoading || !selectedCity || !selectedSpecialist
+                      }
+                      className="w-full sm:w-auto bg-blue-900 hover:bg-blue-700 text-white px-4 py-3 rounded-lg transition-colors duration-200 shadow-lg
+                       flex items-center justify-center  disabled:cursor-not-allowed"
+                    >
+                      {isLoading ? (
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      ) : (
+                        <Search className="w-5 h-5" />
+                      )}
                     </button>
                   </div>
                 </div>

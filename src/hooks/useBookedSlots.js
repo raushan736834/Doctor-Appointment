@@ -15,6 +15,7 @@ export function useBookedSlots(doctorId, date) {
     const fetchSlots = async () => {
       setIsLoading(true);
       setError("");
+      console.log("booked slot " + isLoading)
       try {
         const data = {
           date: format(date, "yyyy-MM-dd"),
@@ -28,6 +29,8 @@ export function useBookedSlots(doctorId, date) {
         if (isMounted) setError("Failed to fetch availability");
       } finally {
         if (isMounted) setIsLoading(false);
+        console.log("booked slot " + isLoading)
+
       }
     };
 

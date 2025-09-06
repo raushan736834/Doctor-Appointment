@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import SpecialistCard from "./SpecialistCard";
 import Shimmer from "./Shimmer";
 import { Link } from "react-router-dom";
-import Searchbar from "../Common/Searchbar";
 import useOnline from "../../hooks/useOnline";
 import useAuth from "../../hooks/useAuth";
 import api from "../../hooks/useAxios";

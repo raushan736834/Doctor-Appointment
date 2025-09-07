@@ -3,9 +3,9 @@ import { Formik, Field, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { Link, useNavigate } from "react-router-dom";
 import { useRef, useState, useEffect } from "react";
-import axios from "../../api/axios";
 import useAuth from "../../hooks/useAuth";
 import { useToast } from "@chakra-ui/react";
+import api from "../../hooks/useAxios";
 
 const REGISTER_URL = "/auth/signup";
 
@@ -102,14 +102,7 @@ const SignUp = () => {
               password: values.password,
               roles: values.roles, // user or doctor
             };
-            const response = await axios.post(
-              REGISTER_URL,
-              JSON.stringify(userData),
-              {
-                headers: { "Content-Type": "application/json" },
-                withCredentials: true,
-              }
-            );
+            const response = await api.post(REGISTER_URL,userData);
             console.log(response.data);
             setSuccess(true);
             actions.resetForm();
@@ -195,7 +188,7 @@ const SignUp = () => {
                           type="password"
                           colSpan={6}
                         />
-                        <div className="sm:col-span-6">
+                        {/* <div className="sm:col-span-6">
                           <label className="block text-sm font-medium leading-6 text-gray-900">
                             <Field name="roles">
                               {({ form }) => (
@@ -221,7 +214,7 @@ const SignUp = () => {
                               )}
                             </Field>
                           </label>
-                        </div>
+                        </div> */}
                       </div>
                     </div>
                   </div>

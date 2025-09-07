@@ -1,11 +1,11 @@
 import logo from "../../assets/img/appointDoctor.jpg";
 import { useRef, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import axios from "../../api/axios";
 import ResetPassword from "./ResetPassword";
+import api from "../../hooks/useAxios";
 
 
-const FORGET_URL = "/forget";
+const FORGET_URL = "/auth/forget";
 
 const ForgetPassword = () => {
   const userRef = useRef();
@@ -29,10 +29,7 @@ const ForgetPassword = () => {
     e.preventDefault();
     setErrMsg("");
     try {
-      const response = await axios.post(FORGET_URL, JSON.stringify({ email }), {
-        headers: { "Content-Type": "application/json" },
-        withCredentials: true,
-      });
+      const response = await api.post(FORGET_URL, email);
       console.log(JSON.stringify(response?.data));
       console.log(response);
       alert("OTP Sent Successfully");
@@ -51,17 +48,17 @@ const ForgetPassword = () => {
 
   const verifyOtp = async (e) => {
     e.preventDefault();
+    const data = {
+      email : email,
+      otp : otp
+    }
     setErrMsg("");
     try {
-      const response = await axios.post(
-        "/forget/verify",
-        JSON.stringify({ email, otp }),
-        {
-          headers: { "Content-Type": "application/json" },
-          withCredentials: true,
-        }
+      const response = await api.post(
+        "/auth/forget/verify",
+        data
       );
-      setSuccess(true);
+      if(response.status === 200) setSuccess(true);
     } catch (err) {
       if (!err?.response) {
         setErrMsg("No Server Response");

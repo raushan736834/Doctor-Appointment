@@ -3,10 +3,10 @@ import { Formik, Field, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { Link } from "react-router-dom";
 import { useRef, useState } from "react";
-import axios from "../../api/axios";
 import Login from "./Login";
+import api from "../../hooks/useAxios";
 
-const RESET_URL = "/reset";
+const RESET_URL = "/auth/reset";
 
 const ResetPassword = ({email}) => {
   const errRef = useRef();
@@ -41,7 +41,7 @@ const ResetPassword = ({email}) => {
                 password: values.password,
                 email
               };
-              const response = await axios.post(
+              const response = await api.post(
                 RESET_URL,
                 JSON.stringify(userData),
                 {

@@ -15,10 +15,10 @@ class SocketService {
     const accessToken = localStorage.getItem("token");
 
     const isProd = process.env.NODE_ENV === "production";
+    
 
-    const url = isProd
-      ? import.meta.env.VITE_BASE_URL
-      : "http://localhost:8081";
+    const url = import.meta.env.VITE_BASE_URL
+    // const url = "http://localhost:8081";
 
     // Connect to Socket.io server with authentication
     this.socket = io(url, {

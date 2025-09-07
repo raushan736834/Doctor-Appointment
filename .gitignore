@@ -31,3 +31,5 @@ src/app3.jsx
 src/constants/routes.js
 src/common/ErrorBoundary.jsx
 src/common/LoadingSpinner.jsx
+
+.env

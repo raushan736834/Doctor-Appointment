@@ -255,7 +255,6 @@ const ProfileDropdown = () => {
     setIsOpen(false);
     setAuth({});
     localStorage.clear();
-    setRole("");
   }, [setAuth]);
 
   if (!auth?.accessToken) {

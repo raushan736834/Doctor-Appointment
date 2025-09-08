@@ -29,7 +29,7 @@ const ForgetPassword = () => {
     e.preventDefault();
     setErrMsg("");
     try {
-      const response = await api.post(FORGET_URL, email);
+      const response = await api.post(FORGET_URL, {email});
       console.log(JSON.stringify(response?.data));
       console.log(response);
       alert("OTP Sent Successfully");

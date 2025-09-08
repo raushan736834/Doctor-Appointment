@@ -8,7 +8,7 @@ import api from "../../hooks/useAxios";
 
 const RESET_URL = "/auth/reset";
 
-const ResetPassword = ({email}) => {
+const ResetPassword = ({ email }) => {
   const errRef = useRef();
   const [errMsg, setErrMsg] = useState("");
   const [success, setSuccess] = useState(false);
@@ -39,16 +39,9 @@ const ResetPassword = ({email}) => {
             try {
               const userData = {
                 password: values.password,
-                email
+                email,
               };
-              const response = await api.post(
-                RESET_URL,
-                JSON.stringify(userData),
-                {
-                  headers: { "Content-Type": "application/json" },
-                  withCredentials: true,
-                }
-              );
+              const response = await api.post(RESET_URL, userData);
               console.log(response.data);
               alert("Password Change Successfully");
               setSuccess(true);
@@ -80,7 +73,7 @@ const ResetPassword = ({email}) => {
             }
           }}
         >
-            {/* console.log(email); */}
+          {/* console.log(email); */}
           {({ isValid, isSubmitting }) => (
             <>
               <div className="sm:mx-auto sm:w-full sm:max-w-sm mt-6">

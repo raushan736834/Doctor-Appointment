@@ -232,13 +232,13 @@ import { useEffect, useState, useMemo } from "react";
 import DoctorCard from "./DoctorCard";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Stethoscope, Filter, SortAsc, X, ChevronDown } from "lucide-react";
-import api from "../../hooks/useAxios";
+import { useApiService } from "../../hooks/useAuthWithAxios";
 
 const DoctorDetails = () => {
   const param = useParams();
   const id = param.id;
   const location = useLocation();
-  console.log(location)
+  const api = useApiService();
   const doctorFromState = location.state && location.state.doctors;
   const flag = location.state && location.state.flag;
   

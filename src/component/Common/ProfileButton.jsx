@@ -1,7 +1,7 @@
 import user_logo from "../../assets/img/user_icon.png";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { Link } from "react-router-dom";
-import useAuth from "../../hooks/useAuth";
+import { useAuth } from "../GlobalComponent/AuthProvider";
 import { ROLES } from "../../constants/slots";
 
 function classNames(...classes) {

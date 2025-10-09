@@ -9,10 +9,8 @@ import {
   useLocation,
 } from "react-router-dom";
 import { ChakraProvider } from "@chakra-ui/react";
-import Header from "./component/UserComponent/Header";
-import Body from "./component/UserComponent/Body";
 import ErrorBoundary from "./component/Common/ErrorBoudary";
-import Footer from "./component/UserComponent/Footer";
+
 import AboutUs from "./component/UserComponent/AboutUs";
 import ContactUs from "./component/UserComponent/ContactUS";
 import DoctorDetails from "./component/UserComponent/DoctorDetails";
@@ -42,50 +40,42 @@ import SecurityPassword from "./component/DoctorComponent/SecurityPassword";
 import Index from "./component/UserComponent/Homepage/Index";
 import ScrollToTop from "./component/Common/ScrollToTop";
 import DoctorProfile from "./component/UserComponent/DoctorProfile";
+import DoctorOnboarding from "./component/DoctorComponent/DoctorOnboarding";
+import { useAuth } from "./component/GlobalComponent/AuthProvider";
+import UserLayout from "./layouts/UserLayout";
+import { useAuthWithAxios } from "./hooks/useAuthWithAxios";
 
 const AppLayout = () => {
   const navigate = useNavigate();
-  const role = localStorage.getItem("role");
+  const { isAuthenticated } = useAuth();
   const { pathname } = useLocation();
-
-  const accessToken = localStorage.getItem("token");
-
+  
   useEffect(() => {
-    const cond =
-      pathname === "auth/login" ||
-      pathname === "auth/signup" ||
-      pathname === "/forget";
-    if (accessToken && cond) {
-      navigate("/", { redirect: true });
+    // Fix: Add leading slashes to pathname comparisons
+    const authRoutes = ["/auth/login", "/auth/signup", "/forget"];
+    const isAuthRoute = authRoutes.includes(pathname);
+    
+    // Only redirect if user is authenticated AND currently on an auth route
+    if (isAuthenticated && isAuthRoute) {
+      console.log("Redirecting authenticated user from auth route to home");
+      navigate("/", { replace: true });
     }
-  }, [pathname]);
+  }, [pathname, isAuthenticated, navigate]); // Add navigate to dependencies
 
   return (
-    <>
-      <ErrorBoundary>
-        <ChakraProvider>
-          <AuthProvider>
-            {(!role || role.includes(ROLES.doctor) === false) && <Header />}
-            <DateTimeProvider>
-              <div
-                style={{
-                  minHeight: "calc(100vh - 196px)",
-                }}
-              >
-                <Outlet />
-              </div>
-              {/* <ToastContainer /> */}
-            </DateTimeProvider>
-            {(!role || role.includes(ROLES.doctor) === false) && <Footer />}
-          </AuthProvider>
-        </ChakraProvider>
-      </ErrorBoundary>
-    </>
+    <div
+      style={{
+        minHeight: "calc(100vh - 196px)",
+      }}
+    >
+      <Outlet />
+    </div>
   );
 };
 
-const email = localStorage.getItem("email");
-const App = () => {
+const AppContent = () => {
+  const auth = useAuthWithAxios();
+  const email = auth?.email;
   return (
     <NotificationProvider userEmail={email}>
       <Router future={{ v7_relativeSplatPath: true }}>
@@ -93,31 +83,48 @@ const App = () => {
         <Routes>
           <Route path="/" element={<AppLayout />}>
             <Route element={<RequireOnline />}>
-              <Route index element={<Index />} />
-              <Route path="about" element={<AboutUs />} />
-              <Route path="contact" element={<ContactUs />} />
-              <Route path="specialist/:id" element={<DoctorDetails />} />
-              <Route path="auth/login" element={<Login />} />
-              <Route path="forget" element={<ForgetPassword />} />
-              <Route path="/search/doctor" element={<DoctorCard />} />
-              <Route path="auth/signup" element={<SignUp />} />
-              <Route path="specialist/:specialist/:doctorId" element={<DoctorProfile />} />
-              <Route element={<RequireAuth />}>
+              <Route element={<UserLayout />}>
+                <Route index element={<Index />} />
+                <Route path="about" element={<AboutUs />} />
+                <Route path="contact" element={<ContactUs />} />
+                <Route path="specialist/:id" element={<DoctorDetails />} />
+                <Route path="auth/login" element={<Login />} />
+                <Route path="forget" element={<ForgetPassword />} />
+                <Route path="/search/doctor" element={<DoctorCard />} />
+                <Route path="auth/signup" element={<SignUp />} />
                 <Route
-                  path="/notifications"
-                  element={<NotificationDashboard userEmail={email} />}
+                  path="specialist/:specialist/:doctorId"
+                  element={<DoctorProfile />}
                 />
-                <Route path="thankyou" element={<ThankYou />} />
-                <Route path="/profile" element={<UserProfile />} />
-                <Route
-                  path="/appointment-details/:id"
-                  element={<AppointmentDetails />}
-                />
-                <Route path="booking-details" element={<BookingDetails />} />
+                <Route element={<RequireAuth />}>
+                  <Route
+                    path="/notifications"
+                    element={<NotificationDashboard userEmail={email} />}
+                  />
+                  <Route path="thankyou" element={<ThankYou />} />
+                  <Route path="/profile" element={<UserProfile />} />
+                  <Route
+                    path="/appointment-details/:id"
+                    element={<AppointmentDetails />}
+                  />
+                  <Route path="booking-details" element={<BookingDetails />} />
+                </Route>
+              </Route>
+              <Route element={<RequireAuth allowedRoles={[ROLES.doctor]} />}>
                 <Route path="doctor" element={<DoctorLayout />}>
-                  <Route index element={<Navigate to="dashboard" replace />} />
+                  <Route
+                    index
+                    element={<Navigate to="dashboard" replace />}
+                  />
                   <Route path="dashboard" element={<DoctorDashboard />} />
-                  <Route path="personalInfo" element={<DoctorPersonalInfo />} />
+                  <Route
+                    path="doctorOnboarding"
+                    element={<DoctorOnboarding />}
+                  />
+                  <Route
+                    path="personalInfo"
+                    element={<DoctorPersonalInfo />}
+                  />
                   <Route path="appointments" element={<Appointments />} />
                   <Route path="settings" element={<DoctorSetting />}>
                     <Route
@@ -137,11 +144,27 @@ const App = () => {
                 </Route>
               </Route>
             </Route>
-            <Route path="*" element={<PageNotFound />} />
           </Route>
+          <Route path="*" element={<PageNotFound />} />
         </Routes>
       </Router>
     </NotificationProvider>
+  );
+};
+
+const App = () => {
+  return (
+    <>
+      <ErrorBoundary>
+        <ChakraProvider>
+          <AuthProvider>
+            <DateTimeProvider>
+              <AppContent />
+            </DateTimeProvider>
+          </AuthProvider>
+        </ChakraProvider>
+      </ErrorBoundary>
+    </>
   );
 };
 

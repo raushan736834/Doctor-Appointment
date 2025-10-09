@@ -533,9 +533,8 @@ import {
 } from "lucide-react";
 import {  useNavigate, useParams } from "react-router-dom";
 import useDate from "../../hooks/useDate";
-import api from "../../hooks/useAxios";
 import DoctorProfileShimmer from "../Shimmer/DoctorProfileShimmer";
-import { InlineLoader } from "../Common/LoadingSpinner";
+import { useApiService } from "../../hooks/useAuthWithAxios";
 
 const FETCH_DOCTOR_DATA = "/api/public/getDoctor";
 
@@ -647,6 +646,7 @@ const DoctorProfile = ({
   const { setData } = useDate();
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const api = useApiService();
   // Calculate average rating from reviews
   const averageRating =
     reviews.length > 0

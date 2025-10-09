@@ -15,8 +15,8 @@ import {
   Monitor,
   MapPin,
 } from "lucide-react";
-import api from "../../hooks/useAxios";
 import { useToast } from "@chakra-ui/react";
+import { useApiService } from "../../hooks/useAuthWithAxios";
 // Using React hooks for form handling instead of Formik
 
 const PASSWORD_CHANGE = "/auth/change-password";
@@ -67,6 +67,7 @@ const SecurityPassword = () => {
   });
   const [passwordErrors, setPasswordErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const api = useApiService();
 
   const validatePassword = (password) => {
     const errors = {};

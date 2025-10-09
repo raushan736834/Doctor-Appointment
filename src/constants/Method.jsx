@@ -1,15 +1,18 @@
-import api from '../hooks/useAxios';
-import { AppointmentStatus } from './slots';
+import { useApiService } from "../hooks/useAuthWithAxios";
+
+import { AppointmentStatus } from "./slots";
 
 export const cancelAppointment = async (
-  appointment, 
-  toast, 
-  setIsLoading, 
-  onSuccess = null, 
+  appointment,
+  toast,
+  setIsLoading,
+  onSuccess = null,
   onError = null
 ) => {
+  const api = useApiService();
+
   if (!appointment) {
-    console.error('No appointment provided for cancellation');
+    console.error("No appointment provided for cancellation");
     return false;
   }
 
@@ -25,13 +28,13 @@ export const cancelAppointment = async (
         amount: amount,
       };
 
-      console.log('Processing refund for payment:', paymentId);
+      console.log("Processing refund for payment:", paymentId);
       const razorpayResponse = await api.post("api/payment/refund", refundData);
-      
+
       if (!razorpayResponse || razorpayResponse.status !== 200) {
         throw new Error("Payment refund failed");
       }
-      
+
       console.log("Refund processed successfully:", razorpayResponse.data);
     }
 
@@ -42,15 +45,20 @@ export const cancelAppointment = async (
       appointmentId: appointment.appointmentId,
     };
 
-    console.log('Cancelling appointment:', appointment.appointmentId);
-    const response = await api.put(`appointment/cancel-appointment`, cancelData);
+    console.log("Cancelling appointment:", appointment.appointmentId);
+    const response = await api.put(
+      `appointment/cancel-appointment`,
+      cancelData
+    );
 
     if (response.status === 200) {
       // Show success toast
       toast({
         position: "top-center",
         title: "Appointment Successfully Cancelled!",
-        description: `Your appointment with ${appointment.doctor?.doctorName || 'the doctor'} has been cancelled`,
+        description: `Your appointment with ${
+          appointment.doctor?.doctorName || "the doctor"
+        } has been cancelled`,
         status: "success",
         duration: 1500,
         isClosable: true,
@@ -58,7 +66,7 @@ export const cancelAppointment = async (
       });
 
       // Execute success callback if provided
-      if (onSuccess && typeof onSuccess === 'function') {
+      if (onSuccess && typeof onSuccess === "function") {
         onSuccess(appointment);
       }
 
@@ -68,7 +76,7 @@ export const cancelAppointment = async (
     }
   } catch (error) {
     console.error("Error cancelling appointment:", error);
-    
+
     // Show error toast
     toast({
       position: "top-center",
@@ -81,7 +89,7 @@ export const cancelAppointment = async (
     });
 
     // Execute error callback if provided
-    if (onError && typeof onError === 'function') {
+    if (onError && typeof onError === "function") {
       onError(error, appointment);
     }
 
@@ -92,20 +100,20 @@ export const cancelAppointment = async (
 };
 
 export const cancelAppointmentByDoctor = async (
-  appointment, 
+  appointment,
   cancelReason,
-  toast, 
-  setIsLoading, 
-  onSuccess = null, 
+  toast,
+  setIsLoading,
+  onSuccess = null,
   onError = null
 ) => {
   if (!appointment) {
-    console.error('No appointment provided for cancellation');
+    console.error("No appointment provided for cancellation");
     return false;
   }
 
   if (!cancelReason || !cancelReason.trim()) {
-    console.error('Cancel reason is required');
+    console.error("Cancel reason is required");
     return false;
   }
 
@@ -113,23 +121,31 @@ export const cancelAppointmentByDoctor = async (
 
   try {
     // Handle refund for paid appointments
-    if (appointment.payment === "Online Payment" || appointment.selectedPayment === "Online Payment") {
+    if (
+      appointment.payment === "Online Payment" ||
+      appointment.selectedPayment === "Online Payment"
+    ) {
       const paymentId = appointment.payment?.paymentId || appointment.paymentId;
-      const amount = appointment.doctor?.consultationFees || appointment.total?.replace('£', '');
-      
+      const amount =
+        appointment.doctor?.consultationFees ||
+        appointment.total?.replace("£", "");
+
       if (paymentId && amount) {
         const refundData = {
           payId: paymentId,
           amount: parseFloat(amount),
         };
 
-        console.log('Processing refund for payment:', paymentId);
-        const razorpayResponse = await api.post("api/payment/refund", refundData);
-        
+        console.log("Processing refund for payment:", paymentId);
+        const razorpayResponse = await api.post(
+          "api/payment/refund",
+          refundData
+        );
+
         if (!razorpayResponse || razorpayResponse.status !== 200) {
           throw new Error("Payment refund failed");
         }
-        
+
         console.log("Refund processed successfully:", razorpayResponse.data);
       }
     }
@@ -142,14 +158,19 @@ export const cancelAppointmentByDoctor = async (
       reason: cancelReason.trim(),
     };
 
-    const response = await api.put(`appointment/cancel-appointment`, cancelData);
+    const response = await api.put(
+      `appointment/cancel-appointment`,
+      cancelData
+    );
 
     if (response.status === 200) {
       // Show success toast
       toast({
         position: "top-center",
         title: "Appointment Successfully Cancelled!",
-        description: `Appointment with ${appointment.fullName || appointment.patientName} has been cancelled. Patient will be notified.`,
+        description: `Appointment with ${
+          appointment.fullName || appointment.patientName
+        } has been cancelled. Patient will be notified.`,
         status: "success",
         duration: 2000,
         isClosable: true,
@@ -157,7 +178,7 @@ export const cancelAppointmentByDoctor = async (
       });
 
       // Execute success callback if provided
-      if (onSuccess && typeof onSuccess === 'function') {
+      if (onSuccess && typeof onSuccess === "function") {
         onSuccess(appointment, cancelReason);
       }
 
@@ -167,7 +188,7 @@ export const cancelAppointmentByDoctor = async (
     }
   } catch (error) {
     console.error("Error cancelling appointment:", error);
-    
+
     // Show error toast
     toast({
       position: "top-center",
@@ -180,7 +201,7 @@ export const cancelAppointmentByDoctor = async (
     });
 
     // Execute error callback if provided
-    if (onError && typeof onError === 'function') {
+    if (onError && typeof onError === "function") {
       onError(error, appointment);
     }
 

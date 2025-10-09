@@ -4,12 +4,12 @@ import ActionMenu from "./ActionMenu";
 import RescheduleModal from "./RescheduleModal";
 import CancelReasonModal from "./CancelReasonModal";
 import { cancelAppointmentByDoctor } from "../../constants/Method";
-import useAuth from "../../hooks/useAuth";
+import { useAuth } from "../GlobalComponent/AuthProvider";
 import { CalendarX, ChevronLeft, ChevronRight, ListFilter } from "lucide-react";
 import FilterDateComponent from "./FilterDateComponent";
-import api from "../../hooks/useAxios";
 import OverlayLoader from "../Common/Loader";
 import { AppointmentStatus } from "../../constants/slots";
+import { useApiService } from "../../hooks/useAuthWithAxios";
 
 const tabs = ["Appointment", "Completed", "Rescheduled", "Cancelled"];
 
@@ -42,6 +42,7 @@ export default function Appointments() {
     last: true,
   });
   const [currentPage, setCurrentPage] = useState(0);
+  const api = useApiService();
 
   const getStatusesForTab = (tab) => {
     switch (tab) {

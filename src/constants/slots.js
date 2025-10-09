@@ -31,7 +31,7 @@ export const allSlots = {
   ],
 };
 
-export const ROLES = { user: "ROLE_USER", doctor: "ROLE_DOCTOR" };
+export const ROLES = { user: "USER", doctor: "DOCTOR" };
 
 export const AppointmentStatus = Object.freeze({
   BOOKED: "BOOKED",

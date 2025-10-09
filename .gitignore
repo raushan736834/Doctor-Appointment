@@ -24,12 +24,6 @@ dist-ssr
 *.sw?
 
 # Specific files and directories to ignore
-src/layouts/
-src/router/
-src/utils/
-src/app3.jsx
-src/constants/routes.js
-src/common/ErrorBoundary.jsx
-src/common/LoadingSpinner.jsx
+
 
 .env

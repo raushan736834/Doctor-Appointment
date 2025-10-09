@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Search, MapPin, Building2, Stethoscope, Users } from "lucide-react";
-import api from "../../../hooks/useAxios";
 import { useNavigate } from "react-router-dom";
+import { useApiService } from "../../../hooks/useAuthWithAxios";
 
 const SPECIALIST_URL = "api/public/getSpecialist";
 const CITIES_URL = "api/public/cities";
@@ -16,6 +16,7 @@ const Banner = () => {
   const [cities, setCities] = useState([]);
   const [doctors, setDoctors] = useState([]);
   const [successFetch, setSuccessFetch] = useState(false);
+  const api = useApiService();
   const navigate = useNavigate();
   useEffect(() => {
     fetchCities();
@@ -35,7 +36,12 @@ const Banner = () => {
   const fetchCities = async () => {
     try {
       const response = await api.get(CITIES_URL);
-      setCities(response.data);
+      if (response?.success) {
+        const fetched = response.data;
+        setCities(Array.isArray(fetched) ? fetched : fetched?.cities ?? []);
+      } else {
+        setErr("Failed to load cities. Please try again later.");
+      }
     } catch (error) {
       console.log("Error fetching cities: ", error);
       setErr("Failed to load cities. Please try again later.");
@@ -54,14 +60,16 @@ const Banner = () => {
     setIsLoading(true);
     try {
       const response = await api.get(SEARCH_URL, {
-        params: {
-          city: selectedCity,
-          specialist: selectedSpecialist,
-        },
+        city: selectedCity,
+        specialist: selectedSpecialist,
       });
       console.log("Search results:", response);
-      setDoctors(response.data);
-      if (response.status === 200) setSuccessFetch(true);
+      if (response?.success) {
+        setDoctors(Array.isArray(response.data) ? response.data : []);
+        setSuccessFetch(true);
+      } else {
+        setErr(response?.error || "Failed to search doctors. Please try again later.");
+      }
     } catch (error) {
       console.error("Error searching doctors:", error);
       setErr("Failed to search doctors. Please try again later.");
@@ -174,8 +182,8 @@ const Banner = () => {
                     <option value="" disabled>
                       City
                     </option>
-                    {cities
-                      .filter((city) => city && city.trim() !== "") // ✅ skip null/empty
+                    {(Array.isArray(cities) ? cities : [])
+                      .filter((city) => typeof city === "string" && city.trim() !== "")
                       .map((city) => (
                         <option key={city} value={city}>
                           {city}
@@ -183,16 +191,6 @@ const Banner = () => {
                       ))}
                   </select>
                 </div>
-
-                {/* Clinic Input */}
-                {/* <div className="relative flex-1">
-                  <Building2 className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                  <input
-                    type="text"
-                    placeholder="Clinic"
-                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
-                  />
-                </div> */}
 
                 {/* Category Input */}
                 <div className="relative flex-1">
@@ -209,7 +207,7 @@ const Banner = () => {
                     <option value="" disabled>
                       Specialist
                     </option>
-                    {specialists.map((specialist) => (
+                    {(Array.isArray(specialists) ? specialists : []).map((specialist) => (
                       <option key={specialist.id} value={specialist.specialist}>
                         {specialist.specialist}
                       </option>
@@ -305,8 +303,8 @@ const Banner = () => {
                       <option value="" disabled>
                         City
                       </option>
-                      {cities
-                        .filter((city) => city && city.trim() !== "") // ✅ skip null/empty
+                      {(Array.isArray(cities) ? cities : [])
+                        .filter((city) => typeof city === "string" && city.trim() !== "")
                         .map((city) => (
                           <option key={city} value={city}>
                             {city}
@@ -338,7 +336,7 @@ const Banner = () => {
                       <option value="" disabled>
                         Specialist
                       </option>
-                      {specialists.map((specialist) => (
+                      {(Array.isArray(specialists) ? specialists : []).map((specialist) => (
                         <option
                           key={specialist.id}
                           value={specialist.specialist}

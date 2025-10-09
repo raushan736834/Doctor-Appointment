@@ -1,10 +1,10 @@
 import { ChevronDownIcon } from "@heroicons/react/16/solid";
-import useAuth from "../../hooks/useAuth";
+import { useAuth } from "../GlobalComponent/AuthProvider";
 import Login from "../AuthComponent/Login";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@chakra-ui/react";
-import api from "../../hooks/useAxios";
+import { useApiService } from "../../hooks/useAuthWithAxios";
 
 const USER_UPDATE_URL = '/user/update-profile';
 
@@ -25,6 +25,7 @@ const UserProfile = () => {
   const [initialData, setInitialData] = useState({});
   const navigate = useNavigate();
   const toast = useToast();
+  const api = useApiService();
 
   useEffect(() => {
     if (email) {

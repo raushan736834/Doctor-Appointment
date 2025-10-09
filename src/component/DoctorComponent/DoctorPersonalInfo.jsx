@@ -1,11 +1,11 @@
 import { useState, useRef, useEffect } from "react";
 import { User, Phone, Mail, MapPin, GraduationCap, Building, IndianRupee, Clock, Plus, Camera, TrashIcon,
 } from "lucide-react";
-import useAuth from "../../hooks/useAuth";
+import { useAuth } from "../GlobalComponent/AuthProvider";
 import { Formik, Field, Form, ErrorMessage, FieldArray } from "formik";
 import * as Yup from "yup";
-import api from "../../hooks/useAxios";
 import OverlayLoader from "../Common/Loader";
+import { useApiService } from "../../hooks/useAuthWithAxios";
 
 function uuid() {
   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
@@ -30,7 +30,7 @@ const DoctorPersonalInfo = () => {
   const [fetchData, setFetchData] = useState([]);
   const currentYear = new Date().getFullYear();
   const years = Array.from(new Array(60), (val, index) => currentYear - index);
-
+  const api = useApiService();
   const FETCH_URL = `/api/user/${email}`;
 
   const fetchUserData = async () => {

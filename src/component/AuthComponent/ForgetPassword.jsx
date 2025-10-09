@@ -2,7 +2,7 @@ import logo from "../../assets/img/appointDoctor.jpg";
 import { useRef, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import ResetPassword from "./ResetPassword";
-import api from "../../hooks/useAxios";
+import { useApiService } from "../../hooks/useAuthWithAxios";
 
 
 const FORGET_URL = "/auth/forget";
@@ -10,12 +10,12 @@ const FORGET_URL = "/auth/forget";
 const ForgetPassword = () => {
   const userRef = useRef();
   const errRef = useRef();
-
   const [email, setUser] = useState("");
   const [otp, setOtp] = useState("");
   const [errMsg, setErrMsg] = useState("");
   const [success, setSuccess] = useState(false);
   const [isOtpGenerated, setIsOtpGenerated] = useState(false);
+  const api = useApiService();
 
   useEffect(() => {
     userRef.current.focus();

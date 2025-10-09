@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Calendar, Stethoscope, X, Edit3, MapPin, Star } from "lucide-react";
-import useAuth from "../../hooks/useAuth";
-import api from "../../hooks/useAxios";
+import { useAuth } from "../GlobalComponent/AuthProvider";
+import { useApiService } from "../../hooks/useAuthWithAxios";
 import RescheduleModal from "../DoctorComponent/RescheduleModal";
 import { cancelAppointment } from "../../constants/Method";
 import { useToast } from "@chakra-ui/react";
@@ -16,6 +16,7 @@ const BookedAppointments = () => {
   const [showRescheduleModal, setShowRescheduleModal] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const toast = useToast();
+  const api = useApiService();
   const navigate = useNavigate();
 
   const getStatusStyle = (status) => {

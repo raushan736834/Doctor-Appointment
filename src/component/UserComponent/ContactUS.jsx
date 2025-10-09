@@ -1,7 +1,7 @@
-import api from '../../hooks/useAxios';
 import React, { useState } from 'react';
 import OverlayLoader from '../Common/Loader';
-import useAuth from '../../hooks/useAuth';
+import {useAuth} from "../GlobalComponent/AuthProvider";
+import { useApiService } from '../../hooks/useAuthWithAxios';
 
 const CONTACT_URL = "api/public/contact-us";
 const ContactUs = () => {
@@ -15,6 +15,7 @@ const ContactUs = () => {
   const [error, setError] = useState(false);
   const [errMsg,setErrMsg] = useState("");
   const {isLoading, setIsLoading} = useAuth();
+  const api = useApiService();
 
   const handleChange = (e) => {
     setFormData({

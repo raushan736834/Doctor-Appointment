@@ -644,26 +644,22 @@ import {
   GraduationCap,
   Edit3,
 } from "lucide-react";
-import api from "../../hooks/useAxios";
 import {
   Link,
-  Navigate,
-  useLocation,
   useNavigate,
   useParams,
 } from "react-router-dom";
 import useDate from "../../hooks/useDate";
 import { format } from "date-fns";
-import OverlayLoader from "../Common/Loader";
 import { AppointmentStatus } from "../../constants/slots";
 import useRazorpayScript from "../../hooks/useRazorpayScript";
-import { InlineLoader, PageLoader } from "../Common/LoadingSpinner";
-import LoaderApp, { CoolLoader } from "../Common/LoaderApp";
+import { useApiService } from "../../hooks/useAuthWithAxios";
 
 const FETCH_DOCTOR_DATA = "/api/public/getDoctor";
 const BOOKED_URL = "/appointment/book-appointment";
 
 const AppointmentDetails = () => {
+  const api = useApiService();
   const errRef = useRef();
   const [errMsg, setErrMsg] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);

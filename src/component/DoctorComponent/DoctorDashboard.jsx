@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import DoctorDashboardStats from "./DoctorDashboardStats";
-import api from "../../hooks/useAxios";
 import { Link } from "react-router-dom";
 import NotificationBell from "../NotificationComponent/NotificationBell";
-import useAuth from "../../hooks/useAuth";
+import { useAuth } from "../GlobalComponent/AuthProvider";
 import { CalendarX, ChevronLeft, ChevronRight } from "lucide-react";
 import OverlayLoader from "../Common/Loader";
+import { useApiService } from "../../hooks/useAuthWithAxios";
 
 const ITEMS_PER_PAGE = 5;
 
@@ -25,6 +25,7 @@ const DoctorDashboard = () => {
     first: true,
     last: true,
   });
+  const api = useApiService();
 
   const fetchAllAppointment = async () => {
     try {

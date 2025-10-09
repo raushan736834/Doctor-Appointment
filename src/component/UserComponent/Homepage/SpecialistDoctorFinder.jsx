@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { ArrowRight, ChevronLeft, ChevronRight, Stethoscope } from "lucide-react";
 import { Link } from "react-router-dom";
-import api from "../../../hooks/useAxios";
 import defaultImage from "../../../assets/img/defaultClinicImage.jpg"
+import { useApiService } from "../../../hooks/useAuthWithAxios";
 
 
 const SPECIALIST_URL = "api/public/getSpecialist";
@@ -14,6 +14,9 @@ const SpecialistDoctorsFinder = () => {
   const [doctor, setDoctor] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const carouselRef = useRef(null);
+  const api = useApiService();
+
+  
 
   useEffect(() => {
     // Simulate API call
@@ -34,7 +37,12 @@ const SpecialistDoctorsFinder = () => {
       const url = `/api/public/search?keyword=${encodeURIComponent(specialist)}`;
       const response = await api.get(url);
       const json = response?.data;
-      setDoctor(json || []);
+      const list = Array.isArray(json)
+        ? json
+        : Array.isArray(json?.results)
+        ? json.results
+        : [];
+      setDoctor(list);
     } catch (error) {
       console.error("Error fetching doctors:", error);
       setErr("Failed to load doctors. Please try again later.");
@@ -47,7 +55,13 @@ const SpecialistDoctorsFinder = () => {
   const fetchSpecialist = async () => {
     try {
       const response = await api.get(SPECIALIST_URL);
-      setSpecialties(response.data);
+      const data = response?.data;
+      const list = Array.isArray(data)
+        ? data
+        : Array.isArray(data?.specialists)
+        ? data.specialists
+        : [];
+      setSpecialties(list);
     } catch (error) {
       console.error("Error fetching specialists:", error);
       setErr("Failed to load specialists. Please try again later.");
@@ -65,17 +79,17 @@ const SpecialistDoctorsFinder = () => {
         });
       }
     },
-    [specialties.length]
+    [specialties?.length]
   );
 
   useEffect(() => {
-    if (carouselRef.current && specialties.length > 0) {
+    if (carouselRef.current && specialties?.length > 0) {
       // Set initial scroll position after the component mounts
       setTimeout(() => {
         scrollToCard(selectedSpecialty);
       }, 100);
     }
-  }, [specialties.length, scrollToCard, selectedSpecialty]);
+  }, [specialties?.length, scrollToCard, selectedSpecialty]);
 
 
   const DoctorCard = ({ doctor }) => (
@@ -184,10 +198,11 @@ const SpecialistDoctorsFinder = () => {
   };
 
   // Create extended array for infinite scroll effect
+  const safeSpecialties = Array.isArray(specialties) ? specialties : [];
   const extendedSpecialties = [
-    ...specialties.slice(-2), // Last 2 items at the beginning
-    ...specialties, // All original items
-    ...specialties.slice(0, 2), // First 2 items at the end
+    ...safeSpecialties.slice(-2), // Last 2 items at the beginning
+    ...safeSpecialties, // All original items
+    ...safeSpecialties.slice(0, 2), // First 2 items at the end
   ];
 
   return (

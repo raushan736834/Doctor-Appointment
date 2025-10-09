@@ -1,4 +1,4 @@
-import useAuth from "../../hooks/useAuth";
+import { useAuth } from "../GlobalComponent/AuthProvider";
 import { useState, useEffect, useRef, useCallback } from "react";
 import NotificationBell from "../NotificationComponent/NotificationBell";
 import { Link, useLocation } from "react-router-dom";
@@ -6,239 +6,16 @@ import {
   UserIcon,
   SettingsIcon,
   LogOutIcon,
-  ClockIcon,
   CalendarIcon,
   ChevronDownIcon,
-  SearchIcon,
   MenuIcon,
   XIcon,
 } from "lucide-react";
 import Searchbar from "../Common/Searchbar";
 
-// Mock data for search results
-const mockSearchData = [
-  {
-    id: 1,
-    type: "doctor",
-    name: "Dr. Smith",
-    specialty: "Cardiology",
-    rating: 4.8,
-  },
-  {
-    id: 2,
-    type: "doctor",
-    name: "Dr. Johnson",
-    specialty: "Dermatology",
-    rating: 4.9,
-  },
-  {
-    id: 3,
-    type: "doctor",
-    name: "Dr. Williams",
-    specialty: "Pediatrics",
-    rating: 4.7,
-  },
-  {
-    id: 4,
-    type: "service",
-    name: "General Consultation",
-    description: "Basic health checkup",
-  },
-  {
-    id: 5,
-    type: "service",
-    name: "Diagnostic Tests",
-    description: "Lab tests and imaging",
-  },
-  {
-    id: 6,
-    type: "appointment",
-    name: "Emergency Booking",
-    description: "Urgent medical care",
-  },
-];
-
-// Search Bar Component
-// const SearchBar = () => {
-//   const [searchQuery, setSearchQuery] = useState("");
-//   const [searchResults, setSearchResults] = useState([]);
-//   const [isSearchOpen, setIsSearchOpen] = useState(false);
-//   const searchRef = useRef(null);
-
-//   useEffect(() => {
-//     if (searchQuery.trim()) {
-//       const filtered = mockSearchData.filter(
-//         (item) =>
-//           item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-//           (item.specialty &&
-//             item.specialty.toLowerCase().includes(searchQuery.toLowerCase())) ||
-//           (item.description &&
-//             item.description.toLowerCase().includes(searchQuery.toLowerCase()))
-//       );
-//       setSearchResults(filtered);
-//       setIsSearchOpen(true);
-//     } else {
-//       setSearchResults([]);
-//       setIsSearchOpen(false);
-//     }
-//   }, [searchQuery]);
-
-//   useEffect(() => {
-//     function handleClickOutside(event) {
-//       if (searchRef.current && !searchRef.current.contains(event.target)) {
-//         setIsSearchOpen(false);
-//       }
-//     }
-//     document.addEventListener("mousedown", handleClickOutside);
-//     return () => document.removeEventListener("mousedown", handleClickOutside);
-//   }, []);
-
-//   const getSearchIcon = (type) => {
-//     const iconClass = "h-4 w-4";
-//     switch (type) {
-//       case "doctor":
-//         return <UserIcon className={iconClass} />;
-//       case "service":
-//         return <ClockIcon className={iconClass} />;
-//       case "appointment":
-//         return <CalendarIcon className={iconClass} />;
-//       default:
-//         return <SearchIcon className={iconClass} />;
-//     }
-//   };
-
-//   const getTypeColor = (type) => {
-//     switch (type) {
-//       case "doctor":
-//         return "text-blue-500";
-//       case "service":
-//         return "text-green-500";
-//       case "appointment":
-//         return "text-purple-500";
-//       default:
-//         return "text-gray-400";
-//     }
-//   };
-
-//   return (
-//     <div className="relative flex-1 max-w-2xl mx-4" ref={searchRef}>
-//       <div className="relative group">
-//         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-//           <div className="text-gray-400 group-focus-within:text-blue-500 transition-colors">
-//             <SearchIcon />
-//           </div>
-//         </div>
-//         <input
-//           type="text"
-//           value={searchQuery}
-//           onChange={(e) => setSearchQuery(e.target.value)}
-//           className="block w-full pl-12 pr-4 py-3 border border-gray-200 rounded-2xl
-//                    bg-gray-50/80 backdrop-blur-sm text-gray-900 placeholder-gray-500
-//                    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
-//                    focus:bg-white transition-all duration-200 hover:bg-white/80 shadow-sm
-//                    hover:shadow-md focus:shadow-lg"
-//           placeholder="Search doctors, services, appointments..."
-//         />
-//       </div>
-
-//       {/* Search Results Dropdown */}
-//       {isSearchOpen && searchResults.length > 0 && (
-//         <div
-//           className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl
-//                        border border-gray-100 z-50 max-h-96 overflow-y-auto backdrop-blur-xl"
-//         >
-//           <div className="p-2">
-//             <div className="px-4 py-2 border-b border-gray-100">
-//               <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-//                 {searchResults.length} result
-//                 {searchResults.length !== 1 ? "s" : ""} found
-//               </p>
-//             </div>
-//             {searchResults.map((result) => (
-//               <button
-//                 key={result.id}
-//                 className="w-full flex items-center px-4 py-3 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 rounded-xl transition-all duration-200 text-left m-1 group"
-//                 onClick={() => {
-//                   console.log("Selected:", result);
-//                   setIsSearchOpen(false);
-//                   setSearchQuery("");
-//                 }}
-//               >
-//                 <div
-//                   className={`flex-shrink-0 mr-4 p-2 rounded-lg bg-gray-50 group-hover:bg-white transition-colors ${getTypeColor( result.type )}`}
-//                 >
-//                   {getSearchIcon(result.type)}
-//                 </div>
-//                 <div className="flex-1 min-w-0">
-//                   <p className="text-sm font-semibold text-gray-900 truncate group-hover:text-blue-900">
-//                     {result.name}
-//                   </p>
-//                   <p className="text-sm text-gray-500 truncate">
-//                     {result.specialty || result.description}
-//                   </p>
-//                   {result.rating && (
-//                     <div className="flex items-center mt-1">
-//                       <div className="flex text-yellow-400">
-//                         {"★".repeat(Math.floor(result.rating))}
-//                       </div>
-//                       <span className="text-xs text-gray-600 ml-1 font-medium">
-//                         {result.rating}
-//                       </span>
-//                     </div>
-//                   )}
-//                 </div>
-//                 <div className="flex-shrink-0">
-//                   <span
-//                     className="inline-flex items-center px-3 py-1 rounded-full text-xs
-//                                font-semibold bg-gradient-to-r from-blue-100 to-purple-100
-//                                text-blue-800 capitalize border border-blue-200"
-//                   >
-//                     {result.type}
-//                   </span>
-//                 </div>
-//               </button>
-//             ))}
-//           </div>
-//         </div>
-//       )}
-
-//       {/* No Results */}
-//       {isSearchOpen && searchQuery && searchResults.length === 0 && (
-//         <div
-//           className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl
-//                        border border-gray-100 z-50 backdrop-blur-xl"
-//         >
-//           <div className="p-8 text-center">
-//             <div className="text-gray-300 mb-3">
-//               <SearchIcon className="h-12 w-12 mx-auto" />
-//             </div>
-//             <p className="text-sm font-medium text-gray-600">
-//               No results found for "{searchQuery}"
-//             </p>
-//             <p className="text-xs text-gray-400 mt-2">
-//               Try searching for doctors, services, or appointments
-//             </p>
-//           </div>
-//         </div>
-//       )}
-//     </div>
-//   );
-// };
-
-// Profile Dropdown Component
 const ProfileDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const name = localStorage.getItem("name");
-  const email = localStorage.getItem("email");
-  const { auth, setAuth } = useAuth();
-
-  const user = {
-    name: name,
-    email: email,
-    role: "Patient",
-    avatar: null,
-  };
-
+  const { user, isAuthenticated, logout } = useAuth();
   const dropdownRef = useRef(null);
 
   useEffect(() => {
@@ -251,13 +28,12 @@ const ProfileDropdown = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleLogout = useCallback(() => {
+  const handleLogout = useCallback(async () => {
+    await logout();
     setIsOpen(false);
-    setAuth({});
-    localStorage.clear();
-  }, [setAuth]);
+  }, [logout]);
 
-  if (!auth?.accessToken) {
+  if (!isAuthenticated) {
     return (
       <Link
         to="/auth/login"
@@ -282,10 +58,10 @@ const ProfileDropdown = () => {
           className="h-10 w-10 bg-gradient-to-br from-blue-400 to-purple-500 
           rounded-xl flex items-center justify-center text-white font-semibold"
         >
-          {user.name
-            .split(" ")
-            .map((n) => n[0])
-            .join("")}
+          {user.fullname
+            ?.split(" ")
+            ?.map((n) => n[0])
+            ?.join("") || "U"}
         </div>
         <div
           className={`text-white transition-transform duration-200 hidden sm:block${
@@ -308,21 +84,21 @@ const ProfileDropdown = () => {
                 className="h-12 w-12 bg-gradient-to-br from-blue-400 to-purple-500 
                             rounded-xl flex items-center justify-center text-white font-semibold"
               >
-                {user.name
-                  .split(" ")
-                  .map((n) => n[0])
-                  .join("")}
+                {user.fullname
+                  ?.split(" ")
+                  ?.map((n) => n[0])
+                  ?.join("") || "U"}
               </div>
               <div>
                 <p className="text-sm font-semibold text-gray-900">
-                  {user.name}
+                  {user.fullname || "User"}
                 </p>
-                <p className="text-xs text-gray-500">{user.email}</p>
+                <p className="text-xs text-gray-500">{user.email || "No email"}</p>
                 <span
                   className="inline-flex items-center px-2 py-1 rounded-full text-xs 
                                font-medium bg-blue-100 text-blue-800 capitalize mt-1"
                 >
-                  {user.role}
+                  User
                 </span>
               </div>
             </div>
@@ -399,7 +175,7 @@ const ModernHeader = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const role = useState(localStorage.getItem("role"));
   const location = useLocation();
-  const { auth } = useAuth();
+  const { auth, isAuthenticated } = useAuth();
 
   const navigation = [
     {
@@ -485,7 +261,7 @@ const ModernHeader = () => {
           </div>
 
           {/* Right side icons */}
-          {auth.accessToken && (
+          {isAuthenticated && (
             <div className="flex items-center space-x-4">
               <Link to={"/notifications"}>
                 <NotificationBell />

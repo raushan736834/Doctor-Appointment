@@ -54,7 +54,7 @@ const AvailabilityStep = () => {
     clinicAddress: "",
     clinicCity: "",
     clinicState: "",
-    clinicZipCode: "",
+    clinicPinCode: "",
     establishedYear: "",
     availableFacilities: [],
     consultationDuration: "",
@@ -424,7 +424,7 @@ const AvailabilityStep = () => {
               </div>
             </div>
 
-            {/* Clinic Zip Code */}
+            {/* Clinic Pin Code */}
             <div className="sm:col-span-2 space-y-2">
               <label className="flex items-center text-sm font-semibold text-slate-700 mb-2 sm:mb-3">
                 <MapPin className="w-4 h-4 mr-2 text-violet-500" />
@@ -433,92 +433,37 @@ const AvailabilityStep = () => {
               <div className="relative">
                 <input
                   type="text"
-                  value={data.clinicZipCode || ""}
+                  value={data.clinicPinCode || ""}
                   onChange={(e) =>
                     handleInputChange("clinicZipCode", e.target.value)
                   }
-                  onFocus={() => setFocusedField("clinicZipCode")}
+                  onFocus={() => setFocusedField("clinicPinCode")}
                   onBlur={() => setFocusedField(null)}
                   className={`w-full px-4 py-3 sm:px-6 sm:py-4 border-2 rounded-xl sm:rounded-2xl transition-all duration-300 bg-white/50 backdrop-blur-sm text-base ${
-                    focusedField === "clinicZipCode"
+                    focusedField === "clinicPinCode"
                       ? "border-violet-400 ring-2 sm:ring-4 ring-violet-100 shadow-lg transform scale-[1.02] sm:scale-105"
-                      : isFieldValid("clinicZipCode")
+                      : isFieldValid("clinicPinCode")
                       ? "border-green-300 shadow-md"
                       : "border-slate-200 hover:border-slate-300"
                   }`}
                   placeholder="12345"
                   required
                 />
-                {isFieldValid("clinicZipCode") && (
+                {isFieldValid("clinicPinCode") && (
                   <Check className="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-green-500" />
                 )}
               </div>
             </div>
 
             {/* Available Facilities */}
-            <div className="sm:col-span-2 space-y-4">
-              <label className="flex items-center text-sm font-semibold text-slate-700">
-                <Award className="w-4 h-4 mr-2 text-blue-500" />
-                Available Facilities
-                <span className="text-xs text-slate-500 ml-1">(Optional)</span>
-              </label>
-
-              <div className="flex gap-2">
-                <select
-                  value={newFacility}
-                  onChange={(e) => setNewFacility(e.target.value)}
-                  className="flex-1 w-36 sm:w-full  px-4 py-3 sm:px-6 sm:py-4 border-2 border-slate-200 rounded-xl sm:rounded-2xl bg-white/50 backdrop-blur-sm text-base focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition-all"
-                >
-                  <option value="">Select a facility</option>
-                  {facilities
-                    .filter(
-                      (facility) => !data.availableFacilities.includes(facility)
-                    )
-                    .map((facility) => (
-                      <option key={facility} value={facility}>
-                        {facility}
-                      </option>
-                    ))}
-                </select>
-                <button
-                  type="button"
-                  onClick={addFacility}
-                  disabled={!newFacility}
-                  className="px-3 py-3 sm:px-6 sm:py-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl sm:rounded-2xl hover:from-blue-600 hover:to-indigo-700 transition-all flex items-center disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
-                >
-                  <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
-                </button>
-              </div>
-
-              {data.availableFacilities.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {data.availableFacilities.map((facility, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center gap-2 bg-gradient-to-r from-blue-100 to-indigo-100 px-3 py-2 rounded-xl border border-blue-200"
-                    >
-                      <span className="text-sm font-medium text-blue-700">
-                        {facility}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => removeFacility(index)}
-                        className="text-blue-500 hover:text-blue-700 transition-colors"
-                      >
-                        <X className="w-3 h-3" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+           
 
             {/* Operating Hours - Responsive Grid Layout */}
             <div className="sm:col-span-2 space-y-4">
               <label className="flex items-center text-sm font-semibold text-slate-700">
                 <Clock className="w-4 h-4 mr-2 text-green-500" />
                 Operating Hours
-                <span className="text-xs text-slate-500 ml-1">(Optional)</span>
+                {/* <span className="text-xs text-slate-500 ml-1">(Optional)</span> */}
               </label>
 
               {/* Grid: 1 column on mobile, 2 columns on tablet and desktop */}

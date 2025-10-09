@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
-import api from "./useAxios";
+import { useApiService } from "./useAuthWithAxios";
+
 
 export function useBookedSlots(doctorId, date) {
   const [bookedSlots, setBookedSlots] = useState([]);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-
+  const api = useApiService();
   useEffect(() => {
     if (!doctorId || !date) return;
 

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import AutoSuggestion from "./AutoSuggestion";
 import { useNavigate } from "react-router-dom";
-import api from "../../hooks/useAxios";
+import { useApiService } from "../../hooks/useAuthWithAxios";
 
 const Searchbar = () => {
   const [showDropdown, setShowDropdown] = useState(false);
@@ -9,6 +9,7 @@ const Searchbar = () => {
   const [searchText, setSearchText] = useState('');
   const navigate = useNavigate();
   const debounceRef = useRef();
+  const api = useApiService();
 
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -31,7 +32,7 @@ const Searchbar = () => {
       fetchSuggestions();
     }, 400);
     return () => clearTimeout(debounceRef.current);
-  }, [searchText, api]);
+  }, [searchText]);
 
   const handleSuggestionClick = (doctor) => {
     // onChange({ target: { value: doctor.doctorName } });

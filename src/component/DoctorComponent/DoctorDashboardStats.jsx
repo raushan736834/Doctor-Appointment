@@ -1,5 +1,5 @@
 import React from "react";
-import { FaPeopleGroup, FaMoneyBillTrendUp } from "react-icons/fa6";
+import { FaPeopleGroup } from "react-icons/fa6";
 import { Wallet, Ambulance } from "lucide-react";
 
 const DoctorDashboardStats = ({ totalBookings, todayBookings }) => {
@@ -25,7 +25,7 @@ const DoctorDashboardStats = ({ totalBookings, todayBookings }) => {
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       {resources.map((item, idx) => (
         <div
           key={idx}
@@ -39,7 +39,7 @@ const DoctorDashboardStats = ({ totalBookings, todayBookings }) => {
             <p className="text-sm text-gray-400 mt-1">{item.desc}</p>
           </div>
           <div className="flex items-end gap-1 h-16">
-            {[2, 4, 3, 5, 4].map((h, i) => (
+            {[2, 9, 3, 5, 4].map((h, i) => (
               <div
                 key={i}
                 className={`w-2 rounded bg-blue-300 ${

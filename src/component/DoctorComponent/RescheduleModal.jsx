@@ -2,9 +2,10 @@ import React, { useState } from "react";
 import { Edit3 } from 'lucide-react';
 import { useToast } from "@chakra-ui/react";
 import AppointmentForm from "../UserComponent/AppointmentForm";
-import api from "../../hooks/useAxios";
-import useAuth from "../../hooks/useAuth";
+import { useAuth } from "../GlobalComponent/AuthProvider";
 import { AppointmentStatus } from "../../constants/slots";
+import { useApiService } from "../../hooks/useAuthWithAxios";
+
 
 const RescheduleModal = ({
   selectedAppointment,
@@ -19,6 +20,7 @@ const RescheduleModal = ({
   });
 
   const { setIsLoading } = useAuth();
+  const api = useApiService();
   const toast = useToast();
 
   const formatDate = (dateString) => {

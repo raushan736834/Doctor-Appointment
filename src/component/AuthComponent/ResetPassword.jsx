@@ -4,7 +4,7 @@ import * as Yup from "yup";
 import { Link } from "react-router-dom";
 import { useRef, useState } from "react";
 import Login from "./Login";
-import api from "../../hooks/useAxios";
+import { useApiService } from "../../hooks/useAuthWithAxios";
 
 const RESET_URL = "/auth/reset";
 
@@ -12,7 +12,7 @@ const ResetPassword = ({ email }) => {
   const errRef = useRef();
   const [errMsg, setErrMsg] = useState("");
   const [success, setSuccess] = useState(false);
-
+  const api = useApiService();
   return (
     <>
       {success ? (

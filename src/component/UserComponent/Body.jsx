@@ -3,13 +3,13 @@ import SpecialistCard from "./SpecialistCard";
 import Shimmer from "./Shimmer";
 import { Link } from "react-router-dom";
 import useOnline from "../../hooks/useOnline";
-import useAuth from "../../hooks/useAuth";
-import api from "../../hooks/useAxios";
+import { useAuth } from "../GlobalComponent/AuthProvider";
+import { useApiService } from "../../hooks/useAuthWithAxios";
 
 const SPECIALIST_URL = "api/public/getSpecialist";
 
 const Body = () => {
-  const [searchText, setSearchText] = useState('');
+  const api = useApiService();
   const [allSpecialist, setAllSpecialist] = useState([]);
   const isOnline = useOnline();
   const {isLoading,setIsLoading} = useAuth();

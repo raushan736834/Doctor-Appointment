@@ -1,155 +1,36 @@
-// import React from 'react';
-
-// const EducationStep = ({ data, updateData }) => {
-//   const handleInputChange = (field, value) => {
-//     updateData({ [field]: value });
-//   };
-
-//   const currentYear = new Date().getFullYear();
-//   const years = Array.from({ length: 50 }, (_, i) => currentYear - i);
-
-//   return (
-//     <div className="space-y-8">
-//       <div className="text-center">
-//         <h2 className="text-2xl font-bold text-gray-900 mb-2">Education & Training</h2>
-//         <p className="text-gray-600">Share your academic background and medical training</p>
-//       </div>
-
-//       <div className="space-y-8">
-//         {/* Medical School */}
-//         <div className="bg-gradient-to-r from-blue-50 to-teal-50 p-6 rounded-lg border border-blue-100">
-//           <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-//             <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center mr-3 text-sm font-bold">1</div>
-//             Medical School
-//           </h3>
-//           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-//             <div>
-//               <label className="block text-sm font-medium text-gray-700 mb-2">
-//                 Medical School Name *
-//               </label>
-//               <input
-//                 type="text"
-//                 value={data.medicalSchool}
-//                 onChange={(e) => handleInputChange('medicalSchool', e.target.value)}
-//                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-//                 placeholder="Enter your medical school"
-//                 required
-//               />
-//             </div>
-//             <div>
-//               <label className="block text-sm font-medium text-gray-700 mb-2">
-//                 Graduation Year *
-//               </label>
-//               <select
-//                 value={data.graduationYear}
-//                 onChange={(e) => handleInputChange('graduationYear', e.target.value)}
-//                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-//                 required
-//               >
-//                 <option value="">Select year</option>
-//                 {years.map((year) => (
-//                   <option key={year} value={year.toString()}>{year}</option>
-//                 ))}
-//               </select>
-//             </div>
-//           </div>
-//         </div>
-
-//         {/* Residency */}
-//         <div className="bg-gradient-to-r from-teal-50 to-green-50 p-6 rounded-lg border border-teal-100">
-//           <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-//             <div className="w-8 h-8 bg-teal-600 text-white rounded-full flex items-center justify-center mr-3 text-sm font-bold">2</div>
-//             Residency Training
-//           </h3>
-//           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-//             <div>
-//               <label className="block text-sm font-medium text-gray-700 mb-2">
-//                 Residency Program *
-//               </label>
-//               <input
-//                 type="text"
-//                 value={data.residency}
-//                 onChange={(e) => handleInputChange('residency', e.target.value)}
-//                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
-//                 placeholder="e.g., Internal Medicine at Johns Hopkins"
-//                 required
-//               />
-//             </div>
-//             <div>
-//               <label className="block text-sm font-medium text-gray-700 mb-2">
-//                 Completion Year *
-//               </label>
-//               <select
-//                 value={data.residencyYear}
-//                 onChange={(e) => handleInputChange('residencyYear', e.target.value)}
-//                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
-//                 required
-//               >
-//                 <option value="">Select year</option>
-//                 {years.map((year) => (
-//                   <option key={year} value={year.toString()}>{year}</option>
-//                 ))}
-//               </select>
-//             </div>
-//           </div>
-//         </div>
-
-//         {/* Fellowship */}
-//         <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-lg border border-green-100">
-//           <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-//             <div className="w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center mr-3 text-sm font-bold">3</div>
-//             Fellowship Training <span className="text-sm font-normal text-gray-500 ml-2">(Optional)</span>
-//           </h3>
-//           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-//             <div>
-//               <label className="block text-sm font-medium text-gray-700 mb-2">
-//                 Fellowship Program
-//               </label>
-//               <input
-//                 type="text"
-//                 value={data.fellowship}
-//                 onChange={(e) => handleInputChange('fellowship', e.target.value)}
-//                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
-//                 placeholder="e.g., Cardiology Fellowship at Mayo Clinic"
-//               />
-//             </div>
-//             <div>
-//               <label className="block text-sm font-medium text-gray-700 mb-2">
-//                 Completion Year
-//               </label>
-//               <select
-//                 value={data.fellowshipYear}
-//                 onChange={(e) => handleInputChange('fellowshipYear', e.target.value)}
-//                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
-//               >
-//                 <option value="">Select year</option>
-//                 {years.map((year) => (
-//                   <option key={year} value={year.toString()}>{year}</option>
-//                 ))}
-//               </select>
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-
-//       {/* Additional Information */}
-//       <div className="bg-amber-50 p-6 rounded-lg border border-amber-200">
-//         <h3 className="text-lg font-semibold text-amber-900 mb-2">Verification Process</h3>
-//         <p className="text-amber-800 text-sm">
-//           Your educational credentials will be verified through primary source verification. 
-//           This may include contacting your medical school and training programs directly. 
-//           Please ensure all information is accurate to avoid delays in the verification process.
-//         </p>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default EducationStep;
-
-
 import React, { useState } from 'react';
-import { Plus, X, GraduationCap, Award, Building, Clock, Stethoscope, Check, Star, Shield, BookOpen } from 'lucide-react';
+import { Formik, Form, Field, FieldArray } from 'formik';
+import * as Yup from 'yup';
+import { GraduationCap, Award, Building, Clock, Stethoscope, Check, Star, BookOpen, Plus } from 'lucide-react';
+
+const validationSchema = Yup.object().shape({
+  medicalSchool: Yup.string()
+    .required('Medical school name is required')
+    .min(3, 'Medical school name must be at least 3 characters'),
+  medicalDegree: Yup.string()
+    .required('Degree type is required'),
+  medicalGraduationYear: Yup.string()
+    .required('Graduation year is required'),
+  primarySpecialty: Yup.string()
+    .required('Primary specialty is required'),
+  residencyInstitution: Yup.string()
+    .required('Residency institution is required')
+    .min(3, 'Institution name must be at least 3 characters'),
+  residencyYear: Yup.string()
+    .required('Residency completion year is required'),
+  yearsOfExperience: Yup.string()
+    .required('Years of experience is required'),
+  fellowshipSpecialty: Yup.string(),
+  fellowshipInstitution: Yup.string(),
+  fellowshipYear: Yup.string(),
+  additionalSpecializations: Yup.array().of(
+    Yup.object().shape({
+      specialty: Yup.string().required('Specialty is required'),
+      institution: Yup.string().required('Institution is required'),
+      year: Yup.string().required('Year is required')
+    })
+  )
+});
 
 const medicalSpecialties = [
   'Internal Medicine', 'Pediatrics', 'Surgery', 'Obstetrics & Gynecology', 'Psychiatry',
@@ -159,56 +40,47 @@ const medicalSpecialties = [
   'Rheumatology', 'Pathology', 'General Practice', 'Other'
 ];
 
-const boardCertifications = [
-  'American Board of Internal Medicine', 'American Board of Pediatrics', 
-  'American Board of Surgery', 'American Board of Family Medicine',
-  'American Board of Psychiatry and Neurology', 'American Board of Radiology',
-  'American Board of Anesthesiology', 'American Board of Emergency Medicine',
-  'American Board of Obstetrics and Gynecology', 'Royal College of Physicians',
-  'Medical Council of India', 'National Medical Commission (NMC)', 'Other International Board'
-];
 
-const EducationStep = ({ data = {}, updateData }) => {
+const EducationStep = ({ data: initialData = {}, onSubmit }) => {
   const [showAdditionalSpecializations, setShowAdditionalSpecializations] = useState(false);
   const [focusedField, setFocusedField] = useState(null);
-
-  const handleInputChange = (field, value) => {
-    updateData({ [field]: value });
-  };
-
-  const handleSpecializationChange = (index, field, value) => {
-    const specializations = data.additionalSpecializations || [];
-    const updated = [...specializations];
-    if (!updated[index]) {
-      updated[index] = {};
-    }
-    updated[index][field] = value;
-    updateData({ additionalSpecializations: updated });
-  };
-
-  const addSpecialization = () => {
-    const specializations = data.additionalSpecializations || [];
-    updateData({ 
-      additionalSpecializations: [...specializations, { specialty: '', institution: '', year: '' }] 
-    });
-  };
-
-  const removeSpecialization = (index) => {
-    const specializations = data.additionalSpecializations || [];
-    const updated = specializations.filter((_, i) => i !== index);
-    updateData({ additionalSpecializations: updated });
-  };
 
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 60 }, (_, i) => currentYear - i);
 
-  const isFieldValid = (field) => {
-    return data[field] && data[field].length > 0;
+  const handleFormSubmit = async (values, { setSubmitting }) => {
+    try {
+      if (onSubmit) {
+        await onSubmit(values);
+      }
+    } catch (error) {
+      console.error('Error submitting form:', error);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-indigo-100 p-3 sm:p-6">
-      <div className="max-w-4xl mx-auto">
+      <Formik
+        initialValues={{
+          medicalSchool: initialData?.medicalSchool || '',
+          medicalDegree: initialData?.medicalDegree || '',
+          medicalGraduationYear: initialData?.medicalGraduationYear || '',
+          primarySpecialty: initialData?.primarySpecialty || '',
+          residencyInstitution: initialData?.residencyInstitution || '',
+          residencyYear: initialData?.residencyYear || '',
+          yearsOfExperience: initialData?.yearsOfExperience || '',
+          fellowshipSpecialty: initialData?.fellowshipSpecialty || '',
+          fellowshipInstitution: initialData?.fellowshipInstitution || '',
+          fellowshipYear: initialData?.fellowshipYear || '',
+          additionalSpecializations: initialData?.additionalSpecializations || []
+        }}
+        validationSchema={validationSchema}
+        onSubmit={handleFormSubmit}
+      >
+        {({ values, errors, touched, setFieldValue, setFieldTouched }) => (
+          <Form className="max-w-4xl mx-auto">
         {/* Modern Header */}
         <div className="text-center mb-8 sm:mb-12 relative">
           <div className="absolute -top-4 sm:-top-6 left-1/2 transform -translate-x-1/2 w-16 sm:w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full animate-pulse"></div>
@@ -252,23 +124,35 @@ const EducationStep = ({ data = {}, updateData }) => {
                   Medical School Name *
                 </label>
                 <div className="relative">
-                  <input
-                    type="text"
-                    value={data.medicalSchool || ''}
-                    onChange={(e) => handleInputChange('medicalSchool', e.target.value)}
-                    onFocus={() => setFocusedField('medicalSchool')}
-                    onBlur={() => setFocusedField(null)}
-                    className={`w-full px-4 py-3 sm:px-6 sm:py-4 border-2 rounded-xl sm:rounded-2xl transition-all duration-300 bg-white/50 backdrop-blur-sm text-base ${
-                      focusedField === 'medicalSchool' 
-                        ? 'border-blue-400 ring-2 sm:ring-4 ring-blue-100 shadow-lg transform scale-[1.02] sm:scale-105' 
-                        : isFieldValid('medicalSchool')
-                        ? 'border-green-300 shadow-md'
-                        : 'border-slate-200 hover:border-slate-300'
-                    }`}
-                    placeholder="e.g., Harvard Medical School, AIIMS New Delhi"
-                    required
-                  />
-                  {isFieldValid('medicalSchool') && (
+                  <Field name="medicalSchool">
+                    {({ field, meta }) => (
+                      <div>
+                        <input
+                          type="text"
+                          {...field}
+                          onFocus={() => setFocusedField('medicalSchool')}
+                          onBlur={(e) => {
+                            field.onBlur(e);
+                            setFocusedField(null);
+                          }}
+                          className={`w-full px-4 py-3 sm:px-6 sm:py-4 border-2 rounded-xl sm:rounded-2xl transition-all duration-300 bg-white/50 backdrop-blur-sm text-base ${
+                            focusedField === 'medicalSchool' 
+                              ? 'border-blue-400 ring-2 sm:ring-4 ring-blue-100 shadow-lg transform scale-[1.02] sm:scale-105' 
+                              : meta.touched && !meta.error
+                              ? 'border-green-300 shadow-md'
+                              : meta.touched && meta.error
+                              ? 'border-red-300'
+                              : 'border-slate-200 hover:border-slate-300'
+                          }`}
+                          placeholder="e.g., Harvard Medical School, AIIMS New Delhi"
+                        />
+                        {meta.touched && meta.error && (
+                          <div className="mt-1 text-sm text-red-500">{meta.error}</div>
+                        )}
+                      </div>
+                    )}
+                  </Field>
+                  {touched.medicalSchool && !errors.medicalSchool && (
                     <Check className="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-green-500" />
                   )}
                 </div>
@@ -280,27 +164,39 @@ const EducationStep = ({ data = {}, updateData }) => {
                   Degree Type *
                 </label>
                 <div className="relative">
-                  <select
-                    value={data.medicalDegree || ''}
-                    onChange={(e) => handleInputChange('medicalDegree', e.target.value)}
-                    onFocus={() => setFocusedField('medicalDegree')}
-                    onBlur={() => setFocusedField(null)}
-                    className={`w-full px-4 py-3 sm:px-6 sm:py-4 border-2 rounded-xl sm:rounded-2xl transition-all duration-300 bg-white/50 backdrop-blur-sm appearance-none text-base ${
-                      focusedField === 'medicalDegree' 
-                        ? 'border-purple-400 ring-2 sm:ring-4 ring-purple-100 shadow-lg transform scale-[1.02] sm:scale-105' 
-                        : isFieldValid('medicalDegree')
-                        ? 'border-green-300 shadow-md'
-                        : 'border-slate-200 hover:border-slate-300'
-                    }`}
-                    required
-                  >
-                    <option value="">Select degree</option>
-                    <option value="MD">MD (Doctor of Medicine)</option>
-                    <option value="MBBS">MBBS (Bachelor of Medicine, Bachelor of Surgery)</option>
-                    <option value="DO">DO (Doctor of Osteopathic Medicine)</option>
-                    <option value="Other">Other Medical Degree</option>
-                  </select>
-                  {isFieldValid('medicalDegree') && (
+                  <Field name="medicalDegree">
+                    {({ field, meta }) => (
+                      <div>
+                        <select
+                          {...field}
+                          onFocus={() => setFocusedField('medicalDegree')}
+                          onBlur={(e) => {
+                            field.onBlur(e);
+                            setFocusedField(null);
+                          }}
+                          className={`w-full px-4 py-3 sm:px-6 sm:py-4 border-2 rounded-xl sm:rounded-2xl transition-all duration-300 bg-white/50 backdrop-blur-sm appearance-none text-base ${
+                            focusedField === 'medicalDegree' 
+                              ? 'border-purple-400 ring-2 sm:ring-4 ring-purple-100 shadow-lg transform scale-[1.02] sm:scale-105' 
+                              : meta.touched && !meta.error
+                              ? 'border-green-300 shadow-md'
+                              : meta.touched && meta.error
+                              ? 'border-red-300'
+                              : 'border-slate-200 hover:border-slate-300'
+                          }`}
+                        >
+                          <option value="">Select degree</option>
+                          <option value="MD">MD (Doctor of Medicine)</option>
+                          <option value="MBBS">MBBS (Bachelor of Medicine, Bachelor of Surgery)</option>
+                          <option value="DO">DO (Doctor of Osteopathic Medicine)</option>
+                          <option value="Other">Other Medical Degree</option>
+                        </select>
+                        {meta.touched && meta.error && (
+                          <div className="mt-1 text-sm text-red-500">{meta.error}</div>
+                        )}
+                      </div>
+                    )}
+                  </Field>
+                  {touched.medicalDegree && !errors.medicalDegree && (
                     <Check className="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-green-500" />
                   )}
                 </div>
@@ -312,26 +208,38 @@ const EducationStep = ({ data = {}, updateData }) => {
                   Graduation Year *
                 </label>
                 <div className="relative">
-                  <select
-                    value={data.medicalGraduationYear || ''}
-                    onChange={(e) => handleInputChange('medicalGraduationYear', e.target.value)}
-                    onFocus={() => setFocusedField('medicalGraduationYear')}
-                    onBlur={() => setFocusedField(null)}
-                    className={`w-full px-4 py-3 sm:px-6 sm:py-4 border-2 rounded-xl sm:rounded-2xl transition-all duration-300 bg-white/50 backdrop-blur-sm appearance-none text-base ${
-                      focusedField === 'medicalGraduationYear' 
-                        ? 'border-orange-400 ring-2 sm:ring-4 ring-orange-100 shadow-lg transform scale-[1.02] sm:scale-105' 
-                        : isFieldValid('medicalGraduationYear')
-                        ? 'border-green-300 shadow-md'
-                        : 'border-slate-200 hover:border-slate-300'
-                    }`}
-                    required
-                  >
-                    <option value="">Select year</option>
-                    {years.map((year) => (
-                      <option key={year} value={year.toString()}>{year}</option>
-                    ))}
-                  </select>
-                  {isFieldValid('medicalGraduationYear') && (
+                  <Field name="medicalGraduationYear">
+                    {({ field, meta }) => (
+                      <div>
+                        <select
+                          {...field}
+                          onFocus={() => setFocusedField('medicalGraduationYear')}
+                          onBlur={(e) => {
+                            field.onBlur(e);
+                            setFocusedField(null);
+                          }}
+                          className={`w-full px-4 py-3 sm:px-6 sm:py-4 border-2 rounded-xl sm:rounded-2xl transition-all duration-300 bg-white/50 backdrop-blur-sm appearance-none text-base ${
+                            focusedField === 'medicalGraduationYear' 
+                              ? 'border-orange-400 ring-2 sm:ring-4 ring-orange-100 shadow-lg transform scale-[1.02] sm:scale-105' 
+                              : meta.touched && !meta.error
+                              ? 'border-green-300 shadow-md'
+                              : meta.touched && meta.error
+                              ? 'border-red-300'
+                              : 'border-slate-200 hover:border-slate-300'
+                          }`}
+                        >
+                          <option value="">Select year</option>
+                          {years.map((year) => (
+                            <option key={year} value={year.toString()}>{year}</option>
+                          ))}
+                        </select>
+                        {meta.touched && meta.error && (
+                          <div className="mt-1 text-sm text-red-500">{meta.error}</div>
+                        )}
+                      </div>
+                    )}
+                  </Field>
+                  {touched.medicalGraduationYear && !errors.medicalGraduationYear && (
                     <Check className="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-green-500" />
                   )}
                 </div>
@@ -342,7 +250,8 @@ const EducationStep = ({ data = {}, updateData }) => {
           {/* Residency */}
           <div className="bg-white/70 backdrop-blur-xl rounded-2xl sm:rounded-3xl p-4 sm:p-8 shadow-xl sm:shadow-2xl border border-white/20">
             <div className="flex items-center mb-6 sm:mb-8">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-xl sm:rounded-2xl flex items-center justify-center mr-3 sm:mr-4 shadow-lg">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-xl sm:rounded-2xl flex 
+              items-center justify-center mr-3 sm:mr-4 shadow-lg">
                 <span className="text-sm sm:text-lg font-bold">2</span>
               </div>
               <div>
@@ -358,26 +267,38 @@ const EducationStep = ({ data = {}, updateData }) => {
                   Primary Specialty *
                 </label>
                 <div className="relative">
-                  <select
-                    value={data.primarySpecialty || ''}
-                    onChange={(e) => handleInputChange('primarySpecialty', e.target.value)}
-                    onFocus={() => setFocusedField('primarySpecialty')}
-                    onBlur={() => setFocusedField(null)}
-                    className={`w-full px-4 py-3 sm:px-6 sm:py-4 border-2 rounded-xl sm:rounded-2xl transition-all duration-300 bg-white/50 backdrop-blur-sm appearance-none text-base ${
-                      focusedField === 'primarySpecialty' 
-                        ? 'border-teal-400 ring-2 sm:ring-4 ring-teal-100 shadow-lg transform scale-[1.02] sm:scale-105' 
-                        : isFieldValid('primarySpecialty')
-                        ? 'border-green-300 shadow-md'
-                        : 'border-slate-200 hover:border-slate-300'
-                    }`}
-                    required
-                  >
-                    <option value="">Select specialty</option>
-                    {medicalSpecialties.map((specialty) => (
-                      <option key={specialty} value={specialty}>{specialty}</option>
-                    ))}
-                  </select>
-                  {isFieldValid('primarySpecialty') && (
+                  <Field name="primarySpecialty">
+                    {({ field, meta }) => (
+                      <div>
+                        <select
+                          {...field}
+                          onFocus={() => setFocusedField('primarySpecialty')}
+                          onBlur={(e) => {
+                            field.onBlur(e);
+                            setFocusedField(null);
+                          }}
+                          className={`w-full px-4 py-3 sm:px-6 sm:py-4 border-2 rounded-xl sm:rounded-2xl transition-all duration-300 bg-white/50 backdrop-blur-sm appearance-none text-base ${
+                            focusedField === 'primarySpecialty' 
+                              ? 'border-teal-400 ring-2 sm:ring-4 ring-teal-100 shadow-lg transform scale-[1.02] sm:scale-105' 
+                              : meta.touched && !meta.error
+                              ? 'border-green-300 shadow-md'
+                              : meta.touched && meta.error
+                              ? 'border-red-300'
+                              : 'border-slate-200 hover:border-slate-300'
+                          }`}
+                        >
+                          <option value="">Select specialty</option>
+                          {medicalSpecialties.map((specialty) => (
+                            <option key={specialty} value={specialty}>{specialty}</option>
+                          ))}
+                        </select>
+                        {meta.touched && meta.error && (
+                          <div className="mt-1 text-sm text-red-500">{meta.error}</div>
+                        )}
+                      </div>
+                    )}
+                  </Field>
+                  {touched.primarySpecialty && !errors.primarySpecialty && (
                     <Check className="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-green-500" />
                   )}
                 </div>
@@ -389,23 +310,30 @@ const EducationStep = ({ data = {}, updateData }) => {
                   Residency Institution *
                 </label>
                 <div className="relative">
-                  <input
-                    type="text"
-                    value={data.residencyInstitution || ''}
-                    onChange={(e) => handleInputChange('residencyInstitution', e.target.value)}
-                    onFocus={() => setFocusedField('residencyInstitution')}
-                    onBlur={() => setFocusedField(null)}
-                    className={`w-full px-4 py-3 sm:px-6 sm:py-4 border-2 rounded-xl sm:rounded-2xl transition-all duration-300 bg-white/50 backdrop-blur-sm text-base ${
-                      focusedField === 'residencyInstitution' 
-                        ? 'border-indigo-400 ring-2 sm:ring-4 ring-indigo-100 shadow-lg transform scale-[1.02] sm:scale-105' 
-                        : isFieldValid('residencyInstitution')
-                        ? 'border-green-300 shadow-md'
-                        : 'border-slate-200 hover:border-slate-300'
-                    }`}
-                    placeholder="e.g., Johns Hopkins Hospital, AIIMS New Delhi"
-                    required
-                  />
-                  {isFieldValid('residencyInstitution') && (
+                  <Field name="residencyInstitution">
+                    {({ field, meta }) => (
+                      <input
+                        type="text"
+                        {...field}
+                        onFocus={() => setFocusedField('residencyInstitution')}
+                        onBlur={(e) => {
+                          field.onBlur(e);
+                          setFocusedField(null);
+                        }}
+                        className={`w-full px-4 py-3 sm:px-6 sm:py-4 border-2 rounded-xl sm:rounded-2xl transition-all duration-300 bg-white/50 backdrop-blur-sm text-base ${
+                          focusedField === 'residencyInstitution' 
+                            ? 'border-indigo-400 ring-2 sm:ring-4 ring-indigo-100 shadow-lg transform scale-[1.02] sm:scale-105' 
+                            : meta.touched && !meta.error
+                            ? 'border-green-300 shadow-md'
+                            : meta.touched && meta.error
+                            ? 'border-red-300'
+                            : 'border-slate-200 hover:border-slate-300'
+                        }`}
+                        placeholder="e.g., Johns Hopkins Hospital, AIIMS New Delhi"
+                      />
+                    )}
+                  </Field>
+                  {touched.residencyInstitution && !errors.residencyInstitution && (
                     <Check className="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-green-500" />
                   )}
                 </div>
@@ -417,26 +345,38 @@ const EducationStep = ({ data = {}, updateData }) => {
                   Completion Year *
                 </label>
                 <div className="relative">
-                  <select
-                    value={data.residencyYear || ''}
-                    onChange={(e) => handleInputChange('residencyYear', e.target.value)}
-                    onFocus={() => setFocusedField('residencyYear')}
-                    onBlur={() => setFocusedField(null)}
-                    className={`w-full px-4 py-3 sm:px-6 sm:py-4 border-2 rounded-xl sm:rounded-2xl transition-all duration-300 bg-white/50 backdrop-blur-sm appearance-none text-base ${
-                      focusedField === 'residencyYear' 
-                        ? 'border-cyan-400 ring-2 sm:ring-4 ring-cyan-100 shadow-lg transform scale-[1.02] sm:scale-105' 
-                        : isFieldValid('residencyYear')
-                        ? 'border-green-300 shadow-md'
-                        : 'border-slate-200 hover:border-slate-300'
-                    }`}
-                    required
-                  >
-                    <option value="">Select year</option>
-                    {years.map((year) => (
-                      <option key={year} value={year.toString()}>{year}</option>
-                    ))}
-                  </select>
-                  {isFieldValid('residencyYear') && (
+                  <Field name="residencyYear">
+                    {({ field, meta }) => (
+                      <div>
+                        <select
+                          {...field}
+                          onFocus={() => setFocusedField('residencyYear')}
+                          onBlur={(e) => {
+                            field.onBlur(e);
+                            setFocusedField(null);
+                          }}
+                          className={`w-full px-4 py-3 sm:px-6 sm:py-4 border-2 rounded-xl sm:rounded-2xl transition-all duration-300 bg-white/50 backdrop-blur-sm appearance-none text-base ${
+                            focusedField === 'residencyYear' 
+                              ? 'border-cyan-400 ring-2 sm:ring-4 ring-cyan-100 shadow-lg transform scale-[1.02] sm:scale-105' 
+                              : meta.touched && !meta.error
+                              ? 'border-green-300 shadow-md'
+                              : meta.touched && meta.error
+                              ? 'border-red-300'
+                              : 'border-slate-200 hover:border-slate-300'
+                          }`}
+                        >
+                          <option value="">Select year</option>
+                          {years.map((year) => (
+                            <option key={year} value={year.toString()}>{year}</option>
+                          ))}
+                        </select>
+                        {meta.touched && meta.error && (
+                          <div className="mt-1 text-sm text-red-500">{meta.error}</div>
+                        )}
+                      </div>
+                    )}
+                  </Field>
+                  {touched.residencyYear && !errors.residencyYear && (
                     <Check className="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-green-500" />
                   )}
                 </div>
@@ -448,29 +388,41 @@ const EducationStep = ({ data = {}, updateData }) => {
                   Years of Experience *
                 </label>
                 <div className="relative">
-                  <select
-                    value={data.yearsOfExperience || ''}
-                    onChange={(e) => handleInputChange('yearsOfExperience', e.target.value)}
-                    onFocus={() => setFocusedField('yearsOfExperience')}
-                    onBlur={() => setFocusedField(null)}
-                    className={`w-full px-4 py-3 sm:px-6 sm:py-4 border-2 rounded-xl sm:rounded-2xl transition-all duration-300 bg-white/50 backdrop-blur-sm appearance-none text-base ${
-                      focusedField === 'yearsOfExperience' 
-                        ? 'border-amber-400 ring-2 sm:ring-4 ring-amber-100 shadow-lg transform scale-[1.02] sm:scale-105' 
-                        : isFieldValid('yearsOfExperience')
-                        ? 'border-green-300 shadow-md'
-                        : 'border-slate-200 hover:border-slate-300'
-                    }`}
-                    required
-                  >
-                    <option value="">Select experience</option>
-                    <option value="0-2">0-2 years</option>
-                    <option value="3-5">3-5 years</option>
-                    <option value="6-10">6-10 years</option>
-                    <option value="11-15">11-15 years</option>
-                    <option value="16-20">16-20 years</option>
-                    <option value="20+">20+ years</option>
-                  </select>
-                  {isFieldValid('yearsOfExperience') && (
+                  <Field name="yearsOfExperience">
+                    {({ field, meta }) => (
+                      <div>
+                        <select
+                          {...field}
+                          onFocus={() => setFocusedField('yearsOfExperience')}
+                          onBlur={(e) => {
+                            field.onBlur(e);
+                            setFocusedField(null);
+                          }}
+                          className={`w-full px-4 py-3 sm:px-6 sm:py-4 border-2 rounded-xl sm:rounded-2xl transition-all duration-300 bg-white/50 backdrop-blur-sm appearance-none text-base ${
+                            focusedField === 'yearsOfExperience' 
+                              ? 'border-amber-400 ring-2 sm:ring-4 ring-amber-100 shadow-lg transform scale-[1.02] sm:scale-105' 
+                              : meta.touched && !meta.error
+                              ? 'border-green-300 shadow-md'
+                              : meta.touched && meta.error
+                              ? 'border-red-300'
+                              : 'border-slate-200 hover:border-slate-300'
+                          }`}
+                        >
+                          <option value="">Select experience</option>
+                          <option value="0-2">0-2 years</option>
+                          <option value="3-5">3-5 years</option>
+                          <option value="6-10">6-10 years</option>
+                          <option value="11-15">11-15 years</option>
+                          <option value="16-20">16-20 years</option>
+                          <option value="20+">20+ years</option>
+                        </select>
+                        {meta.touched && meta.error && (
+                          <div className="mt-1 text-sm text-red-500">{meta.error}</div>
+                        )}
+                      </div>
+                    )}
+                  </Field>
+                  {touched.yearsOfExperience && !errors.yearsOfExperience && (
                     <Check className="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-green-500" />
                   )}
                 </div>
@@ -500,22 +452,30 @@ const EducationStep = ({ data = {}, updateData }) => {
                   Fellowship Specialty
                 </label>
                 <div className="relative">
-                  <input
-                    type="text"
-                    value={data.fellowshipSpecialty || ''}
-                    onChange={(e) => handleInputChange('fellowshipSpecialty', e.target.value)}
-                    onFocus={() => setFocusedField('fellowshipSpecialty')}
-                    onBlur={() => setFocusedField(null)}
-                    className={`w-full px-4 py-3 sm:px-6 sm:py-4 border-2 rounded-xl sm:rounded-2xl transition-all duration-300 bg-white/50 backdrop-blur-sm text-base ${
-                      focusedField === 'fellowshipSpecialty' 
-                        ? 'border-emerald-400 ring-2 sm:ring-4 ring-emerald-100 shadow-lg transform scale-[1.02] sm:scale-105' 
-                        : isFieldValid('fellowshipSpecialty')
-                        ? 'border-green-300 shadow-md'
-                        : 'border-slate-200 hover:border-slate-300'
-                    }`}
-                    placeholder="e.g., Interventional Cardiology, Pediatric Surgery"
-                  />
-                  {isFieldValid('fellowshipSpecialty') && (
+                  <Field name="fellowshipSpecialty">
+                    {({ field, meta }) => (
+                      <input
+                        type="text"
+                        {...field}
+                        onFocus={() => setFocusedField('fellowshipSpecialty')}
+                        onBlur={(e) => {
+                          field.onBlur(e);
+                          setFocusedField(null);
+                        }}
+                        className={`w-full px-4 py-3 sm:px-6 sm:py-4 border-2 rounded-xl sm:rounded-2xl transition-all duration-300 bg-white/50 backdrop-blur-sm text-base ${
+                          focusedField === 'fellowshipSpecialty' 
+                            ? 'border-emerald-400 ring-2 sm:ring-4 ring-emerald-100 shadow-lg transform scale-[1.02] sm:scale-105' 
+                            : meta.touched && !meta.error
+                            ? 'border-green-300 shadow-md'
+                            : meta.touched && meta.error
+                            ? 'border-red-300'
+                            : 'border-slate-200 hover:border-slate-300'
+                        }`}
+                        placeholder="e.g., Interventional Cardiology, Pediatric Surgery"
+                      />
+                    )}
+                  </Field>
+                  {touched.fellowshipSpecialty && !errors.fellowshipSpecialty && (
                     <Check className="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-green-500" />
                   )}
                 </div>
@@ -527,22 +487,30 @@ const EducationStep = ({ data = {}, updateData }) => {
                   Fellowship Institution
                 </label>
                 <div className="relative">
-                  <input
-                    type="text"
-                    value={data.fellowshipInstitution || ''}
-                    onChange={(e) => handleInputChange('fellowshipInstitution', e.target.value)}
-                    onFocus={() => setFocusedField('fellowshipInstitution')}
-                    onBlur={() => setFocusedField(null)}
-                    className={`w-full px-4 py-3 sm:px-6 sm:py-4 border-2 rounded-xl sm:rounded-2xl transition-all duration-300 bg-white/50 backdrop-blur-sm text-base ${
-                      focusedField === 'fellowshipInstitution' 
-                        ? 'border-rose-400 ring-2 sm:ring-4 ring-rose-100 shadow-lg transform scale-[1.02] sm:scale-105' 
-                        : isFieldValid('fellowshipInstitution')
-                        ? 'border-green-300 shadow-md'
-                        : 'border-slate-200 hover:border-slate-300'
-                    }`}
-                    placeholder="Institution name"
-                  />
-                  {isFieldValid('fellowshipInstitution') && (
+                  <Field name="fellowshipInstitution">
+                    {({ field, meta }) => (
+                      <input
+                        type="text"
+                        {...field}
+                        onFocus={() => setFocusedField('fellowshipInstitution')}
+                        onBlur={(e) => {
+                          field.onBlur(e);
+                          setFocusedField(null);
+                        }}
+                        className={`w-full px-4 py-3 sm:px-6 sm:py-4 border-2 rounded-xl sm:rounded-2xl transition-all duration-300 bg-white/50 backdrop-blur-sm text-base ${
+                          focusedField === 'fellowshipInstitution' 
+                            ? 'border-rose-400 ring-2 sm:ring-4 ring-rose-100 shadow-lg transform scale-[1.02] sm:scale-105' 
+                            : meta.touched && !meta.error
+                            ? 'border-green-300 shadow-md'
+                            : meta.touched && meta.error
+                            ? 'border-red-300'
+                            : 'border-slate-200 hover:border-slate-300'
+                        }`}
+                        placeholder="Institution name"
+                      />
+                    )}
+                  </Field>
+                  {touched.fellowshipInstitution && !errors.fellowshipInstitution && (
                     <Check className="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-green-500" />
                   )}
                 </div>
@@ -554,27 +522,38 @@ const EducationStep = ({ data = {}, updateData }) => {
                   Completion Year
                 </label>
                 <div className="relative">
-                  <select
-                    value={data.fellowshipYear || ''}
-                    onChange={(e) => handleInputChange('fellowshipYear', e.target.value)}
-                    onFocus={() => setFocusedField('fellowshipYear')}
-                    onBlur={() => setFocusedField(null)}
-                    className={`w-full px-4 py-3 sm:px-6 sm:py-4 border-2 rounded-xl sm:rounded-2xl transition-all duration-300 bg-white/50 backdrop-blur-sm appearance-none text-base ${
-                      focusedField === 'fellowshipYear' 
-                        ? 'border-violet-400 ring-2 sm:ring-4 ring-violet-100 shadow-lg transform scale-[1.02] sm:scale-105' 
-                        : isFieldValid('fellowshipYear')
-                        ? 'border-green-300 shadow-md'
-                        : 'border-slate-200 hover:border-slate-300'
-                    }`}
-                  >
-                    <option value="">Select year</option>
-                    {years.map((year) => (
-                      <option key={year} value={year.toString()}>{year}</option>
-                    ))}
-                  </select>
-                  {isFieldValid('fellowshipYear') && (
-                    <Check className="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-green-500" />
-                  )}
+                  <Field name="fellowshipYear">
+                    {({ field, meta }) => (
+                      <div>
+                        <select
+                          {...field}
+                          onFocus={() => setFocusedField('fellowshipYear')}
+                          onBlur={(e) => {
+                            field.onBlur(e);
+                            setFocusedField(null);
+                          }}
+                          className={`w-full px-4 py-3 sm:px-6 sm:py-4 border-2 rounded-xl sm:rounded-2xl transition-all duration-300 bg-white/50 backdrop-blur-sm appearance-none text-base ${
+                            focusedField === 'fellowshipYear' 
+                              ? 'border-violet-400 ring-2 sm:ring-4 ring-violet-100 shadow-lg transform scale-[1.02] sm:scale-105' 
+                              : meta.touched && !meta.error
+                              ? 'border-green-300 shadow-md'
+                              : meta.touched && meta.error
+                              ? 'border-red-300'
+                              : 'border-slate-200 hover:border-slate-300'
+                          }`}
+                        >
+                          <option value="">Select year</option>
+                          {years.map((year) => (
+                            <option key={year} value={year.toString()}>{year}</option>
+                          ))}
+                        </select>
+                        {meta.touched && meta.error && (
+                          <div className="mt-1 text-sm text-red-500">{meta.error}</div>
+                        )}
+                      </div>
+                    )}
+                  </Field>
+                    </div>
                 </div>
               </div>
             </div>
@@ -597,129 +576,89 @@ const EducationStep = ({ data = {}, updateData }) => {
 
               {showAdditionalSpecializations && (
                 <div className="space-y-4">
-                  {(data.additionalSpecializations || []).map((spec, index) => (
-                    <div key={index} className="bg-emerald-50 p-4 rounded-2xl border border-emerald-100 relative">
-                      <button
-                        onClick={() => removeSpecialization(index)}
-                        className="absolute top-3 right-3 w-6 h-6 bg-red-100 text-red-600 rounded-full flex items-center justify-center hover:bg-red-200 transition-colors"
-                      >
-                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <input
-                          type="text"
-                          value={spec.specialty || ''}
-                          onChange={(e) => handleSpecializationChange(index, 'specialty', e.target.value)}
-                          className="px-3 py-2 border border-emerald-200 rounded-lg focus:ring-1 focus:ring-emerald-500 text-sm bg-white"
-                          placeholder="Specialty name"
-                        />
-                        <input
-                          type="text"
-                          value={spec.institution || ''}
-                          onChange={(e) => handleSpecializationChange(index, 'institution', e.target.value)}
-                          className="px-3 py-2 border border-emerald-200 rounded-lg focus:ring-1 focus:ring-emerald-500 text-sm bg-white"
-                          placeholder="Institution"
-                        />
-                        <select
-                          value={spec.year || ''}
-                          onChange={(e) => handleSpecializationChange(index, 'year', e.target.value)}
-                          className="px-3 py-2 border border-emerald-200 rounded-lg focus:ring-1 focus:ring-emerald-500 text-sm bg-white"
+                  <FieldArray name="additionalSpecializations">
+                    {({ push, remove }) => (
+                      <div>
+                        {values.additionalSpecializations.map((_, index) => (
+                          <div key={index} className="bg-emerald-50 p-4 rounded-2xl border border-emerald-100 relative mb-4">
+                            <button
+                              type="button"
+                              onClick={() => remove(index)}
+                              className="absolute top-3 right-3 w-6 h-6 bg-red-100 text-red-600 rounded-full flex items-center justify-center hover:bg-red-200 transition-colors"
+                            >
+                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            </button>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                              <Field name={`additionalSpecializations.${index}.specialty`}>
+                                {({ field, meta }) => (
+                                  <div>
+                                    <input
+                                      {...field}
+                                      type="text"
+                                      className="px-3 py-2 w-full border border-emerald-200 rounded-lg focus:ring-1 focus:ring-emerald-500 text-sm bg-white"
+                                      placeholder="Specialty name"
+                                    />
+                                    {meta.touched && meta.error && (
+                                      <div className="mt-1 text-xs text-red-500">{meta.error}</div>
+                                    )}
+                                  </div>
+                                )}
+                              </Field>
+                              <Field name={`additionalSpecializations.${index}.institution`}>
+                                {({ field, meta }) => (
+                                  <div>
+                                    <input
+                                      {...field}
+                                      type="text"
+                                      className="px-3 py-2 w-full border border-emerald-200 rounded-lg focus:ring-1 focus:ring-emerald-500 text-sm bg-white"
+                                      placeholder="Institution"
+                                    />
+                                    {meta.touched && meta.error && (
+                                      <div className="mt-1 text-xs text-red-500">{meta.error}</div>
+                                    )}
+                                  </div>
+                                )}
+                              </Field>
+                              <Field name={`additionalSpecializations.${index}.year`}>
+                                {({ field, meta }) => (
+                                  <div>
+                                    <select
+                                      {...field}
+                                      className="px-3 py-2 w-full border border-emerald-200 rounded-lg focus:ring-1 focus:ring-emerald-500 text-sm bg-white"
+                                    >
+                                      <option value="">Year</option>
+                                      {years.slice(0, 30).map((year) => (
+                                        <option key={year} value={year.toString()}>{year}</option>
+                                      ))}
+                                    </select>
+                                    {meta.touched && meta.error && (
+                                      <div className="mt-1 text-xs text-red-500">{meta.error}</div>
+                                    )}
+                                  </div>
+                                )}
+                              </Field>
+                            </div>
+                          </div>
+                        ))}
+                        <button
+                          type="button"
+                          onClick={() => push({ specialty: '', institution: '', year: '' })}
+                          className="w-full py-3 border-2 border-dashed border-emerald-300 text-emerald-600 rounded-2xl hover:border-emerald-400 hover:text-emerald-700 transition-colors flex items-center justify-center"
                         >
-                          <option value="">Year</option>
-                          {years.slice(0, 30).map((year) => (
-                            <option key={year} value={year.toString()}>{year}</option>
-                          ))}
-                        </select>
+                          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                          </svg>
+                          Add Another Specialization
+                        </button>
                       </div>
-                    </div>
-                  ))}
-                  <button
-                    onClick={addSpecialization}
-                    className="w-full py-3 border-2 border-dashed border-emerald-300 text-emerald-600 rounded-2xl hover:border-emerald-400 hover:text-emerald-700 transition-colors flex items-center justify-center"
-                  >
-                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
-                    Add Another Specialization
-                  </button>
+                    )}
+                  </FieldArray>
                 </div>
               )}
             </div>
           </div>
-
-          {/* Board Certifications & Licenses */}
-          {/* <div className="bg-white rounded-3xl border border-gray-100 shadow-xl p-8 hover:shadow-2xl transition-all duration-300">
-            <div className="flex items-center mb-8">
-              <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-2xl flex items-center justify-center mr-4 shadow-lg">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <div>
-                <h3 className="text-2xl font-bold text-gray-900">Board Certifications & Medical License</h3>
-                <p className="text-gray-600 mt-1">Professional certifications and licensing information</p>
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-3">
-                  Board Certification *
-                </label>
-                <select
-                  value={data.boardCertification || ''}
-                  onChange={(e) => handleInputChange('boardCertification', e.target.value)}
-                  className="w-full px-4 py-4 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all bg-gray-50 hover:bg-white"
-                  required
-                >
-                  <option value="">Select certification</option>
-                  {boardCertifications.map((cert) => (
-                    <option key={cert} value={cert}>{cert}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-3">
-                  Medical License Number *
-                </label>
-                <input
-                  type="text"
-                  value={data.medicalLicense || ''}
-                  onChange={(e) => handleInputChange('medicalLicense', e.target.value)}
-                  className="w-full px-4 py-4 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all bg-gray-50 hover:bg-white"
-                  placeholder="Enter license number"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-3">
-                  License Issuing State/Country *
-                </label>
-                <input
-                  type="text"
-                  value={data.licenseState || ''}
-                  onChange={(e) => handleInputChange('licenseState', e.target.value)}
-                  className="w-full px-4 py-4 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all bg-gray-50 hover:bg-white"
-                  placeholder="e.g., California, Maharashtra, India"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-3">
-                  License Expiry Date *
-                </label>
-                <input
-                  type="date"
-                  value={data.licenseExpiry || ''}
-                  onChange={(e) => handleInputChange('licenseExpiry', e.target.value)}
-                  className="w-full px-4 py-4 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all bg-gray-50 hover:bg-white"
-                  required
-                />
-              </div>
-            </div>
-          </div> */}
 
           {/* Verification & Compliance */}
           <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-3xl p-8 shadow-lg">
@@ -743,10 +682,11 @@ const EducationStep = ({ data = {}, updateData }) => {
                   <p className="font-medium">✅ <strong>Important:</strong> Ensure all information is accurate to avoid verification delays</p>
                 </div>
               </div>
+              </div>
             </div>
-          </div>
-        </div>
-      </div>
+          </Form>
+        )}
+      </Formik>
     </div>
   );
 };

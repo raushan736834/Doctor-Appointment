@@ -23,7 +23,4 @@ dist-ssr
 *.sln
 *.sw?
 
-# Specific files and directories to ignore
-
-
 .env

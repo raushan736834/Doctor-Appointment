@@ -1,52 +1,18 @@
-import React, { useEffect, useState } from "react";
-import { Search, MapPin, Building2, Stethoscope, Users } from "lucide-react";
+import React, { useState } from "react";
+import { Search, MapPin, Stethoscope } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useApiService } from "../../../hooks/useAuthWithAxios";
 
-const SPECIALIST_URL = "api/public/getSpecialist";
-const CITIES_URL = "api/public/cities";
 const SEARCH_URL = "api/public/searchByCityAndSpecialist";
 
-const Banner = () => {
-  const [specialists, setSpecialists] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+const Banner = ({ specialists, cities, isLoading, setIsLoading }) => {
   const [err, setErr] = useState();
   const [selectedSpecialist, setSelectedSpecialist] = useState("");
   const [selectedCity, setSelectedCity] = useState("");
-  const [cities, setCities] = useState([]);
   const [doctors, setDoctors] = useState([]);
   const [successFetch, setSuccessFetch] = useState(false);
   const api = useApiService();
   const navigate = useNavigate();
-  useEffect(() => {
-    fetchCities();
-    fetchSpecialist();
-  }, []);
-
-  const fetchSpecialist = async () => {
-    try {
-      const response = await api.get(SPECIALIST_URL);
-      setSpecialists(response.data);
-    } catch (error) {
-      console.error("Error fetching specialists:", error);
-      setErr("Failed to load specialists. Please try again later.");
-    }
-  };
-
-  const fetchCities = async () => {
-    try {
-      const response = await api.get(CITIES_URL);
-      if (response?.success) {
-        const fetched = response.data;
-        setCities(Array.isArray(fetched) ? fetched : fetched?.cities ?? []);
-      } else {
-        setErr("Failed to load cities. Please try again later.");
-      }
-    } catch (error) {
-      console.log("Error fetching cities: ", error);
-      setErr("Failed to load cities. Please try again later.");
-    }
-  };
 
   const handleSearch = async () => {
     console.log(selectedCity);
@@ -68,7 +34,9 @@ const Banner = () => {
         setDoctors(Array.isArray(response.data) ? response.data : []);
         setSuccessFetch(true);
       } else {
-        setErr(response?.error || "Failed to search doctors. Please try again later.");
+        setErr(
+          response?.error || "Failed to search doctors. Please try again later."
+        );
       }
     } catch (error) {
       console.error("Error searching doctors:", error);
@@ -85,8 +53,8 @@ const Banner = () => {
   }
 
   return (
-    <div className="flex justify-center bg-gradient-to-r from-white via-gray-100 to-white p-4 md:p-6">
-      <div className="max-w-7xl">
+    <div className="min-h-screen bg-gradient-to-r from-white via-gray-100 to-white p-4 md:p-8">
+      <div className="max-w-7xl mx-auto">
         <div className="relative bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 rounded-3xl overflow-hidden shadow-2xl">
           {/* Background decorative elements */}
           <div className="absolute inset-0 overflow-hidden">
@@ -183,7 +151,9 @@ const Banner = () => {
                       City
                     </option>
                     {(Array.isArray(cities) ? cities : [])
-                      .filter((city) => typeof city === "string" && city.trim() !== "")
+                      .filter(
+                        (city) => typeof city === "string" && city.trim() !== ""
+                      )
                       .map((city) => (
                         <option key={city} value={city}>
                           {city}
@@ -207,11 +177,16 @@ const Banner = () => {
                     <option value="" disabled>
                       Specialist
                     </option>
-                    {(Array.isArray(specialists) ? specialists : []).map((specialist) => (
-                      <option key={specialist.id} value={specialist.specialist}>
-                        {specialist.specialist}
-                      </option>
-                    ))}
+                    {(Array.isArray(specialists) ? specialists : []).map(
+                      (specialist) => (
+                        <option
+                          key={specialist.id}
+                          value={specialist.specialist}
+                        >
+                          {specialist.specialist}
+                        </option>
+                      )
+                    )}
                   </select>
                 </div>
 
@@ -304,7 +279,10 @@ const Banner = () => {
                         City
                       </option>
                       {(Array.isArray(cities) ? cities : [])
-                        .filter((city) => typeof city === "string" && city.trim() !== "")
+                        .filter(
+                          (city) =>
+                            typeof city === "string" && city.trim() !== ""
+                        )
                         .map((city) => (
                           <option key={city} value={city}>
                             {city}
@@ -336,14 +314,16 @@ const Banner = () => {
                       <option value="" disabled>
                         Specialist
                       </option>
-                      {(Array.isArray(specialists) ? specialists : []).map((specialist) => (
-                        <option
-                          key={specialist.id}
-                          value={specialist.specialist}
-                        >
-                          {specialist.specialist}
-                        </option>
-                      ))}
+                      {(Array.isArray(specialists) ? specialists : []).map(
+                        (specialist) => (
+                          <option
+                            key={specialist.id}
+                            value={specialist.specialist}
+                          >
+                            {specialist.specialist}
+                          </option>
+                        )
+                      )}
                     </select>
                   </div>
 

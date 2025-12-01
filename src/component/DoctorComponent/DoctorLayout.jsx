@@ -119,8 +119,8 @@ const DoctorLayout = () => {
   const accountStatus = user?.accountStatus;
 
   // Check if current route is doctorOnboarding
-  const isOnboardingRoute = location.pathname === "/doctor/doctorOnboarding";
-
+  const isOnboardingRoute = (location.pathname === "/doctor/doctorOnboarding") || (location.pathname === '/doctor/afterReview');
+  console.log(isOnboardingRoute);
   // if no token, push back to home/login
   useEffect(() => {
     if (!accessToken) {
@@ -137,6 +137,9 @@ const DoctorLayout = () => {
     ) {
       console.log("navigating to onboarding");
       navigate("/doctor/doctorOnboarding", { replace: true });
+    }
+    if(accountStatus === 'PENDING'){
+      navigate("/doctor/afterReview",{state: {doctor: user}}, { replace: true });
     }
     if (
       accountStatus === "COMPLETE" &&
@@ -205,7 +208,7 @@ const DoctorLayout = () => {
           transition-transform duration-300 ease-in-out overflow-hidden
           ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
           md:fixed md:top-0 md:translate-x-0 md:block md:shadow-none
-          ${isOnboardingRoute ? "w-16 md:w-16 lg:w-16" : "w-48 md:w-48 lg:w-64"}
+          ${isOnboardingRoute ? "w-20" : "w-48 md:w-48 lg:w-64"}
         `}
       >
         <Sidebar

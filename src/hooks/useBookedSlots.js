@@ -3,13 +3,13 @@ import { format } from "date-fns";
 import { useApiService } from "./useAuthWithAxios";
 
 
-export function useBookedSlots(doctorId, date) {
+export function useBookedSlots(id, date) {
   const [bookedSlots, setBookedSlots] = useState([]);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const api = useApiService();
   useEffect(() => {
-    if (!doctorId || !date) return;
+    if (!id || !date) return;
 
     let isMounted = true;
 
@@ -20,7 +20,7 @@ export function useBookedSlots(doctorId, date) {
       try {
         const data = {
           date: format(date, "yyyy-MM-dd"),
-          doctor: { id: doctorId },
+          doctor: { doctorId : id },
         };
         const response = await api.post("/api/public/booked-slots", data);
         if (isMounted) {
@@ -39,7 +39,7 @@ export function useBookedSlots(doctorId, date) {
     return () => {
       isMounted = false;
     };
-  }, [doctorId, date]);
+  }, [id, date]);
 
   return { bookedSlots, isLoading, error };
 }

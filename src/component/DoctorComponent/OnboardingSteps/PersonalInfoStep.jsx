@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Formik, Form, Field } from "formik";
+import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import {
   Camera,
@@ -48,37 +48,42 @@ const PersonalInfoSchema = Yup.object().shape({
     .required("Pincode is required"),
 });
 
-const PersonalInfoStep = ({ onSubmit }) => {
-  const [photoPreview, setPhotoPreview] = useState(null);
+const PersonalInfoStep = ({ updateData, data, onSubmit }) => {
+  const [photoPreview, setPhotoPreview] = useState(data?.profileImage || null);
   const [isUploading, setIsUploading] = useState(false);
   const [focusedField, setFocusedField] = useState(null);
+
+  useEffect(() => {
+    if (data?.profileImage) {
+      setPhotoPreview(data.profileImage);
+    }
+  }, [data?.profileImage]);
+
   const fileInputRef = useRef(null);
   const { user } = useAuth();
   const fullname = user?.fullname || "";
   const splitName = fullname.split(" ");
   const api = useApiService();
-  const [data, setData] = useState({});
-  const [err, setErr] = useState();
-
-  useEffect(() => {
-    handleFetchUserData();
-  }, []);
-
-  const handleFetchUserData = async () => {
-    try {
-      const response = await api.get("/api/doctors/getPersonalDetails");
-      if (response.success) {
-        setData(response.data?.data);
-      }
-      console.log(data);  
-    } catch (err) {
-      setErr(err);
-    }
-  };
 
   const handleSubmit = async (values, { setSubmitting, setErrors }) => {
     try {
       setSubmitting(true);
+      
+      // Check if any values have changed
+      const hasChanges = Object.keys(values).some(key => {
+        // Skip profilePhoto comparison if it's a File object
+        if (key === 'profilePhoto' && values[key] instanceof File) return true;
+        return values[key] !== data?.[key];
+      });
+
+      // If no changes and data exists, skip API call
+      if (!hasChanges && data) {
+        if (onSubmit) {
+          await onSubmit({ ...values, __skipApi: true });
+        }
+        return true;
+      }
+
       const formData = new FormData();
 
       // Create a copy of values without the profilePhoto
@@ -93,7 +98,7 @@ const PersonalInfoStep = ({ onSubmit }) => {
         formData.append("profileImage", values.profilePhoto);
       }
 
-      const response = await api.post("api/doctors/personalDetails", formData, {
+      const response = await api.put("api/doctors/personalDetails", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -101,9 +106,9 @@ const PersonalInfoStep = ({ onSubmit }) => {
 
       if (response.success) {
         if (onSubmit) {
-          await onSubmit(values); // Call parent's onSubmit to move to next step
+          await onSubmit(values);
         }
-        return true; // Indicate successful submission
+        return true;
       } else {
         setErrors({
           submit: response.data?.message || "Failed to submit form",
@@ -150,16 +155,19 @@ const PersonalInfoStep = ({ onSubmit }) => {
       <div className="max-w-4xl mx-auto">
         {/* Mobile-Optimized Animated Header */}
         <div className="text-center mb-8 sm:mb-12 relative">
-          <div className="absolute -top-4 sm:-top-6 left-1/2 transform -translate-x-1/2 w-16 sm:w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full animate-pulse"></div>
+          <div className="absolute -top-4 sm:-top-6 left-1/2 transform -translate-x-1/2 w-16 sm:w-24 h-1 bg-gradient-to-r
+           from-blue-500 to-purple-500 rounded-full animate-pulse"></div>
 
           <div
-            className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl sm:rounded-2xl mb-4 sm:mb-6 shadow-lg transform 
+            className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-blue-500
+             to-purple-600 rounded-xl sm:rounded-2xl mb-4 sm:mb-6 shadow-lg transform 
           rotate-3 hover:rotate-0 transition-transform duration-300"
           >
             <User className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
           </div>
 
-          <h2 className="text-2xl sm:text-4xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent mb-2 sm:mb-3 leading-tight">
+          <h2 className="text-2xl sm:text-4xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text
+           text-transparent mb-2 sm:mb-3 leading-tight">
             Personal Information
           </h2>
           <p className="text-slate-600 text-base sm:text-lg font-medium px-2">
@@ -184,17 +192,17 @@ const PersonalInfoStep = ({ onSubmit }) => {
 
         <Formik
           initialValues={{
-            profilePhoto: data.profilePhoto || "",
-            firstName: data.firstName || splitName[0] || "",
-            lastName: data.lastName || splitName[1] || "",
-            email: data.email || user?.email || "",
-            phone: data.phone || "",
-            dob: data.dob || "",
-            gender: data.gender || "",
-            address: data.address || "",
-            city: data.city || "",
-            state: data.state || "",
-            pincode: data.pincode || "",
+            profilePhoto: data?.profileImage || "",
+            firstName: data?.firstName || splitName[0] || "",
+            lastName: data?.lastName || splitName[1] || "",
+            email: data?.email || user?.email || "",
+            phone: data?.phone || "",
+            dob: data?.dob || "",
+            gender: data?.gender || "",
+            address: data?.address || "",
+            city: data?.city || "",
+            state: data?.state || "",
+            pincode: data?.pincode || "",
           }}
           validationSchema={PersonalInfoSchema}
           onSubmit={handleSubmit}
@@ -212,11 +220,12 @@ const PersonalInfoStep = ({ onSubmit }) => {
               {/* Mobile-Optimized Profile Photo Section */}
               <div className="flex justify-center mb-8 sm:mb-12">
                 <div className="relative group">
-                  <div className="w-28 h-28 sm:w-40 sm:h-40 rounded-2xl sm:rounded-3xl bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500 p-1 shadow-xl sm:shadow-2xl transform hover:scale-105 transition-all duration-300">
+                  <div className="w-28 h-28 sm:w-40 sm:h-40 rounded-2xl sm:rounded-3xl bg-gradient-to-br from-blue-400 via-purple-500
+                   to-pink-500 p-1 shadow-xl sm:shadow-2xl transform hover:scale-105 transition-all duration-300">
                     <div className="w-full h-full rounded-2xl sm:rounded-3xl overflow-hidden bg-white">
                       {photoPreview || values.profilePhoto ? (
                         <img
-                          src={photoPreview || values.profilePhoto}
+                          src={`data:image/jpeg;base64,${photoPreview}` || `data:image/jpeg;base64,${values.profilePhoto}`}
                           alt="Profile"
                           className="w-full h-full object-cover"
                         />
@@ -691,7 +700,7 @@ const PersonalInfoStep = ({ onSubmit }) => {
                         values.address && !errors.address,
                         values.city && !errors.city,
                         values.state && !errors.state,
-                        values.pincode && !errors.pinCode,
+                        values.pincode && !errors.pincode,
                       ].filter(Boolean).length
                     }
                     /10 completed

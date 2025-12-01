@@ -174,7 +174,7 @@ export default function Footer() {
         {/* Bottom Copyright/Additional Info */}
         <div className="border-t border-blue-500 mt-12 pt-6 text-center">
           <p className="text-blue-200 text-sm">
-            © 2024 HeyDoctor. All rights reserved.
+            © 2025 HeyDoctor. All rights reserved.
           </p>
         </div>
       </div>

@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { Calendar, Stethoscope, X, Edit3, MapPin, Star } from "lucide-react";
-import { useAuth } from "../GlobalComponent/AuthProvider";
-import { useApiService } from "../../hooks/useAuthWithAxios";
+import { useApiService, useAuthWithAxios } from "../../hooks/useAuthWithAxios";
 import RescheduleModal from "../DoctorComponent/RescheduleModal";
 import { cancelAppointment } from "../../constants/Method";
 import { useToast } from "@chakra-ui/react";
 import OverlayLoader from "../Common/Loader";
 import { useNavigate } from "react-router-dom";
+import defaultImage from "../../assets/img/defaultClinicImage.jpg";
 
 const BookedAppointments = () => {
-  const email = localStorage.getItem("email");
-  const { setIsLoading, isLoading } = useAuth();
+  const { user } = useAuthWithAxios();
+  const email = user?.email;
+  const [isLoading, setIsLoading] = useState(false);
   const [appointments, setAppointments] = useState([]);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showRescheduleModal, setShowRescheduleModal] = useState(false);
@@ -36,22 +37,18 @@ const BookedAppointments = () => {
     navigate("/");
   };
 
-  // const photoUrl =
-  //     profilePhoto && profilePhoto.trim() !== ""
-  //       ? getDirectGoogleDriveLink(profilePhoto)
-  //       : defaultDoctorImage;
-    
-
   const handleConfirmCancel = async () => {
+    console.log(selectedAppointment);
     if (!selectedAppointment) return;
 
     await cancelAppointment(
       selectedAppointment,
       toast,
       setIsLoading,
+      api,
       () => {
         // Success callback
-        fetchAppointments(); // Refresh appointments
+        fetchAppointments(); 
         setSelectedAppointment(null);
       },
       (error) => {
@@ -73,9 +70,22 @@ const BookedAppointments = () => {
     setShowRescheduleModal(true);
   };
 
-  const handleRescheduleSuccess = () => {
+  const handleRescheduleSuccess = (updatedAppointment) => {
     setShowRescheduleModal(false);
-    fetchAppointments();
+    
+    // Update appointments state directly without API call
+    if (updatedAppointment) {
+      setAppointments((prevAppointments) =>
+        prevAppointments.map((apt) =>
+          apt.appointmentId === updatedAppointment.appointmentId
+            ? updatedAppointment
+            : apt
+        )
+      );
+    } else {
+      // Fallback: fetch appointments if updated appointment is not provided
+      fetchAppointments();
+    }
   };
 
   const formatDate = (dateString) => {
@@ -126,12 +136,11 @@ const BookedAppointments = () => {
       });
   };
 
-  if (isLoading) {
-    return <OverlayLoader />;
-  }
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+      {/* Show overlay loader if isLoading is true */}
+      {isLoading && <OverlayLoader />}
+      
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-purple-600/10"></div>
         <div className="relative backdrop-blur-xl bg-white/70 border-b border-white/20">
@@ -164,7 +173,6 @@ const BookedAppointments = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-4">
-        {/* Quick Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           {[
             {
@@ -197,15 +205,12 @@ const BookedAppointments = () => {
             </div>
           ))}
         </div>
-
-        {/* Appointments Grid */}
         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
           {appointments.map((appointment) => (
             <div
               key={appointment.id}
               className="group relative bg-white/70 backdrop-blur-xl rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 overflow-hidden border border-white/20 hover:scale-[1.02] hover:-translate-y-1"
             >
-              {/* Background Gradient Overlay */}
               <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-purple-500/5 to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
 
               {/* Content */}
@@ -222,7 +227,7 @@ const BookedAppointments = () => {
                   </div>
                   <div className="text-right">
                     <div className="text-xs text-gray-500">
-                      #{appointment.appointmentId}
+                      {/* #{appointment.appointmentId} */}
                     </div>
                     <div className="text-sm font-medium text-gray-700">
                       {getDaysUntil(appointment.date)}
@@ -235,7 +240,7 @@ const BookedAppointments = () => {
                   <div className="relative">
                     <div className="w-16 h-16 rounded-2xl overflow-hidden ring-4 ring-white shadow-lg">
                       <img
-                        src={appointment?.doctor?.profilePhoto}
+                        src={defaultImage || appointment?.doctor?.profilePhoto}
                         alt={appointment?.doctor?.doctorName}
                         className="w-full h-full object-cover"
                       />
@@ -244,19 +249,23 @@ const BookedAppointments = () => {
                   </div>
                   <div className="flex-1 min-w-0">
                     <h3 className="text-lg font-bold text-gray-800 truncate">
-                      {appointment.doctor.doctorName}
+                      {appointment?.doctor?.firstName +
+                        " " +
+                        appointment?.doctor?.lastName}
                     </h3>
                     <div className="flex items-center space-x-2 text-sm text-gray-600">
                       <Stethoscope className="w-4 h-4" />
-                      <span>{appointment.doctor.specialization}</span>
+                      <span>
+                        {appointment.doctor?.professional?.specialization}
+                      </span>
                     </div>
                     <div className="flex items-center space-x-1 mt-1">
                       <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
                       <span className="text-sm font-medium text-gray-700">
-                        {appointment.doctor.rating}
+                        {/* {appointment?.doctor?.rating} */}4.2
                       </span>
                       <span className="text-xs text-gray-500">
-                        ({appointment.doctor.experienceYears}+ years)
+                        ({appointment?.doctor?.professional?.yearOfExp}+ years)
                       </span>
                     </div>
                   </div>
@@ -278,7 +287,7 @@ const BookedAppointments = () => {
                     </div>
                     <div className="text-right">
                       <div className="text-lg font-bold text-gray-800">
-                        ₹{appointment.doctor.consultationFees}
+                        ₹{appointment.doctor?.professional?.consultationFees}
                       </div>
                       <div className="text-xs text-gray-500">
                         {appointment.selectedPayment}
@@ -289,7 +298,9 @@ const BookedAppointments = () => {
                   <div className="flex items-center justify-between text-sm">
                     <div className="flex items-center space-x-2 text-gray-600">
                       <MapPin className="w-4 h-4" />
-                      <span>{appointment.doctor.locality}</span>
+                      <span>
+                        {appointment?.doctor?.clinicInfos?.clinicAddress}
+                      </span>
                     </div>
                     <div className="px-3 py-1 bg-gray-100 rounded-full text-xs font-medium text-gray-700">
                       {/* {appointment.type} */}
@@ -382,7 +393,7 @@ const BookedAppointments = () => {
                 Are you sure you want to cancel your appointment with{" "}
                 {selectedAppointment?.doctor.doctorName}
                 <span className="font-semibold text-gray-800">
-                  {selectedAppointment?.doctor.name}
+                  {selectedAppointment?.doctor?.firstName}
                 </span>
                 ?
               </p>
@@ -422,7 +433,7 @@ const BookedAppointments = () => {
             setShowRescheduleModal(false);
             setSelectedAppointment(null);
           }}
-          handleRescheduleSuccess={handleRescheduleSuccess}
+          onRescheduleSuccess={handleRescheduleSuccess}
         />
       )}
     </div>

@@ -18,8 +18,6 @@ const validationSchema = Yup.object().shape({
     .min(3, 'Institution name must be at least 3 characters'),
   residencyYear: Yup.string()
     .required('Residency completion year is required'),
-  yearsOfExperience: Yup.string()
-    .required('Years of experience is required'),
   fellowshipSpecialty: Yup.string(),
   fellowshipInstitution: Yup.string(),
   fellowshipYear: Yup.string(),
@@ -41,17 +39,142 @@ const medicalSpecialties = [
 ];
 
 
-const EducationStep = ({ data: initialData = {}, onSubmit }) => {
+const EducationStep = ({ data: initialData, onSubmit }) => {
   const [showAdditionalSpecializations, setShowAdditionalSpecializations] = useState(false);
   const [focusedField, setFocusedField] = useState(null);
 
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 60 }, (_, i) => currentYear - i);
 
+  // Map backend `doctorEducation` array (if provided) to the form's initial values
+  const educationArray = Array.isArray(initialData)
+    ? initialData
+    : [];
+
+  const medEdu = educationArray[0] || {};
+  const resEdu = educationArray[1] || {};
+
+  // Detect fellowship (optional) and collect any remaining entries as additionalSpecializations
+  let fellowshipEdu = null;
+  const additionalFromEdu = [];
+  for (let i = 2; i < educationArray.length; i++) {
+    const entry = educationArray[i];
+    if (!entry) continue;
+    const degree = String(entry.degreeName || '').toLowerCase();
+    if (!fellowshipEdu && degree.includes('fellowship')) {
+      fellowshipEdu = entry;
+    } else {
+      additionalFromEdu.push({
+        specialty: entry.degreeName || '',
+        institution: entry.schoolName || '',
+        year: entry.completionYear ? String(entry.completionYear) : ''
+      });
+    }
+  }
+
+  const mappedInitialValues = {
+    medicalSchool: medEdu?.schoolName || initialData?.medicalSchool || '',
+    medicalDegree: medEdu?.degreeName || initialData?.medicalDegree || '',
+    medicalGraduationYear: medEdu?.completionYear ? String(medEdu.completionYear) : initialData?.medicalGraduationYear || '',
+    primarySpecialty:
+      initialData?.primarySpecialty || (resEdu?.degreeName && /Residency in\s*/i.test(resEdu.degreeName) ? resEdu.degreeName.replace(/Residency in\s*/i, '') : ''),
+    residencyInstitution: resEdu?.schoolName || initialData?.residencyInstitution || '',
+    residencyYear: resEdu?.completionYear ? String(resEdu.completionYear) : initialData?.residencyYear || '',
+    fellowshipSpecialty: fellowshipEdu ? String(fellowshipEdu.degreeName).replace(/Fellowship in\s*/i, '') : initialData?.fellowshipSpecialty || '',
+    fellowshipInstitution: fellowshipEdu?.schoolName || initialData?.fellowshipInstitution || '',
+    fellowshipYear: fellowshipEdu?.completionYear ? String(fellowshipEdu.completionYear) : initialData?.fellowshipYear || '',
+    additionalSpecializations: Array.isArray(initialData?.additionalSpecializations) && initialData.additionalSpecializations.length > 0
+      ? initialData.additionalSpecializations
+      : additionalFromEdu
+  };
+
   const handleFormSubmit = async (values, { setSubmitting }) => {
     try {
+      // Transform form values to backend structure
+      const doctorEducation = [
+        {
+          schoolName: values.medicalSchool,
+          degreeName: `${values.medicalDegree}`,
+          completionYear: parseInt(values.medicalGraduationYear)
+        },
+        {
+          schoolName: values.residencyInstitution,
+          degreeName: `Residency in ${values.primarySpecialty}`,
+          completionYear: parseInt(values.residencyYear)
+        }
+      ];
+      // Add fellowship if provided
+      if (values.fellowshipInstitution && values.fellowshipSpecialty && values.fellowshipYear) {
+        doctorEducation.push({
+          schoolName: values.fellowshipInstitution,
+          degreeName: `Fellowship in ${values.fellowshipSpecialty}`,
+          completionYear: parseInt(values.fellowshipYear)
+        });
+      }
+      // Add additional specializations if any
+      if (values.additionalSpecializations && values.additionalSpecializations.length > 0) {
+        values.additionalSpecializations.forEach(spec => {
+          if (spec.institution && spec.specialty && spec.year) {
+            doctorEducation.push({
+              schoolName: spec.institution,
+              degreeName: spec.specialty,
+              completionYear: parseInt(spec.year)
+            });
+          }
+        });
+      }
       if (onSubmit) {
-        await onSubmit(values);
+        // Build payload expected by backend
+        const payload = {
+          doctorEducation
+        };
+
+        // Determine if form has changed compared to initial mapped values
+        const fieldsToCompare = {
+          medicalSchool: values.medicalSchool || '',
+          medicalDegree: values.medicalDegree || '',
+          medicalGraduationYear: values.medicalGraduationYear || '',
+          primarySpecialty: values.primarySpecialty || '',
+          residencyInstitution: values.residencyInstitution || '',
+          residencyYear: values.residencyYear || '',
+          fellowshipSpecialty: values.fellowshipSpecialty || '',
+          fellowshipInstitution: values.fellowshipInstitution || '',
+          fellowshipYear: values.fellowshipYear || '',
+          additionalSpecializations: values.additionalSpecializations || []
+        };
+
+        const mappedCompare = {
+          medicalSchool: mappedInitialValues.medicalSchool || '',
+          medicalDegree: mappedInitialValues.medicalDegree || '',
+          medicalGraduationYear: mappedInitialValues.medicalGraduationYear || '',
+          primarySpecialty: mappedInitialValues.primarySpecialty || '',
+          residencyInstitution: mappedInitialValues.residencyInstitution || '',
+          residencyYear: mappedInitialValues.residencyYear || '',
+          fellowshipSpecialty: mappedInitialValues.fellowshipSpecialty || '',
+          fellowshipInstitution: mappedInitialValues.fellowshipInstitution || '',
+          fellowshipYear: mappedInitialValues.fellowshipYear || '',
+          additionalSpecializations: mappedInitialValues.additionalSpecializations || []
+        };
+
+        const isChanged = JSON.stringify(fieldsToCompare) !== JSON.stringify(mappedCompare);
+
+        // Check required fields presence
+        const requiredPresent = Boolean(
+          (mappedCompare.medicalSchool || fieldsToCompare.medicalSchool) &&
+          (mappedCompare.medicalDegree || fieldsToCompare.medicalDegree) &&
+          (mappedCompare.medicalGraduationYear || fieldsToCompare.medicalGraduationYear) &&
+          (mappedCompare.residencyInstitution || fieldsToCompare.residencyInstitution) &&
+          (mappedCompare.residencyYear || fieldsToCompare.residencyYear) &&
+          (mappedCompare.primarySpecialty || fieldsToCompare.primarySpecialty)
+        );
+
+        if (!isChanged && requiredPresent) {
+          // No changes and required data already present -> skip API and let parent advance
+          await onSubmit({ __skipApi: true });
+        } else {
+          // Changes present or required data missing -> send payload to save
+          await onSubmit(payload);
+        }
       }
     } catch (error) {
       console.error('Error submitting form:', error);
@@ -63,23 +186,12 @@ const EducationStep = ({ data: initialData = {}, onSubmit }) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-indigo-100 p-3 sm:p-6">
       <Formik
-        initialValues={{
-          medicalSchool: initialData?.medicalSchool || '',
-          medicalDegree: initialData?.medicalDegree || '',
-          medicalGraduationYear: initialData?.medicalGraduationYear || '',
-          primarySpecialty: initialData?.primarySpecialty || '',
-          residencyInstitution: initialData?.residencyInstitution || '',
-          residencyYear: initialData?.residencyYear || '',
-          yearsOfExperience: initialData?.yearsOfExperience || '',
-          fellowshipSpecialty: initialData?.fellowshipSpecialty || '',
-          fellowshipInstitution: initialData?.fellowshipInstitution || '',
-          fellowshipYear: initialData?.fellowshipYear || '',
-          additionalSpecializations: initialData?.additionalSpecializations || []
-        }}
+        initialValues={mappedInitialValues}
+        enableReinitialize
         validationSchema={validationSchema}
         onSubmit={handleFormSubmit}
       >
-        {({ values, errors, touched, setFieldValue, setFieldTouched }) => (
+        {({ values, errors, touched }) => (
           <Form className="max-w-4xl mx-auto">
         {/* Modern Header */}
         <div className="text-center mb-8 sm:mb-12 relative">
@@ -381,52 +493,6 @@ const EducationStep = ({ data: initialData = {}, onSubmit }) => {
                   )}
                 </div>
               </div>
-
-              <div>
-                <label className="flex items-center text-sm font-semibold text-slate-700 mb-2 sm:mb-3">
-                  <Star className="w-4 h-4 mr-2 text-amber-500" />
-                  Years of Experience *
-                </label>
-                <div className="relative">
-                  <Field name="yearsOfExperience">
-                    {({ field, meta }) => (
-                      <div>
-                        <select
-                          {...field}
-                          onFocus={() => setFocusedField('yearsOfExperience')}
-                          onBlur={(e) => {
-                            field.onBlur(e);
-                            setFocusedField(null);
-                          }}
-                          className={`w-full px-4 py-3 sm:px-6 sm:py-4 border-2 rounded-xl sm:rounded-2xl transition-all duration-300 bg-white/50 backdrop-blur-sm appearance-none text-base ${
-                            focusedField === 'yearsOfExperience' 
-                              ? 'border-amber-400 ring-2 sm:ring-4 ring-amber-100 shadow-lg transform scale-[1.02] sm:scale-105' 
-                              : meta.touched && !meta.error
-                              ? 'border-green-300 shadow-md'
-                              : meta.touched && meta.error
-                              ? 'border-red-300'
-                              : 'border-slate-200 hover:border-slate-300'
-                          }`}
-                        >
-                          <option value="">Select experience</option>
-                          <option value="0-2">0-2 years</option>
-                          <option value="3-5">3-5 years</option>
-                          <option value="6-10">6-10 years</option>
-                          <option value="11-15">11-15 years</option>
-                          <option value="16-20">16-20 years</option>
-                          <option value="20+">20+ years</option>
-                        </select>
-                        {meta.touched && meta.error && (
-                          <div className="mt-1 text-sm text-red-500">{meta.error}</div>
-                        )}
-                      </div>
-                    )}
-                  </Field>
-                  {touched.yearsOfExperience && !errors.yearsOfExperience && (
-                    <Check className="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-green-500" />
-                  )}
-                </div>
-              </div>
             </div>
           </div>
 
@@ -558,7 +624,7 @@ const EducationStep = ({ data: initialData = {}, onSubmit }) => {
               </div>
             </div>
 
-            {/* Additional Specializations */}
+            {/* Additional Specializations
             <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-slate-200">
               <div className="flex items-center justify-between mb-4">
                 <h4 className="text-base sm:text-lg font-semibold text-slate-900">Additional Specializations</h4>
@@ -657,11 +723,11 @@ const EducationStep = ({ data: initialData = {}, onSubmit }) => {
                   </FieldArray>
                 </div>
               )}
-            </div>
+            </div> */}
           </div>
 
           {/* Verification & Compliance */}
-          <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-3xl p-8 shadow-lg">
+          <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-3xl p-8 shadow-lg mt-6 sm:mt-8 pt-4 sm:pt-6">
             <div className="flex items-start">
               <div className="w-12 h-12 bg-amber-500 text-white rounded-2xl flex items-center justify-center mr-6 flex-shrink-0 shadow-lg">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

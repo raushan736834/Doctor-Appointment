@@ -189,23 +189,24 @@ const DoctorCard = ({
   const [isExpanded, setIsExpanded] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
+  
+  console.log(doctor);
   // Safely extract doctor data with fallbacks
   const {
-    id,
-    doctorName = "Doctor Name",
-    specialization = "General Practice",
-    consultationFees = 0,
-    experienceYears = 0,
-    profilePhoto,
-    locality = "",
-    clinicName = "",
-    city = "",
-    state = "",
+    doctorId = doctor.doctorId,
+    doctorName = doctor?.firstName + " "+ doctor?.lastName || "Doctor Name",
+    specialization = doctor?.professional?.specialization || "General Practice",
+    consultationFees = doctor?.professional?.consultationFees || 0,
+    experienceYears = doctor?.professional?.yearOfExp || 0,
+    profilePhoto = null,
+    locality = doctor?.clinicInfos?.clinicAddress || "",
+    clinicName = doctor?.clinicInfos?.clinicName || "",
+    city = doctor?.clinicInfos?.clinicCity || "",
+    state = doctor?.clinicInfos?.clinicState || "",
     qualifications = [],
-    email,
-    phoneNumber
-  } = doctor || {};
+    email = null,
+    phoneNumber = null
+  } = {};
 
   // Process profile photo URL
   const photoUrl = useMemo(() => {
@@ -227,7 +228,7 @@ const DoctorCard = ({
 
   const handleBookClick = () => {
     onBookAppointment({
-      doctorId: id,
+      doctorId,
       doctorName,
       specialization,
       consultationFees,
@@ -238,7 +239,7 @@ const DoctorCard = ({
 
   const handleProfileClick = () => {
     onBookAppointment({
-      doctorId: id,
+      doctorId,
       doctorName,
       specialization,
       consultationFees,

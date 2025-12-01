@@ -1,17 +1,15 @@
 import { ChevronDownIcon } from "@heroicons/react/16/solid";
-import { useAuth } from "../GlobalComponent/AuthProvider";
 import Login from "../AuthComponent/Login";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@chakra-ui/react";
-import { useApiService } from "../../hooks/useAuthWithAxios";
+import { useApiService, useAuthWithAxios } from "../../hooks/useAuthWithAxios";
 
 const USER_UPDATE_URL = '/user/update-profile';
 
 const UserProfile = () => {
-  const { auth } = useAuth();
-  const accessToken = auth.accessToken;
-  const email = localStorage.getItem("email");
+  const { accessToken, user } = useAuthWithAxios();
+  const email = user?.email;
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [phone, setPhone] = useState("");
@@ -36,10 +34,6 @@ const UserProfile = () => {
   const fetchUserData = async () => {
     try {
       const response = await api.get(`/user/${email}`);
-      // fetchData({
-      //   url: `/user/${email}`,
-      // });
-
       console.log(response);
       const fullName = response.data.fullName;
       const [first, last] = fullName.split(" ");

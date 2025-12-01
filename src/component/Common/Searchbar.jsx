@@ -22,7 +22,8 @@ const Searchbar = () => {
       const fetchSuggestions = async () => {
         try {
           const response = await api.get(`/api/public/search?keyword=${searchText}`);
-          setSuggestions(response?.data || []);
+          console.log(response);
+          setSuggestions(response?.data?.data || []);
           setShowDropdown((response?.data || []).length > 0);
         } catch (error) {
           setSuggestions([]);
@@ -37,7 +38,7 @@ const Searchbar = () => {
   const handleSuggestionClick = (doctor) => {
     // onChange({ target: { value: doctor.doctorName } });
     setShowDropdown(false);
-    navigate(`/specialist/${encodeURIComponent(doctor.specialization)}/${doctor.id}`, { state: { doctor }});
+    navigate(`/specialist/${encodeURIComponent(doctor?.professional?.specialization)}/${doctor.doctorId}`, { state: { doctor }});
   };
 
   return (

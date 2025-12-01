@@ -1,171 +1,159 @@
-import React, { useState } from "react";
-import { Edit3 } from 'lucide-react';
+import { useState } from "react";
+import { Edit3, Loader2, X } from 'lucide-react';
 import { useToast } from "@chakra-ui/react";
 import AppointmentForm from "../UserComponent/AppointmentForm";
-import { useAuth } from "../GlobalComponent/AuthProvider";
-import { AppointmentStatus } from "../../constants/slots";
 import { useApiService } from "../../hooks/useAuthWithAxios";
-
-
-const RescheduleModal = ({
-  selectedAppointment,
-  onClose,
-  onRescheduleSuccess,
-}) => {
-  const [newData, setNewData] = useState({
-    id: "",
-    date: "",
-    time: "",
-    period: "",
-  });
-
-  const { setIsLoading } = useAuth();
-  const api = useApiService();
+const RescheduleModal = ({ selectedAppointment, onClose, onRescheduleSuccess }) => {
+  const [newData, setNewData] = useState({ id: "", date: "", time: "" });
+  const [isLoading, setIsLoading] = useState(false);
   const toast = useToast();
+  const api = useApiService();
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
       weekday: 'short',
       month: 'short',
-      day: 'numeric'
+      day: 'numeric',
+      year: 'numeric'
     });
   };
 
   if (!selectedAppointment) return null;
 
-  const handleRescheduleApi = async ({
-    appointmentId,
-    newDate,
-    newTime,
-    newPeriod,
-  }) => {
-    setNewData({
-      id: appointmentId,
-      date: newDate,
-      time: newTime,
-      period: newPeriod,
-    });
+  const handleRescheduleApi = async ({ appointmentId, newDate, newTime }) => {
+    setNewData({ id: appointmentId, date: newDate, time: newTime });
   };
-
+  
   const confirmRescheduleAppointment = async () => {
+    console.log(newData)
+    if (!newData.date || !newData.time) {
+      alert("Please select both date and time slot");
+      return;
+    }
+    console.log("set")
     setIsLoading(true);
     try {
       const data = {
         appointmentId: newData.id,
-        date: newData.date,
-        time: newData.time,
-        period: newData.period,
-        status: AppointmentStatus.RESCHEDULED,
+        newDate: newData.date,
+        newTimeSlot: newData.time
       };
 
-      console.log(data);
-      const response = await api.put(
-        `appointment/reschedule-appointment`,
-        data
-      );
-
-      if (response.status === 200) {
+      const response = await api.put('appointment/reschedule-appointment', data);
+      console.log(response);
+      if (response.success) {
         toast({
-          position: "top-center",
-          title: "Appointment Rescheduled successfully!",
+          position: "top-right",
+          title: "Appointment Reschedule successfully",
           status: "success",
-          duration: 1500,
+          duration: 1000,
           isClosable: true,
           containerStyle: { marginTop: 20, marginRight: 5 },
         });
-
-        // Close modal and refresh appointments
+        
+        // Create updated appointment object
+        const updatedAppointment = {
+          ...selectedAppointment,
+          date: newData.date,
+          time: newData.time,
+          status: "RESCHEDULED"
+        };
+        
         if (onRescheduleSuccess) {
-          await onRescheduleSuccess();
+          await onRescheduleSuccess(updatedAppointment);
         }
-      } else {
-        toast({
-          position: "top-center",
-          title: "Appointment Rescheduling Fails!",
-          status: "error",
-          duration: 1500,
-          isClosable: true,
-          containerStyle: { marginTop: 20, marginRight: 5 },
-        });
+        onClose();
       }
     } catch (error) {
       console.error("Error rescheduling appointment:", error);
-      toast({
-        position: "top-center",
-        title: "Error rescheduling appointment",
-        description: "Please try again later",
-        status: "error",
-        duration: 1500,
-        isClosable: true,
-        containerStyle: { marginTop: 20, marginRight: 5 },
-      });
+      alert("Error rescheduling appointment. Please try again.");
     } finally {
-      onClose();
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-2">
-  <div className="bg-white/90 backdrop-blur-xl rounded-3xl max-w-md w-full p-4 shadow-2xl border border-white/20
-   max-h-[90vh] overflow-y-auto">
-        <div className="text-center mb-2">
-          <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full 
-          flex items-center justify-center mx-auto mb-4 shadow-lg"
-          >
-            <Edit3 className="w-8 h-8 text-white" />
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-2xl max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto">
+        {/* Header */}
+        <div className="sticky top-0 bg-gradient-to-r from-blue-500 to-blue-600 p-6 rounded-t-2xl">
+          <div className="flex justify-between items-start">
+            <div className="flex items-center space-x-4">
+              <div className="w-14 h-14 bg-white/20 backdrop-blur-lg rounded-full flex items-center justify-center">
+                <Edit3 className="w-7 h-7 text-white" />
+              </div>
+              <div>
+                <h3 className="text-2xl font-bold text-white">
+                  Reschedule Appointment
+                </h3>
+                <p className="text-blue-100 mt-1">
+                  with Dr. {selectedAppointment?.doctor?.firstName} {selectedAppointment?.doctor?.lastName}
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={onClose}
+              className="text-white/80 hover:text-white transition-colors"
+            >
+              <X className="w-6 h-6" />
+            </button>
           </div>
-          <h3 className="text-2xl font-bold text-gray-800">
-            Reschedule Appointment
-          </h3>
-          <p className="text-gray-600">
-            Reschedule your appointment with {selectedAppointment.doctor.doctorName}
-            <span className="font-semibold text-gray-800">
-              {selectedAppointment?.doctor.name}
-            </span>
-          </p>
         </div>
 
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-2">
-          <p className="text-sm text-blue-800">
-            <strong>Current:</strong>{" "}
-            {selectedAppointment && formatDate(selectedAppointment.date)} at{" "}
-            {selectedAppointment?.time}
-          </p>
-        </div>
-        <AppointmentForm
-          id={
-            selectedAppointment.doctorId || selectedAppointment.doctor?.id
-          }
-          specialization={
-            selectedAppointment.doctor?.specialization ||
-            selectedAppointment.specialization
-          }
-          isReschedule={true}
-          appointmentId={selectedAppointment.appointmentId}
-          onSelectionChange={handleRescheduleApi}
-          onClose={onClose}
-        />
+        {/* Content */}
+        <div className="p-6">
+          {/* Current Appointment Info */}
+          <div className="bg-blue-50 border-l-4 border-blue-500 rounded-lg p-4 mb-6">
+            <p className="text-sm font-medium text-blue-900 mb-1">Current Appointment</p>
+            <p className="text-blue-800">
+              <span className="font-semibold">Date:</span> {formatDate(selectedAppointment.date)}
+              <span className="mx-3">•</span>
+              <span className="font-semibold">Time:</span> {selectedAppointment?.time}
+            </p>
+          </div>
 
-        <div className="flex space-x-3">
-          <button
-            onClick={onClose}
-            className="flex-1 px-6 py-3 border-2 bg-white border-gray-200 text-gray-700 
-            rounded-xl font-medium hover:bg-gray-100 transition-colors"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={confirmRescheduleAppointment}
-            className="flex-1 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl font-medium shadow-lg hover:shadow-blue-500/40 transition-all"
-          >
-            Reschedule
-          </button>
+          {/* New Appointment Selection */}
+          <div className="bg-gray-50 rounded-xl p-4">
+            <h4 className="text-lg font-semibold text-gray-800 mb-4">Select New Date & Time</h4>
+            <AppointmentForm
+              id={selectedAppointment?.doctor?.doctorId}
+              isReschedule={true}
+              appointmentId={selectedAppointment.appointmentId}
+              onSelectionChange={handleRescheduleApi}
+              onClose={onClose}
+            />
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex space-x-3 mt-6">
+            <button
+              onClick={onClose}
+              disabled={isLoading}
+              className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors disabled:opacity-50"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={confirmRescheduleAppointment}
+              disabled={isLoading || !newData.date || !newData.time}
+              className="flex-1 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl font-medium shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                  Rescheduling...
+                </>
+              ) : (
+                'Confirm Reschedule'
+              )}
+            </button>
+          </div>
         </div>
       </div>
     </div>
   );
 };
+
 
 export default RescheduleModal;

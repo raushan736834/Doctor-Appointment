@@ -12,13 +12,13 @@ const AutoSuggestion = ({ suggestions, onSuggestionClick, showDropdown }) => {
           onClick={() => onSuggestionClick(doctor)}
         >
           <img
-            src={doctor.profilePhoto || defaultDoctorImage}
-            alt={doctor.doctorName}
+            src={ defaultDoctorImage || doctor.profileImage}
+            alt={doctor.firstName}
             className="w-12 h-12 rounded-full object-cover border border-gray-200"
           />
           <div className="flex flex-col">
-            <span className="font-semibold text-gray-800">{doctor.doctorName}</span>
-            <span className="text-xs text-gray-500">{doctor.specialization}</span>
+            <span className="font-semibold text-gray-800">{doctor.firstName + " " + doctor.lastName}</span>
+            <span className="text-xs text-gray-500">{doctor?.professional?.specialization}</span>
           </div>
         </div>
       ))}

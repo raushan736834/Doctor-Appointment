@@ -5,18 +5,20 @@ import NotificationBell from "../NotificationComponent/NotificationBell";
 import { useAuth } from "../GlobalComponent/AuthProvider";
 import { CalendarX, ChevronLeft, ChevronRight } from "lucide-react";
 import OverlayLoader from "../Common/Loader";
-import { useApiService } from "../../hooks/useAuthWithAxios";
+import { useApiService, useAuthWithAxios } from "../../hooks/useAuthWithAxios";
 
 const ITEMS_PER_PAGE = 5;
 
 const DoctorDashboard = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [pageSize] = useState(ITEMS_PER_PAGE);
-  const { setIsLoading, isLoading } = useAuth();
-  const name = localStorage.getItem("name")?.split(" ")[0];
-  const doctorId = localStorage.getItem("doctorId");
+  const [isLoading, setIsLoading] = useState(false);
+  const { user } = useAuthWithAxios();
+  const doctorId = user.doctorId || "";
+  const name = user?.fullname?.split(" ")[0];
   const [todayAppointments, setTodayAppointments] = useState([]);
   const [totalAppointmentsLength, setTotalAppointmentsLength] = useState(0);
+
   const [paginationInfo, setPaginationInfo] = useState({
     totalElements: 0,
     totalPages: 0,
@@ -38,7 +40,7 @@ const DoctorDashboard = () => {
       setTotalAppointmentsLength(0);
     }
   };
-
+  console.log(todayAppointments);
   const fetchTodayAppointment = async (
     currentPage = 0,
     size = ITEMS_PER_PAGE
@@ -50,10 +52,11 @@ const DoctorDashboard = () => {
         `/appointment/doctorAppointment/${doctorId}?page=${currentPage}&size=${size}`
       );
 
-      const { content, totalElements, totalPages, number, first, last } =
-        response.data;
+      const { totalElements, totalPages, number, first, last } =
+        response.data.page;
+      const { appointmentBookingList } = response?.data?._embedded;
 
-      setTodayAppointments(content || []);
+      setTodayAppointments(appointmentBookingList || []);
       setPaginationInfo({
         totalElements: totalElements || 0,
         totalPages: totalPages || 0,

@@ -9,7 +9,7 @@ import { CalendarX, ChevronLeft, ChevronRight, ListFilter } from "lucide-react";
 import FilterDateComponent from "./FilterDateComponent";
 import OverlayLoader from "../Common/Loader";
 import { AppointmentStatus } from "../../constants/slots";
-import { useApiService } from "../../hooks/useAuthWithAxios";
+import { useApiService, useAuthWithAxios } from "../../hooks/useAuthWithAxios";
 
 const tabs = ["Appointment", "Completed", "Rescheduled", "Cancelled"];
 
@@ -28,9 +28,10 @@ export default function Appointments() {
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [isCancelling, setIsCancelling] = useState(false);
-  const doctorId = localStorage.getItem("doctorId");
+  const { user } = useAuthWithAxios();
+  const doctorId = user.doctorId || "";
   const [todayAppointments, setTodayAppointments] = useState([]);
-  const { setIsLoading, isLoading } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
   const toast = useToast();
   const [pageSize] = useState(ITEMS_PER_PAGE);
   const [paginationInfo, setPaginationInfo] = useState({
@@ -77,10 +78,13 @@ export default function Appointments() {
         `/appointment/doctorAppointment/${doctorId}?${params.toString()}`
       );
 
-      const { content, totalElements, totalPages, number, first, last } =
-        response.data;
+      const {  totalElements, totalPages, number, first, last } =
+        response.data.page;
 
-      setTodayAppointments(content || []);
+      const { appointmentBookingList } = response?.data?._embedded;
+      
+
+      setTodayAppointments(appointmentBookingList || []);
       setPaginationInfo({
         totalElements: totalElements || 0,
         totalPages: totalPages || 0,
@@ -152,6 +156,7 @@ export default function Appointments() {
       cancelReason,
       toast,
       setIsLoading,
+      api,
       (appointment, reason) => {
         // Success callback
         console.log(`Appointment cancelled successfully. Reason: ${reason}`);
@@ -341,8 +346,8 @@ export default function Appointments() {
                   </span>
                 </div>
                 <div className="flex md:block justify-between md:justify-center">
-                  <span className="font-semibold md:hidden">Fees: </span>
-                  {appt?.doctor?.consultationFees}
+                  <span className="font-semibold ">₹ </span>
+                  {appt?.doctor?.professional?.consultationFees}
                 </div>
                 <div className="flex md:block justify-center cursor-pointer text-lg hover:text-indigo-600 transition">
                   <ActionMenu
@@ -450,6 +455,7 @@ export default function Appointments() {
           onConfirm={handleConfirmCancel}
           appointment={selectedAppointment}
           isLoading={isCancelling}
+          api
         />
       )}
     </div>

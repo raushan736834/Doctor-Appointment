@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ChevronLeft,
   ChevronRight,
@@ -10,16 +10,14 @@ import {
   FileText,
   Shield,
 } from "lucide-react";
-import { useAuth } from "../GlobalComponent/AuthProvider";
 import { useApiService } from "../../hooks/useAuthWithAxios";
-
+import { useNavigate } from "react-router-dom";
 import PersonalInfoStep from "./OnboardingSteps/PersonalInfoStep";
 import ProfessionalInfoStep from "./OnboardingSteps/ProfessionalInfoStep";
 import EducationStep from "./OnboardingSteps/EducationStep";
 import AvailabilityStep from "./OnboardingSteps/AvailabilityStep";
 import DocumentsStep from "./OnboardingSteps/DocumentsStep";
 import ReviewStep from "./OnboardingSteps/ReviewStep";
-import EducationStepNew from "./OnboardingSteps/EducationStep.new";
 
 const steps = [
   {
@@ -57,106 +55,260 @@ const steps = [
 
 const DoctorOnboarding = () => {
   const [currentStep, setCurrentStep] = useState(1);
-  const [doctorData, setDoctorData] = useState([]);
+  const [doctorData, setDoctorData] = useState({});
+  const [reviewValidation, setReviewValidation] = useState({
+    allAgreementsAccepted: false,
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState(null);
   const api = useApiService();
+  const navigate = useNavigate();
 
   const updateDoctorData = (section, data) => {
-    setDoctorData((prev) => ({
-      ...prev,
-      [section]: { ...prev[section], ...data },
-    }));
+    setDoctorData((prev) => {
+      if (data === null || data === undefined) {
+        return prev;
+      }
+
+      // If data signals skip without payload, keep existing section untouched
+      if (
+        typeof data === "object" &&
+        !Array.isArray(data) &&
+        Object.keys(data).length === 1 &&
+        data.__skipApi
+      ) {
+        return prev;
+      }
+
+      let nextSectionValue;
+
+      if (Array.isArray(data)) {
+        nextSectionValue = data;
+      } else if (Array.isArray(data?.doctorEducation)) {
+        nextSectionValue = data.doctorEducation;
+      } else if (Array.isArray(prev[section])) {
+        // Preserve array type when existing section is an array
+        nextSectionValue = Array.isArray(data)
+          ? data
+          : Array.isArray(data?.items)
+          ? data.items
+          : prev[section];
+      } else {
+        nextSectionValue = {
+          ...(prev[section] || {}),
+          ...data,
+        };
+      }
+
+      return {
+        ...prev,
+        [section]: nextSectionValue,
+      };
+    });
+  };
+
+  useEffect(() => {
+    fetchDoctorData();
+  }, []);
+
+  const fetchDoctorData = async () => {
+    try {
+      const response = await api.get("/api/doctors/getDoctorDetails");
+      if (response?.success) {
+        // Normalize backend shapes to the form components' expected shapes
+        const raw = response?.data?.data || {};
+        const normalized = { ...raw };
+
+        // If backend returns education wrapped as { doctorEducation: [...] }, unwrap it.
+        if (normalized.education && normalized.education.doctorEducation) {
+          normalized.education = normalized.education.doctorEducation;
+        }
+
+        // Ensure documents is always an object (not undefined or null)
+        if (!normalized.documents || typeof normalized.documents !== "object") {
+          normalized.documents = {};
+        }
+
+        setDoctorData(normalized);
+      } else {
+        setDoctorData({});
+      }
+    } catch (error) {
+      console.error("Error fetching doctor data:", error);
+      setDoctorData({});
+    }
   };
 
   const handleStepSubmit = async (stepData) => {
+    const getCurrentSectionKey = (step) => {
+      switch (step) {
+        case 1:
+          return "personalInfo";
+        case 2:
+          return "professionalInfo";
+        case 3:
+          return "education";
+        case 4:
+          return "clinicInfos";
+        case 5:
+          return "documents";
+        case 6:
+          return "review";
+        default:
+          return "";
+      }
+    };
+
     try {
-      console.log('handleStepSubmit called with data:', stepData);
-      let endpoint = '';
+      // If child indicated to skip API (no changes), update state and advance
+      if (stepData && stepData.__skipApi) {
+        // Still update the local state to ensure consistency
+        const sectionKey = getCurrentSectionKey(currentStep);
+        if (sectionKey) {
+          updateDoctorData(sectionKey, stepData);
+        }
+        setCurrentStep((s) => s + 1);
+        return;
+      }
+
+      let endpoint = "";
       let requestData;
+      let sectionKey = "";
 
       switch (currentStep) {
         case 1:
-          endpoint = 'api/doctors/personalDetails';
+          endpoint = "api/doctors/personalDetails";
+          sectionKey = "personalInfo";
           // For personal info step, handle multipart form data
           requestData = new FormData();
           // Create a copy of stepData without the profilePhoto
           const doctorObj = { ...stepData };
           delete doctorObj.profilePhoto;
           // Append the doctor data as JSON string
-          requestData.append('doctor', JSON.stringify(doctorObj));
+          requestData.append("doctor", JSON.stringify(doctorObj));
 
           // Append the profile image if exists
           if (stepData.profilePhoto instanceof File) {
-            requestData.append('profileImage', stepData.profilePhoto);
+            requestData.append("profileImage", stepData.profilePhoto);
           }
           break;
         case 2:
-          endpoint = 'api/doctors/professional';
+          endpoint = "api/doctors/professional";
+          sectionKey = "professionalInfo";
           requestData = stepData;
           break;
         case 3:
-          endpoint = 'api/doctors/education';
-          requestData = stepData;
+          endpoint = "api/doctors/education";
+          sectionKey = "education";
+          requestData =
+            stepData && Array.isArray(stepData.doctorEducation)
+              ? stepData.doctorEducation
+              : Array.isArray(stepData)
+              ? stepData
+              : stepData?.doctorEducation || stepData;
           break;
         case 4:
-          endpoint = 'api/doctors/availability';
+          endpoint = "api/doctors/clinicInfo";
+          sectionKey = "clinicInfos";
           requestData = stepData;
           break;
         case 5:
-          endpoint = 'api/doctors/documents';
-          requestData = stepData;
+          endpoint = "api/doctors/documents";
+          sectionKey = "documents";
+
+          requestData = new FormData();
+
+          // Explicit keys expected by backend
+          const requiredDocs = [
+            "medicalLicense",
+            "boardCertificate",
+            "malpracticeInsurance",
+          ];
+          const optionalDocs = ["cv"];
+
+          // Append required docs (even if missing, send empty placeholder)
+          requiredDocs.forEach((key) => {
+            const file = stepData[key];
+            if (file instanceof File) {
+              requestData.append(key, file, key);
+            } else {
+              // send empty placeholder to prevent MissingServletRequestPartException
+              requestData.append(key, new Blob([]), "");
+            }
+          });
+
+          // Append optional docs only if present
+          optionalDocs.forEach((key) => {
+            const file = stepData[key];
+            if (file instanceof File) {
+              requestData.append(key, file, key);
+            }
+          });
           break;
+        case 6:
+          endpoint = "api/doctors/review";
+          sectionKey = "review";
         default:
           break;
       }
 
       if (endpoint) {
-        const config = currentStep === 1 ? {
-          headers: { 
-            'Content-Type': 'multipart/form-data',
-            'Accept': 'application/json'
-          }
-        } : {};
+        const config =
+          currentStep === 1 || currentStep === 5
+            ? {
+                headers: {
+                  "Content-Type": "multipart/form-data",
+                  Accept: "application/json",
+                },
+              }
+            : {};
+        let response = null;
+        if (currentStep === 6) {
+          response = await api.get(endpoint, config);
+        } else {
+          response = await api.put(endpoint, requestData, config);
+        }
 
-        const response = await api.post(endpoint, requestData, config);
-      console.log(response)
         if (response.success) {
-          // Update the doctor data in state
-          const section = endpoint.split('/').pop();
-          console.log(section);
-          updateDoctorData(section, stepData);
-          
-          // Show success message (you can add a toast notification here)
-          console.log('Data submitted successfully:', response.data);
-          
+          // Update the doctor data in state with the correct section key
+          // Education step returns an array under `doctorEducation` -> store it as an array
+          if (sectionKey === "education") {
+            // If stepData contains doctorEducation array, use it; otherwise fall back to stepData
+            const edu =
+              stepData && stepData.doctorEducation
+                ? stepData.doctorEducation
+                : stepData;
+            setDoctorData((prev) => ({ ...prev, education: edu }));
+          } else {
+            updateDoctorData(sectionKey, stepData);
+          }
+
           // Move to next step
           setCurrentStep(currentStep + 1);
         } else {
-          console.error('Failed to submit data:', response);
+          console.error("Failed to submit data:", response);
           // You might want to show an error message to the user here
-          throw new Error('Failed to submit data');
+          throw new Error("Failed to submit data");
         }
       }
     } catch (error) {
-      console.error('Error submitting data:', error);
+      console.error("Error submitting data:", error);
     }
   };
 
   const nextStep = () => {
     // Find and trigger form submission
-    const currentForm = document.querySelector('form');
+    const currentForm = document.querySelector("form");
     if (currentForm) {
-      // Prevent immediate form submission if it's already being handled by Formik
-      if (!currentForm.hasAttribute('data-formik-form')) {
-        // Create and dispatch a submit event only for non-Formik forms
-        const submitEvent = new Event('submit', { cancelable: true, bubbles: true });
-        currentForm.dispatchEvent(submitEvent);
-      } else {
-        // For Formik forms, find and click the submit button
-        const submitButton = currentForm.querySelector('button[type="submit"]');
-        if (submitButton) {
-          submitButton.click();
-        }
-      }
+      // Create and dispatch a submit event
+      const submitEvent = new Event("submit", {
+        cancelable: true,
+        bubbles: true,
+      });
+      currentForm.dispatchEvent(submitEvent);
+    } else {
+      // If no form is found, move to next step directly
+      setCurrentStep(currentStep + 1);
     }
   };
 
@@ -173,7 +325,6 @@ const DoctorOnboarding = () => {
   };
 
   const renderStep = () => {
-    console.log(currentStep)
     switch (currentStep) {
       case 1:
         return (
@@ -194,6 +345,7 @@ const DoctorOnboarding = () => {
       case 3:
         return (
           <EducationStep
+            key={currentStep}
             data={doctorData.education}
             updateData={(data) => updateDoctorData("education", data)}
             onSubmit={handleStepSubmit}
@@ -202,7 +354,7 @@ const DoctorOnboarding = () => {
       case 4:
         return (
           <AvailabilityStep
-            data={doctorData.availability}
+            data={doctorData.clinicInfos}
             updateData={(data) => updateDoctorData("availability", data)}
             onSubmit={handleStepSubmit}
           />
@@ -210,21 +362,80 @@ const DoctorOnboarding = () => {
       case 5:
         return (
           <DocumentsStep
+            key={currentStep}
             data={doctorData.documents}
             updateData={(data) => updateDoctorData("documents", data)}
             onSubmit={handleStepSubmit}
           />
         );
+
       case 6:
         return (
           <ReviewStep
             doctorData={doctorData}
             updateData={updateDoctorData}
             onNavigateToStep={navigateToStep}
+            onValidationChange={setReviewValidation}
           />
         );
       default:
         return null;
+    }
+  };
+
+  // Check if all agreements are accepted and required documents are uploaded
+  const requiredDocuments = [
+    { key: "medicalLicense", label: "Medical License" },
+    { key: "boardCertificate", label: "Board Certificate" },
+    { key: "malpracticeInsurance", label: "Malpractice Insurance" },
+  ];
+
+  const allRequiredDocsUploaded = requiredDocuments.every(
+    (doc) => doctorData.documents && doctorData.documents[doc.key]
+  );
+
+  // Use reviewValidation state from ReviewStep instead of doctorData.agreements
+  const canSubmitApplication = reviewValidation.allAgreementsAccepted;
+
+  const handleSubmitApplication = async () => {
+    if (!canSubmitApplication) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    setSubmitError(null);
+
+    try {
+      // Submit the application using GET request to review endpoint
+      const response = await api.get("api/doctors/review");
+
+      if (response.success) {
+        // Update doctor data with the response if needed
+        if (response.data) {
+          updateDoctorData("review", response.data);
+        }
+
+        // Show success message
+       navigate("/doctor/afterReview",{ state : {doctor : doctorData}});
+
+        // Refresh doctor data to get updated status
+        await fetchDoctorData();
+      } else {
+        setSubmitError(
+          response.error || "Failed to submit application. Please try again."
+        );
+        console.error("Failed to submit application:", response);
+      }
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        error.message ||
+        "An error occurred while submitting your application. Please try again.";
+      setSubmitError(errorMessage);
+      console.error("Error submitting application:", error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -319,6 +530,7 @@ const DoctorOnboarding = () => {
               {/* Show Previous button only if not on review step */}
               {currentStep !== steps.length ? (
                 <button
+                  type="button"
                   onClick={prevStep}
                   disabled={currentStep === 1}
                   className={`flex items-center px-3 sm:px-6 py-3 rounded-lg font-medium transition-all duration-200  ${
@@ -339,17 +551,40 @@ const DoctorOnboarding = () => {
               </div>
 
               {currentStep === steps.length ? (
-                <button
-                  onClick={() => {
-                    alert("Application submitted successfully!");
-                  }}
-                  className="flex items-center px-3 sm:px-8 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-all duration-200 shadow-md hover:shadow-lg"
-                >
-                  <span className="hidden sm:block">Submit Application</span>
-                  <Check className="w-5 h-5 ml-2" />
-                </button>
+                <div className="flex flex-col items-end">
+                  <button
+                    type="button"
+                    onClick={handleSubmitApplication}
+                    disabled={!canSubmitApplication || isSubmitting}
+                    className={`flex items-center px-3 sm:px-8 py-3 rounded-lg font-medium transition-all duration-200 shadow-md ${
+                      canSubmitApplication && !isSubmitting
+                        ? "bg-green-600 text-white hover:bg-green-700 hover:shadow-lg cursor-pointer"
+                        : "bg-gray-400 text-gray-200 cursor-not-allowed opacity-60"
+                    }`}
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <span className="hidden sm:block">Submitting...</span>
+                        <div className="w-5 h-5 ml-2 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      </>
+                    ) : (
+                      <>
+                        <span className="hidden sm:block">
+                          Submit Application
+                        </span>
+                        <Check className="w-5 h-5 ml-2" />
+                      </>
+                    )}
+                  </button>
+                  {submitError && (
+                    <p className="text-red-600 text-xs mt-2 text-right max-w-xs">
+                      {submitError}
+                    </p>
+                  )}
+                </div>
               ) : (
                 <button
+                  type="button"
                   onClick={nextStep}
                   className="flex items-center px-3 sm:px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-all duration-200 shadow-md hover:shadow-lg"
                 >

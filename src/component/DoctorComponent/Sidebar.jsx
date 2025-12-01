@@ -41,10 +41,9 @@ const Sidebar = ({ closeSidebar, onLogoutClick }) => {
   const isDoctorOnboarded = accountStatus === "COMPLETE" ? true : false;
   
   // Check if current route is doctorOnboarding
-  const isOnboardingRoute = pathname === "/doctor/doctorOnboarding";
+  const isOnboardingRoute = pathname === "/doctor/doctorOnboarding" || pathname === '/doctor/afterReview';
 
   const handleLinkClick = () => {
-    // Close sidebar on mobile when a link is clicked
     if (closeSidebar) {
       closeSidebar();
     }
@@ -52,7 +51,7 @@ const Sidebar = ({ closeSidebar, onLogoutClick }) => {
 
   return (
     <div className={`flex flex-col items-center h-screen bg-gray-200 text-gray-900 px-5 ${
-      isOnboardingRoute ? "w-16 md:w-16 lg:w-16" : "md:w-48 lg:w-64"
+      isOnboardingRoute ? "w-20" : "md:w-48 lg:w-64"
     }`}>
       <div className={`flex flex-col md:justify-between justify-start h-full items-start text-start ${
         isOnboardingRoute ? "lg:items-center md:items-center" : "lg:items-center md:items-center"

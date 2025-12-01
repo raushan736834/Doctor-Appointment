@@ -1,191 +1,34 @@
-// import React, { useRef } from 'react';
-// import { Upload, FileText, Check, AlertCircle } from 'lucide-react';
-
-// const DocumentsStep = ({ data, updateData }) => {
-//   const fileInputRefs = {
-//     medicalLicense: useRef(null),
-//     boardCertificate: useRef(null),
-//     malpracticeInsurance: useRef(null),
-//     cv: useRef(null),
-//   };
-
-//   const handleFileUpload = (docType, file) => {
-//     if (file) {
-//       updateData({ [docType]: file });
-//     }
-//   };
-
-//   const removeFile = (docType) => {
-//     updateData({ [docType]: undefined });
-//     if (fileInputRefs[docType].current) {
-//       fileInputRefs[docType].current.value = '';
-//     }
-//   };
-
-//   const DocumentUpload = ({ type, title, description, required = false, acceptedFormats = '.pdf,.doc,.docx,.jpg,.jpeg,.png' }) => {
-//     const file = data[type];
-
-//     return (
-//       <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 hover:border-blue-400 transition-colors">
-//         <div className="text-center">
-//           <div className="flex items-center justify-center mb-4">
-//             {file ? (
-//               <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-//                 <Check className="w-6 h-6 text-green-600" />
-//               </div>
-//             ) : (
-//               <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
-//                 <FileText className="w-6 h-6 text-gray-400" />
-//               </div>
-//             )}
-//           </div>
-
-//           <h3 className="text-lg font-semibold text-gray-900 mb-2">
-//             {title} {required && <span className="text-red-500">*</span>}
-//           </h3>
-//           <p className="text-sm text-gray-600 mb-4">{description}</p>
-
-//           {file ? (
-//             <div className="space-y-3">
-//               <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-//                 <div className="flex items-center justify-between">
-//                   <div className="flex items-center">
-//                     <FileText className="w-5 h-5 text-green-600 mr-2" />
-//                     <span className="text-sm font-medium text-green-900">{file.name}</span>
-//                   </div>
-//                   <span className="text-xs text-green-600">{(file.size / 1024 / 1024).toFixed(2)} MB</span>
-//                 </div>
-//               </div>
-//               <div className="flex space-x-2">
-//                 <button
-//                   type="button"
-//                   onClick={() => fileInputRefs[type].current?.click()}
-//                   className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
-//                 >
-//                   Replace File
-//                 </button>
-//                 <button
-//                   type="button"
-//                   onClick={() => removeFile(type)}
-//                   className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
-//                 >
-//                   Remove
-//                 </button>
-//               </div>
-//             </div>
-//           ) : (
-//             <button
-//               type="button"
-//               onClick={() => fileInputRefs[type].current?.click()}
-//               className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-//             >
-//               <Upload className="w-5 h-5 mr-2" />
-//               Upload Document
-//             </button>
-//           )}
-
-//           <input
-//             ref={fileInputRefs[type]}
-//             type="file"
-//             accept={acceptedFormats}
-//             onChange={(e) => handleFileUpload(type, e.target.files?.[0] || null)}
-//             className="hidden"
-//           />
-
-//           <p className="text-xs text-gray-500 mt-2">
-//             Accepted formats: PDF, DOC, DOCX, JPG, PNG (Max 10MB)
-//           </p>
-//         </div>
-//       </div>
-//     );
-//   };
-
-//   return (
-//     <div className="space-y-8">
-//       <div className="text-center">
-//         <h2 className="text-2xl font-bold text-gray-900 mb-2">Document Upload</h2>
-//         <p className="text-gray-600">Please upload the required documents for verification</p>
-//       </div>
-
-//       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-//         <DocumentUpload
-//           type="medicalLicense"
-//           title="Medical License"
-//           description="Upload a copy of your current medical license"
-//           required={true}
-//         />
-
-//         <DocumentUpload
-//           type="boardCertificate"
-//           title="Board Certificate"
-//           description="Upload your board certification document"
-//           required={true}
-//         />
-
-//         <DocumentUpload
-//           type="malpracticeInsurance"
-//           title="Malpractice Insurance"
-//           description="Upload proof of current malpractice insurance"
-//           required={true}
-//         />
-
-//         <DocumentUpload
-//           type="cv"
-//           title="Curriculum Vitae (CV)"
-//           description="Upload your current CV or resume"
-//           required={false}
-//         />
-//       </div>
-
-//       {/* Document Requirements */}
-//       <div className="bg-amber-50 p-6 rounded-lg border border-amber-200">
-//         <div className="flex items-start">
-//           <AlertCircle className="w-6 h-6 text-amber-600 mr-3 flex-shrink-0 mt-0.5" />
-//           <div>
-//             <h3 className="text-lg font-semibold text-amber-900 mb-2">Document Requirements</h3>
-//             <ul className="text-amber-800 text-sm space-y-1">
-//               <li>• All documents must be clear and legible</li>
-//               <li>• Documents should be current and not expired</li>
-//               <li>• File size should not exceed 10MB per document</li>
-//               <li>• Accepted formats: PDF (preferred), DOC, DOCX, JPG, PNG</li>
-//               <li>• All documents will be verified during the credentialing process</li>
-//             </ul>
-//           </div>
-//         </div>
-//       </div>
-
-//       {/* Upload Progress */}
-//       <div className="bg-blue-50 p-6 rounded-lg border border-blue-200">
-//         <h3 className="text-lg font-semibold text-blue-900 mb-3">Upload Progress</h3>
-//         <div className="space-y-2">
-//           {[
-//             { key: 'medicalLicense', label: 'Medical License', required: true },
-//             { key: 'boardCertificate', label: 'Board Certificate', required: true },
-//             { key: 'malpracticeInsurance', label: 'Malpractice Insurance', required: true },
-//             { key: 'cv', label: 'CV/Resume', required: false }
-//           ].map(({ key, label, required }) => (
-//             <div key={key} className="flex items-center justify-between">
-//               <span className="text-blue-800">
-//                 {label} {required && <span className="text-red-500">*</span>}
-//               </span>
-//               <span className={`text-sm ${data[key] ? 'text-green-600' : 'text-gray-500'}`}>
-//                 {data[key] ? '✓ Uploaded' : required ? 'Required' : 'Optional'}
-//               </span>
-//             </div>
-//           ))}
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default DocumentsStep;
 import React, { useRef, useState } from 'react';
 import { Upload, FileText, Check, AlertCircle, Shield, Award, Building, User, X, Eye, Download } from 'lucide-react';
 
-const DocumentsStep = ({ data = {}, updateData }) => {
+const DocumentsStep = ({ data = {}, updateData, onSubmit }) => {
+  console.log(data);
+  // Transform array data into object format
+  const transformedData = Array.isArray(data) ? data.reduce((acc, doc) => {
+    if (doc && doc.fileName) {
+      acc[doc.fileName] = {
+        fileData: doc.fileData,
+        fileType: doc.fileType,
+        name: doc.fileName // store the fileName as name for consistency
+      };
+    }
+    return acc;
+  }, {}) : data;
+
+  // Use transformed data throughout the component
+  const documentData = transformedData;
+  console.log(documentData)
   const [draggedOver, setDraggedOver] = useState(null);
   const [focusedDoc, setFocusedDoc] = useState(null);
+
+  // Handle form submission when next is clicked
+  const handleFormSubmit = (e) => {
+    e?.preventDefault();
+    if (typeof onSubmit === 'function') {
+      // Pass the current data to parent
+      onSubmit(documentData);
+    }
+  };
 
   const fileInputRefs = {
     medicalLicense: useRef(null),
@@ -259,17 +102,44 @@ const DocumentsStep = ({ data = {}, updateData }) => {
     title, 
     description, 
     required = false, 
-    acceptedFormats = '.pdf,.doc,.docx,.jpg,.jpeg,.png' 
+    acceptedFormats = '.pdf,.jpg,.jpeg,' 
   }) => {
-    const file = data[type];
+    console.log(type);
+    console.log(documentData)
+    const file = documentData[type];
+    console.log(documentData[type]);
+    // Check if file exists - it could be a File object or a string/object representing an uploaded document
+     const hasFile = file && (
+      file instanceof File || 
+      (typeof file === 'object' && file !== null && (file.fileData || file.name)) || 
+      typeof file === 'string'
+    );
+    console.log(hasFile);
     const IconComponent = getDocumentIcon(type);
     const color = getDocumentColor(type);
     const isDragged = draggedOver === type;
     const isFocused = focusedDoc === type;
+    
+    // Get file name and size - handle both File objects and previously uploaded file data
+    const getFileName = () => {
+      if (!file) return '';
+      if (file instanceof File) return file.name;
+      if (file.name) return file.name;
+      if (typeof file === 'string') return file.split('/').pop() || file;
+      return 'Document uploaded';
+    };
+    
+    const getFileSize = () => {
+      if (!file) return 0;
+      if (file instanceof File) return file.size;
+      if (file.size) return file.size;
+      return 0;
+    };
 
     return (
       <div 
-        className={`group relative overflow-hidden bg-white/70 backdrop-blur-xl rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-xl border border-white/20 transition-all duration-300 transform hover:scale-[1.02] ${
+        className={`group relative overflow-hidden bg-white/70 backdrop-blur-xl rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-xl border 
+          border-white/20 transition-all duration-300 transform hover:scale-[1.02] ${
           isDragged ? 'scale-105 shadow-2xl ring-2 ring-blue-400' : ''
         } ${
           isFocused ? 'shadow-2xl transform scale-105' : ''
@@ -291,7 +161,8 @@ const DocumentsStep = ({ data = {}, updateData }) => {
         <div className="relative text-center">
           {/* Document Icon */}
           <div className="flex items-center justify-center mb-4 sm:mb-6">
-            {file ? (
+            {console.log(hasFile)}
+            {hasFile ? (
               <div className={`relative w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg transform rotate-3 group-hover:rotate-0 transition-all duration-300`}>
                 <Check className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
                 <div className="absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center animate-pulse">
@@ -318,7 +189,7 @@ const DocumentsStep = ({ data = {}, updateData }) => {
           <p className="text-slate-600 text-sm sm:text-base mb-4 sm:mb-6 px-2">{description}</p>
 
           {/* File Upload State */}
-          {file ? (
+          {hasFile ? (
             <div className="space-y-4">
               {/* File Info Card */}
               <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-3 sm:p-4 shadow-sm">
@@ -326,12 +197,14 @@ const DocumentsStep = ({ data = {}, updateData }) => {
                   <div className="flex items-center min-w-0">
                     <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 mr-2 flex-shrink-0" />
                     <span className="text-sm sm:text-base font-medium text-green-900 truncate">
-                      {file.name}
+                      {getFileName()}
                     </span>
                   </div>
-                  <span className="text-xs sm:text-sm text-green-600 ml-2 flex-shrink-0">
-                    {formatFileSize(file.size)}
-                  </span>
+                  {getFileSize() > 0 && (
+                    <span className="text-xs sm:text-sm text-green-600 ml-2 flex-shrink-0">
+                      {formatFileSize(getFileSize())}
+                    </span>
+                  )}
                 </div>
                 
                 {/* File Actions */}
@@ -362,7 +235,7 @@ const DocumentsStep = ({ data = {}, updateData }) => {
                     color === 'emerald' ? 'from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700' :
                     color === 'purple' ? 'from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700' :
                     'from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700'
-                  } text-white rounded-xl font-medium transition-all transform hover:scale-105 shadow-lg text-sm sm:text-base`}
+                  } text-white rounded-xl font-medium transition-all transform hover:scale-105 shadow-lg text-sm sm:text-base flex items-center justify-center`}
                 >
                   <Upload className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                   Replace
@@ -370,7 +243,7 @@ const DocumentsStep = ({ data = {}, updateData }) => {
                 <button
                   type="button"
                   onClick={() => removeFile(type)}
-                  className="px-3 py-2 sm:px-4 sm:py-3 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-xl font-medium transition-all transform hover:scale-105 shadow-lg text-sm sm:text-base"
+                  className="px-3 py-2 sm:px-4 sm:py-3 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-xl font-medium transition-all transform hover:scale-105 shadow-lg text-sm sm:text-base flex items-center justify-center"
                 >
                   <X className="w-3 h-3 sm:w-4 sm:h-4" />
                 </button>
@@ -404,7 +277,7 @@ const DocumentsStep = ({ data = {}, updateData }) => {
                   color === 'emerald' ? 'from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700' :
                   color === 'purple' ? 'from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700' :
                   'from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700'
-                } text-white rounded-xl sm:rounded-2xl font-semibold transition-all transform hover:scale-105 shadow-lg text-sm sm:text-base`}
+                } text-white rounded-xl sm:rounded-2xl font-semibold transition-all transform hover:scale-105 shadow-lg text-sm sm:text-base flex items-center justify-center`}
               >
                 <Upload className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                 Choose File
@@ -430,22 +303,28 @@ const DocumentsStep = ({ data = {}, updateData }) => {
     );
   };
 
-  const uploadedCount = Object.values(data).filter(Boolean).length;
+  const uploadedCount = Object.values(documentData).filter(file => 
+    file && (file instanceof File || (typeof file === 'object' && file !== null) || typeof file === 'string')
+  ).length;
   const requiredCount = 3; // medicalLicense, boardCertificate, malpracticeInsurance
   const totalCount = 4;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-blue-50 to-purple-100 p-3 sm:p-6">
-      <div className="max-w-6xl mx-auto">
+    <form onSubmit={handleFormSubmit} data-formik-form>
+      <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-blue-50 to-purple-100 p-3 sm:p-6">
+        <div className="max-w-6xl mx-auto">
         {/* Modern Header */}
         <div className="text-center mb-8 sm:mb-12 relative">
-          <div className="absolute -top-4 sm:-top-6 left-1/2 transform -translate-x-1/2 w-16 sm:w-24 h-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full animate-pulse"></div>
+          <div className="absolute -top-4 sm:-top-6 left-1/2 transform -translate-x-1/2 w-16 sm:w-24 h-1 bg-gradient-to-r from-purple-500
+           to-pink-500 rounded-full animate-pulse"></div>
           
-          <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-purple-500 to-pink-600 rounded-xl sm:rounded-2xl mb-4 sm:mb-6 shadow-lg transform rotate-3 hover:rotate-0 transition-transform duration-300">
+          <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-purple-500
+           to-pink-600 rounded-xl sm:rounded-2xl mb-4 sm:mb-6 shadow-lg transform rotate-3 hover:rotate-0 transition-transform duration-300">
             <FileText className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
           </div>
           
-          <h2 className="text-2xl sm:text-4xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent mb-2 sm:mb-3 leading-tight">
+          <h2 className="text-2xl sm:text-4xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text 
+          text-transparent mb-2 sm:mb-3 leading-tight">
             Document Upload
           </h2>
           <p className="text-slate-600 text-base sm:text-lg font-medium px-2">
@@ -526,42 +405,46 @@ const DocumentsStep = ({ data = {}, updateData }) => {
               { key: 'boardCertificate', label: 'Board Certificate', required: true, icon: Award, color: 'emerald' },
               { key: 'malpracticeInsurance', label: 'Malpractice Insurance', required: true, icon: Building, color: 'purple' },
               { key: 'cv', label: 'CV/Resume', required: false, icon: User, color: 'orange' }
-            ].map(({ key, label, required, icon: Icon, color }) => (
-              <div key={key} className={`flex items-center justify-between p-3 sm:p-4 rounded-xl ${
-                data[key] 
-                  ? 'bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200' 
-                  : 'bg-gradient-to-r from-slate-50 to-slate-100 border border-slate-200'
-              }`}>
-                <div className="flex items-center">
-                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center mr-3 ${
-                    data[key]
-                      ? 'bg-gradient-to-r from-green-500 to-green-600'
-                      : `bg-gradient-to-r from-${color}-400 to-${color}-600`
-                  }`}>
-                    {data[key] ? (
-                      <Check className="w-4 h-4 text-white" />
-                    ) : (
-                      <Icon className="w-4 h-4 text-white" />
-                    )}
+            ].map(({ key, label, required, icon: Icon, color }) => {
+              const hasDoc = documentData[key] && (documentData[key] instanceof File 
+              || (typeof documentData[key] === 'object' && documentData[key] !== null) || typeof documentData[key] === 'string');
+              return (
+                <div key={key} className={`flex items-center justify-between p-3 sm:p-4 rounded-xl ${
+                  hasDoc
+                    ? 'bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200' 
+                    : 'bg-gradient-to-r from-slate-50 to-slate-100 border border-slate-200'
+                }`}>
+                  <div className="flex items-center">
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center mr-3 ${
+                      hasDoc
+                        ? 'bg-gradient-to-r from-green-500 to-green-600'
+                        : `bg-gradient-to-r from-${color}-400 to-${color}-600`
+                    }`}>
+                      {hasDoc ? (
+                        <Check className="w-4 h-4 text-white" />
+                      ) : (
+                        <Icon className="w-4 h-4 text-white" />
+                      )}
+                    </div>
+                    <span className={`font-medium text-sm sm:text-base ${
+                      hasDoc ? 'text-green-900' : 'text-slate-700'
+                    }`}>
+                      {label}
+                      {required && <span className="text-red-500 ml-1">*</span>}
+                    </span>
                   </div>
-                  <span className={`font-medium text-sm sm:text-base ${
-                    data[key] ? 'text-green-900' : 'text-slate-700'
+                  <span className={`text-xs sm:text-sm font-semibold px-2 py-1 rounded-lg ${
+                    hasDoc
+                      ? 'text-green-700 bg-green-100' 
+                      : required 
+                      ? 'text-orange-700 bg-orange-100' 
+                      : 'text-slate-600 bg-slate-100'
                   }`}>
-                    {label}
-                    {required && <span className="text-red-500 ml-1">*</span>}
+                    {hasDoc ? 'Uploaded' : required ? 'Required' : 'Optional'}
                   </span>
                 </div>
-                <span className={`text-xs sm:text-sm font-semibold px-2 py-1 rounded-lg ${
-                  data[key] 
-                    ? 'text-green-700 bg-green-100' 
-                    : required 
-                    ? 'text-orange-700 bg-orange-100' 
-                    : 'text-slate-600 bg-slate-100'
-                }`}>
-                  {data[key] ? 'Uploaded' : required ? 'Required' : 'Optional'}
-                </span>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Progress Summary */}
@@ -634,6 +517,9 @@ const DocumentsStep = ({ data = {}, updateData }) => {
         <div className="h-20 sm:h-8"></div>
       </div>
     </div>
+    {/* Hidden submit button that DoctorOnboarding can find and click */}
+    <button type="submit" className="sr-only" aria-hidden="true">Submit</button>
+    </form>
   );
 };
 

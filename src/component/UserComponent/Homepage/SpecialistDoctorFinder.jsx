@@ -7,16 +7,13 @@ import { useApiService } from "../../../hooks/useAuthWithAxios";
 
 const SPECIALIST_URL = "api/public/getSpecialist";
 
-const SpecialistDoctorsFinder = () => {
+const SpecialistDoctorsFinder = ({isLoading, setIsLoading}) => {
   const [selectedSpecialty, setSelectedSpecialty] = useState(0);
   const [err, setErr] = useState();
   const [specialties, setSpecialties] = useState([]);
   const [doctor, setDoctor] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
   const carouselRef = useRef(null);
   const api = useApiService();
-
-  
 
   useEffect(() => {
     // Simulate API call
@@ -31,12 +28,12 @@ const SpecialistDoctorsFinder = () => {
 
   const fetchDoctor = async (specialist) => {
     if (!specialist) return;
-    
     setIsLoading(true);
     try {
       const url = `/api/public/search?keyword=${encodeURIComponent(specialist)}`;
       const response = await api.get(url);
-      const json = response?.data;
+      console.log(response)
+      const json = response?.data?.data;
       const list = Array.isArray(json)
         ? json
         : Array.isArray(json?.results)
@@ -51,6 +48,7 @@ const SpecialistDoctorsFinder = () => {
       setIsLoading(false);
     }
   };
+  console.log(doctor);
 
   const fetchSpecialist = async () => {
     try {
@@ -94,11 +92,12 @@ const SpecialistDoctorsFinder = () => {
 
   const DoctorCard = ({ doctor }) => (
     <div className="bg-white rounded-lg border border-gray-200 p-4 md:p-6 shadow-sm hover:shadow-md transition-shadow">
+      {console.log(doctor)}
       <div className="flex items-start space-x-4 mb-4 max-w-7xl">
         <div className="relative">
           <div className="w-28 h-28 bg-gray-200 rounded-lg overflow-hidden flex items-center justify-center">
             <div className="w-28 h-28 bg-blue-100 rounded-full flex items-center justify-center">
-              <img src={doctor.profilePhoto || defaultImage} className="w-20 h-20 rounded-xl" loading="lazy" />
+              <img src={defaultImage|| doctor.profileImage } className="w-20 h-20 rounded-xl" loading="lazy" />
             </div>
           </div>
           {true && (
@@ -110,32 +109,32 @@ const SpecialistDoctorsFinder = () => {
 
         <div className="flex-1">
           <h3 className="font-semibold text-gray-900 text-lg mb-1">
-            {doctor?.doctorName}
+            {doctor?.firstName +" "+ doctor?.lastName}
           </h3>
-          <p className="text-gray-600 text-sm mb-2">{doctor.specialization}</p>
+          <p className="text-gray-600 text-sm mb-2">{doctor?.profesional?.specialization}</p>
 
           <div className="flex items-center mb-2">
             <Stethoscope className="w-4 h-4 text-blue-400 mr-1" />
-            <span className="font-semibold text-gray-900">{doctor.experienceYears}{" years"}</span>
+            <span className="font-semibold text-gray-900">{doctor?.professional?.yearOfExp}{" years"}</span>
           </div>
 
           <div className="flex items-start text-gray-600 text-sm">
             <span className="mr-1">📍</span>
-            <span>{doctor.clinicName}{", "}{doctor.locality}{", "}{doctor.city}</span>
+            <span>{doctor?.clinicInfos?.clinicName}{", "}{doctor?.clinicInfos?.clinicAddress}{", "}{doctor?.clinicInfos?.clinicCity}</span>
           </div>
         </div>
       </div>
 
       <div className="flex space-x-3">
         <Link 
-          to={`/specialist/${encodeURIComponent(doctor.specialization)}/${doctor.id}`}
+          to={`/specialist/${encodeURIComponent(doctor?.professional?.specialization)}/${doctor?.doctorId}`}
           state={{ doctor : doctor }}
           className="flex-1 bg-blue-900 text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors text-center"
         >
           Book Appointment
         </Link>
         <Link 
-          to={`/specialist/${encodeURIComponent(doctor.specialization)}/${doctor.id}`}
+          to={`/specialist/${encodeURIComponent(doctor?.professional?.specialization)}/${doctor?.doctorId}`}
           className="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
         >
           <span className="mr-1">Doctor Profile</span>

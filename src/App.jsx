@@ -44,6 +44,7 @@ import DoctorOnboarding from "./component/DoctorComponent/DoctorOnboarding";
 import { useAuth } from "./component/GlobalComponent/AuthProvider";
 import UserLayout from "./layouts/UserLayout";
 import { useAuthWithAxios } from "./hooks/useAuthWithAxios";
+import AfterReviewStep from "./component/DoctorComponent/AfterReviewStep";
 
 const AppLayout = () => {
   const navigate = useNavigate();
@@ -120,6 +121,10 @@ const AppContent = () => {
                   <Route
                     path="doctorOnboarding"
                     element={<DoctorOnboarding />}
+                  />
+                  <Route
+                    path="afterReview"
+                    element={<AfterReviewStep />}
                   />
                   <Route
                     path="personalInfo"

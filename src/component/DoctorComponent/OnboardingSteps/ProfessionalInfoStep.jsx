@@ -1,15 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Plus, X, Briefcase, Award, Building, Clock, Stethoscope, Check, Star, Shield, GraduationCap } from 'lucide-react';
 import { useApiService } from "../../../hooks/useAuthWithAxios";
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 
 const specializations = [
-  'Family Medicine', 'Internal Medicine', 'Pediatrics', 'Cardiology', 'Dermatology',
-  'Emergency Medicine', 'Endocrinology', 'Gastroenterology', 'Neurology', 'Oncology',
-  'Orthopedics', 'Psychiatry', 'Radiology', 'Surgery', 'Urology', 'Gynecology',
-  'Ophthalmology', 'Otolaryngology', 'Anesthesiology', 'Pathology', 'Pulmonology',
-  'Rheumatology', 'Infectious Disease', 'Nephrology', 'Critical Care Medicine'
+  'Ayurveda', 'Cardiologist', 'Dermatologist', 'Ear-Nose-Throat (ENT) Specialist', 'Gastroenterologist',
+  'General Physician', 'General Surgeon', 'Gynecologist/Obstetrician', 'Homoeopath', 'Neonatologist',
+  'Nephrologist/Renal Specialist', 'Neurologist', 'Ophthalmologist', 'Orthopedist', 'Pediatrician', 'Physiotherapist',
+  'Psychiatrist', 'Sexologist', 'Yoga & Naturopathy'
 ];
 
 const languageKnown = [
@@ -33,29 +32,10 @@ const ProfessionalInfoSchema = Yup.object({
 });
 
 const ProfessionalInfoStep = ({ updateData, data: initialPropsData, onSubmit }) => {
-  const [newLanguage, setNewLanguage] = useState('');
   const [focusedField, setFocusedField] = useState(null);
-  const api = useApiService();
   const [data, setData] = useState({});
   const [err, setErr] = useState(null);
 
-  useEffect(() => {
-    handleFetchUserData();
-  }, [])
-
-  const handleFetchUserData = async () => {
-    try {
-      const response = await api.get("/api/doctors/getProfessionalDetails");
-      if (response?.success) {
-        setData(response?.data?.data || {});
-      } else {
-        setData({});
-      }
-    } catch (error) {
-      setErr(error);
-      setData({});
-    }
-  };
 
   const handleInputChange = (field, value) => {
     // Update local state so inputs are controlled reliably

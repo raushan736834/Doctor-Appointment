@@ -65,7 +65,7 @@ const Login = () => {
           containerStyle: { marginTop: 20, marginRight: 5 },
         });
         navigate("/doctor/dashboard", { replace: true });
-        debugger;
+      
       } else if(roles.includes(ROLES.doctor) && accountStatus === "PENDING"){
         toast({
           position: "top-right",

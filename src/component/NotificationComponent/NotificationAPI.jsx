@@ -1,13 +1,11 @@
-import { useAuth } from "../GlobalComponent/AuthProvider";
-import { useApiService } from "../../hooks/useAuthWithAxios";
+import axiosInstance from "../../config/axiosConfig";
+
 // Notification API functions using your axios instance
 export const notificationAPI = {
   // Get all notifications for a user
   getUserNotifications: async (userEmail) => {
-    const api = useApiService();
-
     try {
-      const response = await api.get(`/api/notifications/user/${userEmail}`);
+      const response = await axiosInstance.get(`/api/notifications/user/${userEmail}`);
       return response.data;
     } catch (error) {
       console.error("Error fetching user notifications:", error);
@@ -17,10 +15,8 @@ export const notificationAPI = {
 
   // Get unread count for a user
   getUnreadCount: async (userEmail) => {
-    const api = useApiService();
-
     try {
-      const response = await api.get(
+      const response = await axiosInstance.get(
         `/api/notifications/user/${userEmail}/unread-count`
       );
       return response.data;
@@ -32,10 +28,8 @@ export const notificationAPI = {
 
   // Mark a single notification as read
   markAsRead: async (notificationId) => {
-    const api = useApiService();
-
     try {
-      await api.put(`/api/notifications/${notificationId}/read`);
+      await axiosInstance.put(`/api/notifications/${notificationId}/read`);
       return true;
     } catch (error) {
       console.error("Error marking notification as read:", error);
@@ -45,10 +39,8 @@ export const notificationAPI = {
 
   // Mark all notifications as read for a user
   markAllAsRead: async (userEmail) => {
-    const api = useApiService();
-
     try {
-      await api.put(`/api/notifications/user/${userEmail}/mark-all-read`);
+      await axiosInstance.put(`/api/notifications/user/${userEmail}/mark-all-read`);
       return true;
     } catch (error) {
       console.error("Error marking all notifications as read:", error);
@@ -58,10 +50,8 @@ export const notificationAPI = {
 
   // Delete a notification
   deleteNotification: async (notificationId) => {
-    const api = useApiService();
-
     try {
-      await api.delete(`/api/notifications/${notificationId}`);
+      await axiosInstance.delete(`/api/notifications/${notificationId}`);
       return true;
     } catch (error) {
       console.error("Error deleting notification:", error);
@@ -71,10 +61,8 @@ export const notificationAPI = {
 
   // Get notifications with pagination
   getNotificationsPaginated: async (userEmail, page = 0, size = 20) => {
-    const api = useApiService();
-
     try {
-      const response = await api.get(
+      const response = await axiosInstance.get(
         `/api/notifications/user/${userEmail}/paginated`,
         {
           params: { page, size },
@@ -104,25 +92,8 @@ export const authNotificationAPI = {
     return false;
   },
 
-  // Get user info for socket connection
-  getUserInfoForSocket: () => {
-    const { auth } = useAuth();
-
-    const token = auth?.accessToken;
-    const refreshToken = auth?.refreshToken;
-
-    if (!token) {
-      throw new Error("No authentication token found");
-    }
-
-    return { token, refreshToken };
-  },
-
-  // Handle socket authentication error
-  handleSocketAuthError: () => {
-    const { setAuth } = useAuth();
-    console.log("Socket authentication failed, clearing tokens...");
-    setAuth({});
-    window.location.href = "/auth/login";
-  },
+  // Note: getUserInfoForSocket and handleSocketAuthError were removed
+  // because they used hooks inside object methods, which violates React's Rules of Hooks.
+  // If you need these functions, they should be implemented as custom hooks or
+  // accept the auth context as a parameter instead.
 };

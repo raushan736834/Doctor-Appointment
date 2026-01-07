@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { notificationAPI, authNotificationAPI } from './NotificationAPI';
 import SocketService from './SocketService';
+import { useAuth } from '../GlobalComponent/AuthProvider';
 
 const NotificationContext = createContext();
 
@@ -43,6 +44,7 @@ const notificationReducer = (state, action) => {
 };
 
 export const NotificationProvider = ({ children, userEmail }) => {
+  const { accessToken } = useAuth();
   const [state, dispatch] = useReducer(notificationReducer, {
     notifications: [],
     unreadCount: 0,
@@ -50,16 +52,16 @@ export const NotificationProvider = ({ children, userEmail }) => {
   });
 
   useEffect(() => {
-    if (userEmail) {
+    if (userEmail && accessToken) {
       // Fetch existing notifications
       fetchNotifications(userEmail);
       
-      // Connect to Socket.io
+      // Connect to WebSocket with STOMP
       SocketService.connect(userEmail, (notification) => {
         dispatch({ type: 'ADD_NOTIFICATION', payload: notification });
         // Show browser notification if permission granted
         showBrowserNotification(notification);
-      });
+      }, accessToken);
 
       // Monitor connection status
       const checkConnection = setInterval(() => {
@@ -74,11 +76,12 @@ export const NotificationProvider = ({ children, userEmail }) => {
         SocketService.disconnect();
       };
     }
-  }, [userEmail]);
+  }, [userEmail, accessToken]);
 
   const fetchNotifications = async (userEmail) => {
     try {
       const notifications = await notificationAPI.getUserNotifications(userEmail);
+      console.log("notifications", notifications)
       dispatch({ type: 'SET_NOTIFICATIONS', payload: notifications });
     } catch (error) {
       console.error('Error fetching notifications:', error);
@@ -145,21 +148,16 @@ export const NotificationProvider = ({ children, userEmail }) => {
   };
 
   const reconnect = () => {
-    if (userEmail) {
+    if (userEmail && accessToken) {
       SocketService.disconnect();
       setTimeout(() => {
         try {
-          // Check if user is still authenticated
-          const { token } = authNotificationAPI.getUserInfoForSocket();
-          if (token) {
-            SocketService.connect(userEmail, (notification) => {
-              dispatch({ type: 'ADD_NOTIFICATION', payload: notification });
-              showBrowserNotification(notification);
-            });
-          }
+          SocketService.connect(userEmail, (notification) => {
+            dispatch({ type: 'ADD_NOTIFICATION', payload: notification });
+            showBrowserNotification(notification);
+          }, accessToken);
         } catch (error) {
-          console.error('Cannot reconnect: User not authenticated');
-          authNotificationAPI.handleSocketAuthError();
+          console.error('Cannot reconnect: WebSocket error', error);
         }
       }, 1000);
     }

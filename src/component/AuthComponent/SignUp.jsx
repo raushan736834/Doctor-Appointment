@@ -3,7 +3,6 @@ import { Formik, Field, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { Link, useNavigate } from "react-router-dom";
 import { useRef, useState, useEffect } from "react";
-import { useAuth } from "../GlobalComponent/AuthProvider";
 import { useToast } from "@chakra-ui/react";
 import { useApiService } from "../../hooks/useAuthWithAxios";
 
@@ -94,6 +93,7 @@ const SignUp = () => {
         onSubmit={async (values, actions) => {
           console.log("Submitted roles:", values.roles);
           setErrMsg("");
+          setSuccess(false);
           setIsLoading(true);
           try {
             const userData = {
@@ -104,11 +104,23 @@ const SignUp = () => {
               roles: values.roles, // user or doctor
             };
             console.log(userData)
-            const response = await api.post(REGISTER_URL,userData);
-            console.log(response.data);
+            debugger;
+            const response = await api.post(REGISTER_URL, userData);
+            console.log(response);
+
+            if (!response.success) {
+               throw {
+                 response: {
+                   status: response.status,
+                   data: { message: response.error }
+                 }
+               };
+            }
+
             setSuccess(true);
             actions.resetForm();
           } catch (err) {
+            console.log(err);
             if (!err?.response) {
               // No response from server
               setErrMsg("No Server Response");

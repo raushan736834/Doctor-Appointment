@@ -1,104 +1,158 @@
-import { useAuth } from "../GlobalComponent/AuthProvider";
-import { io } from "socket.io-client";
+import { Client } from '@stomp/stompjs';
+import SockJS from 'sockjs-client';
 
-class SocketService {
+class WebSocketService {
   constructor() {
-    this.socket = null;
+    this.client = null;
     this.connected = false;
+    this.subscription = null;
+    this.userEmail = null;
+    this.reconnectAttempts = 0;
+    this.maxReconnectAttempts = 5;
   }
 
-  connect(userEmail, onNotificationReceived) {
-    if (this.socket) {
+  connect(userEmail, onNotificationReceived, accessToken) {
+    if (this.client) {
       this.disconnect();
     }
 
-    // Get the access token for authentication
-    const { auth } = useAuth();
-    const accessToken = auth?.accessToken;
+    this.userEmail = userEmail;
 
-    const isProd = process.env.NODE_ENV === "production";
-    
-    const url = import.meta.env.VITE_BASE_URL
-    // const url = "http://localhost:8081";
+    // WebSocket URL - update based on your backend configuration
+    const url = "http://localhost:8080/ws";
 
-    // Connect to Socket.io server with authentication
-    this.socket = io(url, {
-      transports: ["websocket", "polling"],
-      upgrade: true,
-      rememberUpgrade: true,
-      timeout: 20000,
-      forceNew: true,
-      auth: {
-        token: accessToken,
+    // Create STOMP client
+    this.client = new Client({
+      // Use SockJS for better browser compatibility
+      webSocketFactory: () => new SockJS(url),
+      
+      // Connection headers (JWT authentication)
+      connectHeaders: {
+        Authorization: `Bearer ${accessToken}`,
         userEmail: userEmail,
       },
-      query: {
-        userEmail: userEmail,
+      // Debug output
+      debug: (str) => {
+        console.log('STOMP Debug:', str);
+      },
+      
+      // Reconnect configuration
+      reconnectDelay: 5000,
+      heartbeatIncoming: 4000,
+      heartbeatOutgoing: 4000,
+      
+      // Connection callback
+      onConnect: (frame) => {
+        console.log('Connected to WebSocket server:', frame);
+        this.connected = true;
+        this.reconnectAttempts = 0;
+
+        // Subscribe to user-specific notification queue
+        this.subscription = this.client.subscribe(
+          `/user/queue/notifications`,
+          (message) => {
+            try {
+              const notification = JSON.parse(message.body);
+              console.log('Received notification:', notification);
+              onNotificationReceived(notification);
+            } catch (error) {
+              console.error('Error parsing notification:', error);
+            }
+          },
+          {
+            // Subscription headers if needed
+            id: `sub-${userEmail}`,
+          }
+        );
+
+        console.log('Subscribed to notifications for:', userEmail);
+      },
+
+      // Disconnection callback
+      onDisconnect: (frame) => {
+        console.log('Disconnected from WebSocket server:', frame);
+        this.connected = false;
+        if (this.subscription) {
+          this.subscription.unsubscribe();
+          this.subscription = null;
+        }
+      },
+
+      // Error callback
+      onStompError: (frame) => {
+        console.error('STOMP error:', frame.headers['message']);
+        console.error('Details:', frame.body);
+        this.connected = false;
+
+        // Handle authentication errors
+        if (frame.headers['message']?.includes('Authentication') || 
+            frame.headers['message']?.includes('Unauthorized')) {
+          console.log('WebSocket authentication failed, token may be expired');
+          // Trigger token refresh or logout
+        }
+
+        // Implement reconnect logic
+        if (this.reconnectAttempts < this.maxReconnectAttempts) {
+          this.reconnectAttempts++;
+          console.log(`Reconnection attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts}`);
+        }
+      },
+
+      // Web socket close callback
+      onWebSocketClose: (event) => {
+        console.log('WebSocket connection closed:', event.reason || 'Unknown reason');
+        this.connected = false;
+      },
+
+      // Web socket error callback
+      onWebSocketError: (error) => {
+        console.error('WebSocket error:', error);
+        this.connected = false;
       },
     });
 
-    // Connection events
-    this.socket.on("connect", () => {
-      console.log("Connected to Socket.io server:", this.socket.id);
-      this.connected = true;
-
-      // Join user-specific room
-      this.socket.emit("join", userEmail);
-    });
-
-    this.socket.on("disconnect", (reason) => {
-      console.log("Disconnected from Socket.io server:", reason);
-      this.connected = false;
-    });
-
-    this.socket.on("connect_error", (error) => {
-      console.error("Socket.io connection error:", error);
-      this.connected = false;
-
-      // Handle authentication errors
-      if (error.message === "Authentication failed") {
-        console.log("Socket authentication failed, token may be expired");
-        // You could trigger a token refresh here if needed
-      }
-    });
-
-    // Listen for notifications
-    this.socket.on("notification", (notification) => {
-      console.log("Received notification:", notification);
-      onNotificationReceived(notification);
-    });
-
-    // Handle reconnection
-    this.socket.on("reconnect", (attemptNumber) => {
-      console.log(
-        "Reconnected to Socket.io server after",
-        attemptNumber,
-        "attempts"
-      );
-      this.connected = true;
-      // Rejoin user room after reconnection
-      this.socket.emit("join", userEmail);
-    });
+    // Activate the client
+    this.client.activate();
   }
 
   disconnect() {
-    if (this.socket) {
-      this.socket.disconnect();
-      this.socket = null;
+    if (this.client) {
+      // Unsubscribe before disconnecting
+      if (this.subscription) {
+        this.subscription.unsubscribe();
+        this.subscription = null;
+      }
+
+      // Deactivate the client
+      this.client.deactivate();
+      this.client = null;
       this.connected = false;
+      this.userEmail = null;
     }
   }
 
   isConnected() {
-    return this.connected && this.socket && this.socket.connected;
+    return this.connected && this.client && this.client.connected;
   }
 
-  // Method to manually emit events (if needed)
-  emit(event, data) {
-    if (this.socket && this.connected) {
-      this.socket.emit(event, data);
+  // Method to manually send messages (if needed)
+  send(destination, body, headers = {}) {
+    if (this.client && this.connected) {
+      this.client.publish({
+        destination,
+        body: JSON.stringify(body),
+        headers,
+      });
+    } else {
+      console.warn('Cannot send message: WebSocket not connected');
     }
+  }
+
+  // Get connection state
+  getState() {
+    if (!this.client) return 'DISCONNECTED';
+    return this.client.state;
   }
 }
 
-export default new SocketService();
+export default new WebSocketService();

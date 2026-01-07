@@ -32,7 +32,6 @@ const SpecialistDoctorsFinder = ({isLoading, setIsLoading}) => {
     try {
       const url = `/api/public/search?keyword=${encodeURIComponent(specialist)}`;
       const response = await api.get(url);
-      console.log(response)
       const json = response?.data?.data;
       const list = Array.isArray(json)
         ? json
@@ -48,7 +47,6 @@ const SpecialistDoctorsFinder = ({isLoading, setIsLoading}) => {
       setIsLoading(false);
     }
   };
-  console.log(doctor);
 
   const fetchSpecialist = async () => {
     try {
@@ -92,7 +90,6 @@ const SpecialistDoctorsFinder = ({isLoading, setIsLoading}) => {
 
   const DoctorCard = ({ doctor }) => (
     <div className="bg-white rounded-lg border border-gray-200 p-4 md:p-6 shadow-sm hover:shadow-md transition-shadow">
-      {console.log(doctor)}
       <div className="flex items-start space-x-4 mb-4 max-w-7xl">
         <div className="relative">
           <div className="w-28 h-28 bg-gray-200 rounded-lg overflow-hidden flex items-center justify-center">

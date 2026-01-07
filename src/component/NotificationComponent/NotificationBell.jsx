@@ -3,19 +3,26 @@ import { useNotifications } from './NotificationContext';
 import ConnectionStatus from './ConnectionStatus';
 
 const NotificationBell = () => {
-  const { unreadCount, connected } = useNotifications();
+  const { unreadCount, connected, connectSocket } = useNotifications();
   const [isOpen, setIsOpen] = useState(false);
+
+  const handleClick = () => {
+    // Connect socket if not already connected when bell is clicked
+    if (!connected) {
+      connectSocket();
+    }
+    setIsOpen(!isOpen);
+  };
 
   return (
     <div className="relative flex items-center space-x-4">
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={handleClick}
         className={`relative p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${
           connected 
             ? 'text-indigo-700 hover:text-indigo-400' 
-            : 'text-gray-400 cursor-not-allowed'
+            : 'text-gray-400 hover:text-gray-600'
         }`}
-        disabled={!connected}
       >
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 

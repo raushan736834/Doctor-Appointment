@@ -1,12 +1,11 @@
-
 import axios from 'axios';
 
 const baseUrl = import.meta.env.VITE_BASE_URL;
 
 // Create axios instance
 const axiosInstance = axios.create({
-  // baseURL: 'http://localhost:8080', // Adjust based on your backend URL
-  baseURL : baseUrl, // Adjust based on your backend URL
+  baseURL: 'http://localhost:8080', // Adjust based on your backend URL
+  // baseURL : baseUrl, // Adjust based on your backend URL
   withCredentials: true, // Important for sending cookies
 });
 
@@ -54,25 +53,20 @@ axiosInstance.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // Check if error is 401 and we haven't already tried to refresh
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
-      // Check if the error indicates an expired token
       const errorData = error.response?.data;
       if (errorData?.code === 'TOKEN_EXPIRED' || errorData?.error?.includes('expired')) {
         try {
-          // Attempt to refresh the token
           const newAccessToken = await authFunctions.refreshToken();
           
           if (newAccessToken) {
             // Update the original request with new token
             originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
             
-            // Retry the original request
             return axiosInstance(originalRequest);
           } else {
-            // Refresh failed, redirect to login
             authFunctions.logout();
             return Promise.reject(error);
           }

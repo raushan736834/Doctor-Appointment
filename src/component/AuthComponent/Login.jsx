@@ -19,7 +19,7 @@ import { ROLES } from "./../../constants/slots";
 
 
 const Login = () => {
-  const { login, error, clearError } = useAuth();
+  const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from?.pathname || "/";
@@ -39,7 +39,7 @@ const Login = () => {
     setIsLoading(true);
     try {
       const { success, data } = await login(values.email, values.password);
-      console.log(success)
+      console.log(data)
       if (!success) {
         throw new Error(data?.error || 'Login failed');
       }
@@ -65,7 +65,6 @@ const Login = () => {
           containerStyle: { marginTop: 20, marginRight: 5 },
         });
         navigate("/doctor/dashboard", { replace: true });
-      
       } else if(roles.includes(ROLES.doctor) && accountStatus === "PENDING"){
         toast({
           position: "top-right",

@@ -15,11 +15,13 @@ import {
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import useDate from "../../hooks/useDate";
 import DoctorProfileShimmer from "../Shimmer/DoctorProfileShimmer";
 import { useApiService } from "../../hooks/useAuthWithAxios";
+import { useAuth } from "../../component/GlobalComponent/AuthProvider";
 import defaultImage from "../../assets/img/defaultClinicImage.jpg";
+import { useSlots } from "../../hooks/useSlots";
 
 const FETCH_DOCTOR_DATA = "/api/public/getDoctor";
 
@@ -28,7 +30,24 @@ const DoctorProfile = ({
   onCall = () => {},
   onMessage = () => {},
 }) => {
-  // Function to generate next 14 days
+  const defaultReviews = [
+    {
+      name: "Priya Sharma",
+      rating: 5,
+      comment: "Excellent consultation and very knowledgeable in treatments.",
+    },
+    {
+      name: "Rajesh Kumar",
+      rating: 4,
+      comment: "Good experience, doctor explained everything clearly.",
+    },
+    {
+      name: "Anita Singh",
+      rating: 5,
+      comment: "Very patient and caring. Highly recommend!",
+    },
+  ];
+
   const generateNext14Days = () => {
     const days = [];
     const today = new Date();
@@ -54,34 +73,44 @@ const DoctorProfile = ({
     return days;
   };
 
-  // Function to generate time slots based on availability hours and consultation duration
-  const generateTimeSlots = (openTime, closeTime, durationInMinutes) => {
-    const slots = [];
-    
-    const parseTime = (timeStr) => {
-      const [hours, mins] = timeStr.split(':').map(Number);
-      return hours * 60 + mins;
-    };
-
-    const openMinutes = parseTime(openTime);
-    const closeMinutes = parseTime(closeTime);
-    let currentTime = openMinutes;
-
-    while (currentTime + durationInMinutes <= closeMinutes) {
-      const hours = Math.floor(currentTime / 60);
-      const mins = currentTime % 60;
-      const timeStr = `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
-      slots.push(timeStr);
-      currentTime += durationInMinutes;
-    }
-    return slots;
+  const defaultAvailability = {
+    dates: generateNext14Days(),
   };
 
-  // Function to convert availability data and generate time slots per day
-  const processAvailabilityData = (availData, duration) => {
+  const reviews = reviewsData || defaultReviews;
+  const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
+  const [selectedSlotId, setSelectedSlotId] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedPeriod, setSelectedPeriod] = useState(null);
+  const [isDateDropdownOpen, setIsDateDropdownOpen] = useState(false);
+  const [doctor, setDoctor] = useState(null);
+  const [availability, setAvailability] = useState([]);
+  const param = useParams();
+  const id = param.doctorId;
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { isAuthenticated } = useAuth();
+  const { setData } = useDate();
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const api = useApiService();
+  const [processedAvailability, setProcessedAvailability] =
+    useState(defaultAvailability);
+
+  // Function to convert availability data and determine which dates are available
+  // Note: Slots are now fetched from backend, not generated here
+  const processAvailabilityData = (availData) => {
     if (!availData || !Array.isArray(availData)) return generateNext14Days();
 
-    const dayNames = ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"];
+    const dayNames = [
+      "SUNDAY",
+      "MONDAY",
+      "TUESDAY",
+      "WEDNESDAY",
+      "THURSDAY",
+      "FRIDAY",
+      "SATURDAY",
+    ];
     const processed = [];
     const today = new Date();
 
@@ -89,7 +118,7 @@ const DoctorProfile = ({
       const date = new Date(today);
       date.setDate(today.getDate() + i);
       const dayName = dayNames[date.getDay()];
-      
+
       const formattedDate = date.toLocaleDateString("en-US", {
         weekday: "short",
         day: "numeric",
@@ -97,85 +126,60 @@ const DoctorProfile = ({
       });
 
       // Find availability for this day
-      const dayAvailability = availData.find(av => av.days === dayName);
+      const dayAvailability = availData.find((av) => av.days === dayName);
 
       if (dayAvailability && !dayAvailability.isClosedToday) {
-        const slots = generateTimeSlots(dayAvailability.open, dayAvailability.close, duration);
         processed.push({
           date: formattedDate,
           dateObj: date,
           available: true,
-          slots: slots,
-          timeRange: `${dayAvailability.open} - ${dayAvailability.close}`
+          timeRange: `${dayAvailability.open} - ${dayAvailability.close}`,
         });
       } else {
         processed.push({
           date: formattedDate,
           dateObj: date,
           available: false,
-          slots: [],
-          timeRange: dayAvailability && dayAvailability.isClosedToday ? "Closed" : "Not Available"
+          timeRange:
+            dayAvailability && dayAvailability.isClosedToday
+              ? "Closed"
+              : "Not Available",
         });
       }
     }
     return processed;
   };
 
-  const defaultAvailability = {
-    dates: generateNext14Days(),
-  };
-
-  const defaultReviews = [
-    {
-      name: "Priya Sharma",
-      rating: 5,
-      comment: "Excellent consultation and very knowledgeable in treatments.",
-    },
-    {
-      name: "Rajesh Kumar",
-      rating: 4,
-      comment: "Good experience, doctor explained everything clearly.",
-    },
-    {
-      name: "Anita Singh",
-      rating: 5,
-      comment: "Very patient and caring. Highly recommend!",
-    },
-  ];
-
-  const reviews = reviewsData || defaultReviews;
-  const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [selectedPeriod, setSelectedPeriod] = useState(null);
-  const [isDateDropdownOpen, setIsDateDropdownOpen] = useState(false);
-  const [isPeriodDropdownOpen, setIsPeriodDropdownOpen] = useState(false);
-  const [doctor, setDoctor] = useState(null);
-  const [availability, setAvailability] = useState([]);
-  const param = useParams();
-  const [consultationDuration, setConsulationDuration] = useState("");
-  const id = param.doctorId;
-  const navigate = useNavigate();
-  const { setData } = useDate();
-  const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const api = useApiService();
-  const [processedAvailability, setProcessedAvailability] = useState(defaultAvailability);
-
   // FIXED: Properly memoize the date object
   const bookedSlotsDate = useMemo(() => {
     if (!selectedDate || !processedAvailability?.dates) return null;
-    
+
     // Find the dateObj from processedAvailability that matches selectedDate
-    const selectedDateObj = processedAvailability.dates.find(d => d.date === selectedDate);
-    
+    const selectedDateObj = processedAvailability.dates.find(
+      (d) => d.date === selectedDate
+    );
+
     if (!selectedDateObj || !selectedDateObj.dateObj) return null;
-    
+
     return selectedDateObj.dateObj;
   }, [selectedDate, processedAvailability]);
 
-  // Use the hook with memoized date
-  const { bookedSlots, isLoading: slotsLoading, error: slotsError } = useBookedSlots(id, bookedSlotsDate);
-  console.log(bookedSlots)
+  // Fetch all slots for the selected date from backend
+  const {
+    slots: allSlots,
+    isLoading: slotsLoading,
+    error: slotsError,
+  } = useSlots(id, bookedSlotsDate);
+
+  // Fetch booked slots for the selected date
+  const { bookedSlots, isLoading: bookedSlotsLoading } = useBookedSlots(
+    id,
+    bookedSlotsDate
+  );
+  console.log(allSlots)
+
+  // Combine loading states
+  const isLoadingSlots = slotsLoading || bookedSlotsLoading;
 
   // Calculate average rating from reviews
   const averageRating =
@@ -192,7 +196,8 @@ const DoctorProfile = ({
     const firstName = doctor?.firstName || "";
     const lastName = doctor?.lastName || "";
     const fullName = (firstName + " " + lastName).trim() || "Doctor";
-    const specialization = doctor?.professional?.specialization || "General Practice";
+    const specialization =
+      doctor?.professional?.specialization || "General Practice";
     const experience = doctor?.professional?.yearOfExp || 0;
     return `Dr. ${fullName} is an experienced ${specialization} practitioner with ${experience} years of 
     dedicated service. Specializing in comprehensive healthcare, the doctor provides personalized care focusing on evidence-based treatments 
@@ -202,101 +207,210 @@ const DoctorProfile = ({
   // Helper function to format location
   const formatLocation = (doctor) => {
     if (!doctor) return "";
-    const parts = [doctor?.locality, doctor?.city, doctor?.state].filter(Boolean);
+    const parts = [doctor?.locality, doctor?.city, doctor?.state].filter(
+      Boolean
+    );
     return parts.join(", ");
   };
 
-  const handleBookAppointment = () => {
-    const data = {
-      doctorId: doctor.doctorId,
-      doctorName: doctor.doctorName,
-      specialization: doctor.specialization,
-      selectedDate,
-      selectedPeriod,
-      selectedTimeSlot,
-    };
-    const specialization = doctor.specialization;
-    setData({ selectedDate, selectedTimeSlot, specialization, selectedPeriod });
-    navigate(`/appointment-details/${data.doctorId}`, { state: { data } });
+  const handleBookAppointment = async () => {
+    setError(""); // Clear any previous errors
+    
+    // Check if user is authenticated
+    if (!isAuthenticated) {
+      // Save appointment data to sessionStorage for after login
+      const appointmentData = {
+        doctorId: doctor?.doctorId || id,
+        doctorName: doctor?.firstName + " " + doctor?.lastName || doctor?.doctorName,
+        specialization: doctor?.professional?.specialization || doctor?.specialization,
+        selectedDate,
+        selectedPeriod,
+        selectedTimeSlot,
+        slotId: selectedSlotId,
+      };
+      
+      sessionStorage.setItem("pendingAppointment", JSON.stringify(appointmentData));
+      
+      // Redirect to login with return path
+      navigate("/auth/login", {
+        state: { from: { pathname: location.pathname } },
+      });
+      return;
+    }
+
+    // User is authenticated, proceed with booking
+    try {
+      const response = await api.post("/api/slots/lock", { slotId: selectedSlotId });
+      console.log(response);
+      if (response.success) {
+        const data = {
+          doctorId: doctor?.doctorId || id,
+          doctorName: doctor?.firstName + " " + doctor?.lastName || doctor?.doctorName,
+          specialization: doctor?.professional?.specialization || doctor?.specialization,
+          selectedDate,
+          selectedPeriod,
+          selectedTimeSlot,
+          slotId: selectedSlotId,
+        };
+        const specialization = doctor?.professional?.specialization || doctor?.specialization;
+        setData({
+          selectedDate,
+          selectedTimeSlot,
+          specialization,
+          selectedPeriod,
+          slotId: selectedSlotId,
+        });
+        navigate(`/appointment-details/${data.doctorId}`, { state: { data } });
+      }
+    } catch (err) {
+      console.log(err)
+      console.log("Error booking appointment:", err);
+      const errorMessage = err?.message || err?.data?.message || "Failed to book appointment. Please try again.";
+      setError(errorMessage);
+    }
   };
 
-  // FIXED: Get available time slots with proper slot comparison
+  // Get available time slots by filtering out booked slots from all slots
   const getAvailableTimeSlots = () => {
-    if (!selectedDate) return [];
-    
-    const selectedDateObj = processedAvailability?.dates?.find(d => d.date === selectedDate);
-    
+    if (!selectedDate || !allSlots || allSlots.length === 0) return [];
+
+    const selectedDateObj = processedAvailability?.dates?.find(
+      (d) => d.date === selectedDate
+    );
+
     if (!selectedDateObj || !selectedDateObj.available) {
       return [];
     }
-    
-    const slots = selectedDateObj.slots || [];
-    
-    // If there are no booked slots or still loading, return all slots
-    if (!bookedSlots || bookedSlots.length === 0) {
-      return slots;
-    }
-    
-    // Normalize both slot arrays to ensure consistent format comparison
-    const normalizedBookedSlots = bookedSlots.map(slot => {
-      // Remove seconds if present (e.g., "10:00:00" -> "10:00")
-      return slot.split(':').slice(0, 2).join(':');
-    });
-    
-    // Filter out booked slots
-    const availableSlots = slots.filter(slot => !normalizedBookedSlots.includes(slot));
-    
-    console.log("All Slots:", slots);
-    console.log("Booked Slots (normalized):", normalizedBookedSlots);
-    console.log("Available Slots:", availableSlots);
-    
-    return availableSlots;
-  };
 
-  const handlePeriodSelect = (period) => {
-    setSelectedPeriod(period.id);
-    setSelectedTimeSlot(null);
-    setIsPeriodDropdownOpen(false);
+    // Filter by status first (keep only available/open slots)
+    const statusAllowed = ["AVAILABLE", "OPEN", "FREE", undefined, null];
+    const statusFiltered = allSlots.filter((slot) =>
+      statusAllowed.includes(slot?.status)
+    );
+
+    // If there are no booked slots, return status-filtered slots
+    if (!bookedSlots || bookedSlots.length === 0) {
+      return statusFiltered;
+    }
+
+    // Normalize booked slots to HH:MM
+    const normalizedBookedSlots = bookedSlots.map((slot) => {
+      return slot.split(":").slice(0, 2).join(":");
+    });
+
+    // Filter out booked slots from status-filtered slots
+    const availableSlots = statusFiltered.filter((slot) => {
+      const normalizedSlotTime = (slot?.time || "")
+        .split(":")
+        .slice(0, 2)
+        .join(":");
+      return !normalizedBookedSlots.includes(normalizedSlotTime);
+    });
+
+    console.log("All Slots (from backend):", allSlots);
+    console.log("Booked Slots:", bookedSlots);
+    console.log("Available Slots (filtered):", availableSlots);
+
+    return availableSlots;
   };
 
   useEffect(() => {
     fetchDoctorDetails();
   }, [id]);
 
-  // Process availability data when it changes or consultation duration changes
+  // Process availability data when it changes
   useEffect(() => {
-    if (availability && availability.length > 0 && consultationDuration) {
-      const processed = processAvailabilityData(availability, parseInt(consultationDuration));
+    if (availability && availability.length > 0) {
+      const processed = processAvailabilityData(availability);
       setProcessedAvailability({ dates: processed });
 
-      // Auto-select first available date with slots
-      const firstAvailableWithSlots = processed.find(d => d.available && d.slots && d.slots.length > 0);
-      if (!selectedDate && firstAvailableWithSlots) {
-        setSelectedDate(firstAvailableWithSlots.date);
+      // Auto-select first available date
+      const firstAvailable = processed.find((d) => d.available);
+      if (!selectedDate && firstAvailable) {
+        setSelectedDate(firstAvailable.date);
       }
     }
-  }, [availability, consultationDuration]);
+  }, [availability]);
+
+  // Handle pending appointment after login
+  useEffect(() => {
+    const processPendingAppointment = async () => {
+      // Only process if user is authenticated and doctor data is loaded
+      if (!isAuthenticated || !doctor) return;
+
+      const pendingAppointmentStr = sessionStorage.getItem("pendingAppointment");
+      if (!pendingAppointmentStr) return;
+
+      try {
+        const pendingData = JSON.parse(pendingAppointmentStr);
+        
+        // Verify the appointment data matches current doctor
+        if (pendingData.doctorId !== (doctor?.doctorId || id)) {
+          sessionStorage.removeItem("pendingAppointment");
+          return;
+        }
+
+        // Set the selected values from pending appointment
+        setSelectedDate(pendingData.selectedDate);
+        setSelectedTimeSlot(pendingData.selectedTimeSlot);
+        setSelectedSlotId(pendingData.slotId);
+        setSelectedPeriod(pendingData.selectedPeriod);
+
+        // Execute the booking API call
+        setError("");
+        const response = await api.post("/api/slots/lock", { slotId: pendingData.slotId });
+        
+        if (response.success) {
+          const data = {
+            doctorId: doctor?.doctorId || id,
+            doctorName: doctor?.firstName + " " + doctor?.lastName || doctor?.doctorName,
+            specialization: doctor?.professional?.specialization || doctor?.specialization,
+            selectedDate: pendingData.selectedDate,
+            selectedPeriod: pendingData.selectedPeriod,
+            selectedTimeSlot: pendingData.selectedTimeSlot,
+            slotId: pendingData.slotId,
+          };
+          const specialization = doctor?.professional?.specialization || doctor?.specialization;
+          setData({
+            selectedDate: pendingData.selectedDate,
+            selectedTimeSlot: pendingData.selectedTimeSlot,
+            specialization,
+            selectedPeriod: pendingData.selectedPeriod,
+            slotId: pendingData.slotId,
+          });
+          
+          // Clear pending appointment
+          sessionStorage.removeItem("pendingAppointment");
+          
+          // Navigate to appointment details
+          navigate(`/appointment-details/${data.doctorId}`, { state: { data } });
+        }
+      } catch (err) {
+        console.log("Error processing pending appointment:", err);
+        const errorMessage = err?.message || err?.data?.message || "Failed to book appointment. Please try again.";
+        setError(errorMessage);
+        // Clear pending appointment on error so it doesn't retry indefinitely
+        sessionStorage.removeItem("pendingAppointment");
+      }
+    };
+
+    processPendingAppointment();
+  }, [isAuthenticated, doctor, id, api, navigate, setData]);
 
   const fetchDoctorDetails = async () => {
-    const body = {
-      doctorId: id,
-    };
     setIsLoading(true);
     try {
-      const response = await api.post(FETCH_DOCTOR_DATA, body);
+      const response = await api.get(`${FETCH_DOCTOR_DATA}/${id}`);
       const data = response?.data;
       setDoctor(data);
-      
+        
       let availData = data?.clinicInfos?.operatingHours;
-      let duration = data?.clinicInfos?.consultationDuration || 30;
 
       if (Array.isArray(availData)) {
         setAvailability(availData);
-      } else if (availData && typeof availData === 'object') {
+      } else if (availData && typeof availData === "object") {
         setAvailability([availData]);
       }
-      
-      setConsulationDuration(duration);
     } catch (err) {
       console.log("Error fetching doctor details:", err);
       setError(err.message);
@@ -313,8 +427,12 @@ const DoctorProfile = ({
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="bg-white rounded-lg p-8 text-center shadow-lg">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Doctor Not Found</h2>
-          <p className="text-gray-600">Unable to load doctor information. Please try again later.</p>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            Doctor Not Found
+          </h2>
+          <p className="text-gray-600">
+            Unable to load doctor information. Please try again later.
+          </p>
         </div>
       </div>
     );
@@ -379,10 +497,12 @@ const DoctorProfile = ({
                   <div className="flex items-start justify-between mb-4">
                     <div>
                       <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
-                        {doctor?.firstName + " " + doctor?.lastName || "Doctor Name"}
+                        {doctor?.firstName + " " + doctor?.lastName ||
+                          "Doctor Name"}
                       </h1>
                       <p className="text-blue-600 font-semibold text-lg mb-2">
-                        {doctor?.professional?.specialization || "General Practice"}
+                        {doctor?.professional?.specialization ||
+                          "General Practice"}
                       </p>
                     </div>
                     <div className="text-right">
@@ -406,7 +526,9 @@ const DoctorProfile = ({
                     {doctor?.clinicInfos?.clinicName && (
                       <div className="flex items-center gap-2 text-gray-600">
                         <Building2 className="w-4 h-4 text-blue-500" />
-                        <span className="text-sm">{doctor?.clinicInfos?.clinicName}</span>
+                        <span className="text-sm">
+                          {doctor?.clinicInfos?.clinicName}
+                        </span>
                       </div>
                     )}
                     {formatLocation(doctor) && (
@@ -519,100 +641,119 @@ const DoctorProfile = ({
               </h2>
 
               {/* Date Selection Dropdown */}
-              {processedAvailability?.dates && processedAvailability?.dates?.length > 0 && (
-                <div className="mb-6">
-                  <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-blue-500" />
-                    Select Date
-                  </h3>
-                  <div className="relative">
-                    <button
-                      onClick={() => setIsDateDropdownOpen(!isDateDropdownOpen)}
-                      className="w-full flex items-center justify-between p-3 border border-gray-300 rounded-lg text-left hover:border-blue-500 transition-colors"
-                    >
-                      <span
-                        className={
-                          selectedDate ? "text-gray-900" : "text-gray-500"
+              {processedAvailability?.dates &&
+                processedAvailability?.dates?.length > 0 && (
+                  <div className="mb-6">
+                    <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                      <Calendar className="w-4 h-4 text-blue-500" />
+                      Select Date
+                    </h3>
+                    <div className="relative">
+                      <button
+                        onClick={() =>
+                          setIsDateDropdownOpen(!isDateDropdownOpen)
                         }
+                        className="w-full flex items-center justify-between p-3 border border-gray-300 rounded-lg text-left hover:border-blue-500 transition-colors"
                       >
-                        {selectedDate || "Choose a date"}
-                      </span>
-                      {isDateDropdownOpen ? (
-                        <ChevronUp className="w-4 h-4 text-gray-400" />
-                      ) : (
-                        <ChevronDown className="w-4 h-4 text-gray-400" />
-                      )}
-                    </button>
+                        <span
+                          className={
+                            selectedDate ? "text-gray-900" : "text-gray-500"
+                          }
+                        >
+                          {selectedDate || "Choose a date"}
+                        </span>
+                        {isDateDropdownOpen ? (
+                          <ChevronUp className="w-4 h-4 text-gray-400" />
+                        ) : (
+                          <ChevronDown className="w-4 h-4 text-gray-400" />
+                        )}
+                      </button>
 
-                    {isDateDropdownOpen && (
-                      <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-10 max-h-64 overflow-y-auto scrollbar-thin">
-                        {processedAvailability?.dates.map((dateObj, index) => (
-                          <button
-                            key={index}
-                            onClick={() => {
-                              setSelectedDate(dateObj?.date);
-                              setIsDateDropdownOpen(false);
-                              setSelectedTimeSlot(null);
-                            }}
-                            disabled={!dateObj?.available}
-                            className={`w-full p-3 text-left hover:bg-gray-50 transition-colors first:rounded-t-lg last:rounded-b-lg ${
-                              selectedDate === dateObj.date
-                                ? "bg-blue-50 text-blue-600 font-medium"
-                                : dateObj?.available
-                                ? "text-gray-900"
-                                : "text-gray-400 cursor-not-allowed bg-gray-50"
-                            }`}
-                          >
-                            <div className="flex justify-between items-center">
-                              <span>{dateObj?.date}</span>
-                              <span className="text-xs text-gray-500">
-                                {dateObj?.available ? dateObj?.timeRange : "Closed"}
-                              </span>
-                            </div>
-                          </button>
-                        ))}
-                      </div>
-                    )}
+                      {isDateDropdownOpen && (
+                        <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-10 max-h-64 overflow-y-auto scrollbar-thin">
+                          {processedAvailability?.dates.map(
+                            (dateObj, index) => (
+                              <button
+                                key={index}
+                                onClick={() => {
+                                  setSelectedDate(dateObj?.date);
+                                  setIsDateDropdownOpen(false);
+                                  setSelectedTimeSlot(null);
+                                  setSelectedSlotId(null);
+                                  setError(""); // Clear error when date changes
+                                }}
+                                disabled={!dateObj?.available}
+                                className={`w-full p-3 text-left hover:bg-gray-50 transition-colors first:rounded-t-lg last:rounded-b-lg ${
+                                  selectedDate === dateObj.date
+                                    ? "bg-blue-50 text-blue-600 font-medium"
+                                    : dateObj?.available
+                                    ? "text-gray-900"
+                                    : "text-gray-400 cursor-not-allowed bg-gray-50"
+                                }`}
+                              >
+                                <div className="flex justify-between items-center">
+                                  <span>{dateObj?.date}</span>
+                                  <span className="text-xs text-gray-500">
+                                    {dateObj?.available
+                                      ? dateObj?.timeRange
+                                      : "Closed"}
+                                  </span>
+                                </div>
+                              </button>
+                            )
+                          )}
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
 
               {/* Time Slot Selection */}
-              {selectedDate && slotsLoading && (
+              {selectedDate && isLoadingSlots && (
                 <div className="mb-6 p-3 bg-blue-50 border border-blue-200 rounded-lg text-blue-800 text-sm">
                   Loading available slots...
                 </div>
               )}
 
-              {selectedDate && !slotsLoading && getAvailableTimeSlots().length > 0 && (
-                <div className="mb-6">
-                  <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-blue-500" />
-                    Available Times ({consultationDuration}min slots)
-                  </h3>
-                  <div className="grid grid-cols-3 gap-2">
-                    {getAvailableTimeSlots().map((time, index) => (
-                      <button
-                        key={index}
-                        onClick={() => setSelectedTimeSlot(time)}
-                        className={`p-2 rounded-lg text-xs font-medium transition-colors ${
-                          selectedTimeSlot === time
-                            ? "bg-blue-600 text-white"
-                            : "bg-gray-50 text-gray-700 hover:bg-blue-50"
-                        }`}
-                      >
-                        {time}
-                      </button>
-                    ))}
+              {selectedDate &&
+                !isLoadingSlots &&
+                getAvailableTimeSlots().length > 0 && (
+                  <div className="mb-6">
+                    <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                      <Clock className="w-4 h-4 text-blue-500" />
+                      Available Times
+                    </h3>
+                    <div className="grid grid-cols-3 gap-2">
+                      {getAvailableTimeSlots().map((slot, index) => (
+                        <button
+                          key={slot?.slotId || index}
+                          onClick={() => {
+                            setSelectedTimeSlot(slot?.time);
+                            setSelectedSlotId(slot?.slotId);
+                            setError(""); // Clear error when time slot changes
+                          }}
+                          className={`p-2 rounded-lg text-xs font-medium transition-colors ${
+                            selectedTimeSlot === slot?.time
+                              ? "bg-blue-600 text-white"
+                              : "bg-gray-50 text-gray-700 hover:bg-blue-50"
+                          }`}
+                        >
+                          {slot?.time}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
 
-              {selectedDate && !slotsLoading && getAvailableTimeSlots().length === 0 && (
-                <div className="mb-6 p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-800 text-sm">
-                  No available slots for this date. All slots are booked.
-                </div>
-              )}
+              {selectedDate &&
+                !isLoadingSlots &&
+                getAvailableTimeSlots().length === 0 && (
+                  <div className="mb-6 p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-800 text-sm">
+                    {slotsError
+                      ? "Failed to load slots. Please try again."
+                      : "No available slots for this date. All slots are booked."}
+                  </div>
+                )}
 
               {/* Consultation Fee */}
               <div className="bg-blue-50 rounded-lg p-4 mb-6">
@@ -621,13 +762,22 @@ const DoctorProfile = ({
                     Consultation Fee
                   </span>
                   <span className="text-2xl font-bold text-blue-600">
-                    ₹{doctor?.professional?.consultationFees || "Contact for pricing"}
+                    ₹
+                    {doctor?.professional?.consultationFees ||
+                      "Contact for pricing"}
                   </span>
                 </div>
               </div>
 
               {/* Contact Options */}
               <div className="space-y-3 mb-6">
+                {/* Error Message */}
+                {error && (
+                  <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-800 text-sm">
+                    {error}
+                  </div>
+                )}
+
                 <button
                   onClick={handleBookAppointment}
                   disabled={!selectedDate || !selectedTimeSlot}
@@ -666,9 +816,13 @@ const DoctorProfile = ({
                     Clinic Information
                   </h3>
                   <div className="text-sm text-gray-600 space-y-1">
-                    <p className="font-medium">{doctor?.clinicInfos?.clinicName}</p>
+                    <p className="font-medium">
+                      {doctor?.clinicInfos?.clinicName}
+                    </p>
                     {formatLocation(doctor) && <p>{formatLocation(doctor)}</p>}
-                    {doctor?.clinicInfos?.pincode && <p>PIN: {doctor?.clinicInfos?.pincode}</p>}
+                    {doctor?.clinicInfos?.pincode && (
+                      <p>PIN: {doctor?.clinicInfos?.pincode}</p>
+                    )}
                     <div className="flex items-center gap-1 text-green-600 mt-2">
                       <CheckCircle className="w-4 h-4" />
                       <span className="text-xs">Verified Clinic</span>

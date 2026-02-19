@@ -81,8 +81,7 @@ export const NotificationProvider = ({ children, userEmail }) => {
   const fetchNotifications = async (userEmail) => {
     try {
       const notifications = await notificationAPI.getUserNotifications(userEmail);
-      console.log("notifications", notifications)
-      dispatch({ type: 'SET_NOTIFICATIONS', payload: notifications });
+      dispatch({ type: 'SET_NOTIFICATIONS', payload: notifications?.data });
     } catch (error) {
       console.error('Error fetching notifications:', error);
       // Handle authentication errors

@@ -2,11 +2,11 @@ import React from "react";
 import { FaPeopleGroup } from "react-icons/fa6";
 import { Wallet, Ambulance } from "lucide-react";
 
-const DoctorDashboardStats = ({ totalBookings, todayBookings }) => {
+const DoctorDashboardStats = ({totalRevenue, totalBookings, todayBookings }) => {
   const resources = [
     {
       title: "Revenue",
-      count: `₹86`,
+      count: `₹ ${totalRevenue}`,
       desc: "Total generated revenue",
       icon: <Wallet />,
     },

@@ -38,9 +38,9 @@ const ActionMenu = ({
     toggle();
   };
 
-  // Don't show cancel option if appointment is already cancelled
-  const canCancel = appointment.status !== "Cancelled";
-  const canReschedule = appointment.status !== "Cancelled" && appointment.status !== "Completed";
+  // Don't show cancel option if appointment is already cancelled or completed
+  const canCancel = appointment.status !== "CANCELLED" && appointment.status !== "COMPLETED";
+  const canReschedule = appointment.status !== "CANCELLED" && appointment.status !== "COMPLETED";
 
   return (
     <div className="relative inline-block text-left" ref={menuRef}>
@@ -71,10 +71,10 @@ const ActionMenu = ({
               </button>
             )}
 
-            {appointment.status !== "Completed" && appointment.status !== "Cancelled" && (
+            {appointment.status !== "COMPLETED" && appointment.status !== "CANCELLED" && (
               <button
                 onClick={handleMarkCompletedClick}
-                className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 text-left transition-colors"
+                className="block w-full px-4 py-2 text-sm text-emerald-400 hover:bg-emerald-50 text-left transition-colors"
               >
                 Mark As Completed
               </button>

@@ -44,6 +44,7 @@ import DoctorOnboarding from "./component/DoctorComponent/DoctorOnboarding";
 import { useAuth } from "./component/GlobalComponent/AuthProvider";
 import UserLayout from "./layouts/UserLayout";
 import AfterReviewStep from "./component/DoctorComponent/AfterReviewStep";
+import { useAuthWithAxios } from "./hooks/useAuthWithAxios";
 
 const AppLayout = () => {
   const navigate = useNavigate();
@@ -76,6 +77,8 @@ const AppLayout = () => {
 const AppContent = () => {
   const { user } = useAuth();
   const email = user?.email;
+  // Initialize axios interceptors with auth functions
+  useAuthWithAxios();
   return (
     <NotificationProvider userEmail={email}>
       <Router future={{ v7_relativeSplatPath: true }}>

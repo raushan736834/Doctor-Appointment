@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import { useBookedSlots } from "../../hooks/useBookedSlots";
+import { useSlots } from "../../hooks/useSlots";
 import { useApiService } from "../../hooks/useAuthWithAxios";
 import { Calendar, Clock, Loader2, ChevronDown } from "lucide-react";
 
@@ -14,33 +15,94 @@ const AppointmentForm = ({
   const [selectedDate, setSelectedDate] = useState(today);
   const [selectedSlot, setSelectedSlot] = useState("");
   const [expandedPeriod, setExpandedPeriod] = useState(null);
-  const [doctorDetails, setDoctorDetails] = useState(null);
-  const [loadingDoctor, setLoadingDoctor] = useState(false);
-  const { bookedSlots, isLoading: slotsLoading } = useBookedSlots(
-    id,
-    selectedDate
-  );
+  const [operatingHours, setOperatingHours] = useState(null);
+  const [loadingOperatingHours, setLoadingDoctor] = useState(false);
+  const [operatingHoursError, setOperatingHoursError] = useState(null);
+
+  const {
+    slots: allSlots,
+    isLoading: slotsLoading,
+    error: slotsError,
+  } = useSlots(id, selectedDate);
+
   const api = useApiService();
 
   useEffect(() => {
-    if (id) {
+    if(id){
       fetchDoctorDetails();
     }
   }, [id]);
-
+  
   const fetchDoctorDetails = async () => {
+    setLoadingDoctor(true);
     try {
-      setLoadingDoctor(true);
-      const response = await api.post(`/api/public/getDoctor`, {
-        doctorId: id,
-      });
-      setDoctorDetails(response.data);
+      const response = await api.get(`/api/public/operatingHours/${id}`);
+      setOperatingHours(response.data);
     } catch (error) {
+      setOperatingHoursError(error.message);
       console.error("Error fetching doctor details:", error);
     } finally {
       setLoadingDoctor(false);
     }
+  }
+
+  // Convert 24-hour format (HH:MM) to 12-hour format (HH:MM AM/PM)
+  const convertTo12Hour = (time24) => {
+    if (!time24) return "";
+    const [hours, minutes] = time24.split(":").map(Number);
+    const hour12 = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
+    const meridian = hours >= 12 ? "PM" : "AM";
+    return `${hour12.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")} ${meridian}`;
   };
+
+  // Get available slots from API, filter out booked slots and past slots
+  const getAvailableSlots = useMemo(() => {
+    if (!selectedDate || !allSlots || allSlots.length === 0) return [];
+
+    const now = new Date();
+    const isToday = selectedDate.toDateString() === now.toDateString();
+
+    // Filter slots: only available/open slots, not booked, and not in the past (if today)
+    const availableSlots = allSlots
+      .filter((slot) => {
+        // Filter by status (only AVAILABLE, OPEN, FREE, or undefined/null)
+        const statusAllowed = ["AVAILABLE", "OPEN", "FREE", undefined, null];
+        if (!statusAllowed.includes(slot?.status)) return false;
+
+        // Check if slot is booked
+        const slotTime = slot?.time || "";        
+
+        // For today, filter out past slots
+        if (isToday && slotTime) {
+          const [hours, minutes] = slotTime.split(":").map(Number);
+          const slotDateTime = new Date(selectedDate);
+          slotDateTime.setHours(hours, minutes, 0, 0);
+          if (slotDateTime <= now) return false;
+        }
+
+        return true;
+      })
+      .map((slot) => ({
+        ...slot,
+        displayTime: convertTo12Hour(slot.time), // Add 12-hour format for display
+        originalTime: slot.time, // Keep original for comparison
+      }));
+
+    // Sort slots by time
+    return availableSlots.sort((a, b) => {
+      const [aHours, aMins] = a.originalTime.split(":").map(Number);
+      const [bHours, bMins] = b.originalTime.split(":").map(Number);
+      return aHours * 60 + aMins - (bHours * 60 + bMins);
+    });
+  }, [selectedDate, allSlots]);
+
+  // Reset selected slot when date changes
+  useEffect(() => {
+    if (selectedDate) {
+      setSelectedSlot("");
+      setExpandedPeriod(null);
+    }
+  }, [selectedDate]);
 
   const handleDateChange = (date) => {
     setSelectedDate(date);
@@ -51,7 +113,10 @@ const AppointmentForm = ({
   const handleSlotChange = (slot) => {
     setSelectedSlot(slot);
     if (isReschedule && onSelectionChange) {
-      // Format date in local timezone to avoid UTC conversion issues
+      // Find the slot object to get the slotId and time
+      const slotObj = getAvailableSlots.find(s => s.displayTime === slot);
+      
+      // Format date in YYYY-MM-DD format
       const year = selectedDate.getFullYear();
       const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
       const day = String(selectedDate.getDate()).padStart(2, '0');
@@ -59,106 +124,47 @@ const AppointmentForm = ({
       
       onSelectionChange({
         appointmentId,
-        newDate: formattedDate,
-        newTime: slot,
+        slotId: slotObj?.slotId,
+        slotTime: slotObj?.originalTime || slotObj?.time, // 24-hour format time
+        slotDate: formattedDate, // YYYY-MM-DD format date
+        displayTime: slot, // 12-hour format for display
       });
     }
   };
 
-  const generateTimeSlots = (startTime, endTime, duration) => {
-    const slots = [];
-    const [startHour, startMin] = startTime.split(":").map(Number);
-    const [endHour, endMin] = endTime.split(":").map(Number);
-
-    let currentHour = startHour;
-    let currentMin = startMin;
-
-    const endTimeInMinutes = endHour * 60 + endMin;
-
-    while (currentHour * 60 + currentMin < endTimeInMinutes) {
-      const hour12 =
-        currentHour === 0
-          ? 12
-          : currentHour > 12
-          ? currentHour - 12
-          : currentHour;
-      const meridian = currentHour >= 12 ? "PM" : "AM";
-      const timeStr = `${hour12.toString().padStart(2, "0")}:${currentMin
-        .toString()
-        .padStart(2, "0")} ${meridian}`;
-      slots.push(timeStr);
-
-      currentMin += parseInt(duration);
-      if (currentMin >= 60) {
-        currentHour += Math.floor(currentMin / 60);
-        currentMin = currentMin % 60;
-      }
-    }
-
-    return slots;
-  };
-
-  const getAvailableSlots = () => {
-    if (!doctorDetails || !selectedDate) return [];
-
-    const dayName = selectedDate
-      .toLocaleDateString("en-US", { weekday: "long" })
-      .toUpperCase();
-    const daySchedule = doctorDetails.clinicInfos.operatingHours.find(
-      (oh) => oh.days === dayName
-    );
-
-    if (!daySchedule || daySchedule.isClosedToday) return [];
-
-    const allSlots = generateTimeSlots(
-      daySchedule.open,
-      daySchedule.close,
-      parseInt(doctorDetails.clinicInfos.consultationDuration)
-    );
-
-    const now = new Date();
-    const isToday = selectedDate.toDateString() === now.toDateString();
-
-    return allSlots.filter((slot) => {
-      // Check if slot is booked
-      if (bookedSlots.includes(slot)) return false;
-
-      // For today, filter out past slots
-      if (isToday) {
-        const [time, meridian] = slot.split(" ");
-        let [hours, minutes] = time.split(":").map(Number);
-        if (meridian === "PM" && hours !== 12) hours += 12;
-        if (meridian === "AM" && hours === 12) hours = 0;
-
-        const slotTime = new Date(selectedDate);
-        slotTime.setHours(hours, minutes, 0, 0);
-
-        return slotTime > now;
-      }
-
-      return true;
-    });
-  };
-
-  if (loadingDoctor) {
-    return (
-      <div className="flex justify-center items-center py-12">
-        <Loader2 className="w-10 h-10 text-blue-600 animate-spin" />
-      </div>
-    );
-  }
 
   const DatePickerComponent = ({
     selectedDate,
     onDateChange,
     today,
     operatingHours,
+    loadingOperatingHours,
   }) => {
+    if (loadingOperatingHours) {
+      return (
+        <div className="flex justify-center items-center py-8">
+          Loading available slots...
+        </div>
+      );
+    }
+    if (operatingHoursError) {
+      return (
+        <div className="text-center py-8">
+          <p className="text-gray-600 font-medium">
+            Error loading operating hours
+          </p>
+        </div>
+      );
+    }
     const isDayDisabled = (date) => {
+      // If operating hours are not available, don't disable any days
+      // The API will only return slots for available days anyway
+      if (!operatingHours || !Array.isArray(operatingHours)) return false;
+      
       const dayName = date
         .toLocaleDateString("en-US", { weekday: "long" })
         .toUpperCase();
-      const daySchedule = operatingHours?.find((oh) => oh.days === dayName);
+      const daySchedule = operatingHours.find((oh) => oh.days === dayName);
       return daySchedule?.isClosedToday || false;
     };
 
@@ -381,10 +387,11 @@ const AppointmentForm = ({
         selectedDate={selectedDate}
         onDateChange={handleDateChange}
         today={today}
-        operatingHours={doctorDetails?.clinicInfos?.operatingHours}
+        operatingHours={operatingHours}
+        loadingOperatingHours={loadingOperatingHours}
       />
       <SlotSelector
-        availableSlots={getAvailableSlots()}
+        availableSlots={getAvailableSlots.map(slot => slot.displayTime)}
         selectedSlot={selectedSlot}
         handleSlotChange={handleSlotChange}
         isLoading={slotsLoading}

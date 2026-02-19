@@ -16,20 +16,14 @@ import {
   GraduationCap,
   Edit3,
 } from "lucide-react";
-import {
-  Link,
-  useNavigate,
-  useParams,
-} from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import useDate from "../../hooks/useDate";
-import { format } from "date-fns";
-import { AppointmentStatus } from "../../constants/slots";
 import useRazorpayScript from "../../hooks/useRazorpayScript";
 import { useApiService, useAuthWithAxios } from "../../hooks/useAuthWithAxios";
 import { CoolLoader } from "../Common/LoaderApp";
 
 const FETCH_DOCTOR_DATA = "/api/public/getDoctor";
-const BOOKED_URL = "/appointment/book-appointment";
+const BOOKED_URL = "/appointment/user/book-appointment";
 
 const AppointmentDetails = () => {
   const api = useApiService();
@@ -39,11 +33,9 @@ const AppointmentDetails = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { data } = useDate();
   const date = data.selectedDate;
-  console.log(date);
   const time = data.selectedTimeSlot;
-  console.log(time)
+  const slotId = data.slotId;
   const [specialization, setSpecialization] = useState("");
-  console.log(specialization);
   const [doctorData, setDoctorData] = useState({});
   const { id } = useParams();
   const [selectedPatient, setSelectedPatient] = useState("myself");
@@ -57,19 +49,18 @@ const AppointmentDetails = () => {
   useRazorpayScript();
 
   const fetchDoctorDetails = async () => {
-    const body = {
-      doctorId : id
-    };
     setIsLoading(true);
     try {
-      const response = await api.post(FETCH_DOCTOR_DATA, body);
-      if(response?.success){
-        const data = response?.data;
-        setDoctorData(data);
-        setSpecialization(data?.professional?.specialization);
-      }
+      const response = await api.get(`${FETCH_DOCTOR_DATA}/${id}`);
+      const data = response?.data;
+      setDoctorData(data);
+      setSpecialization(data?.professional?.specialization);
     } catch (err) {
-      setError(err.message);
+      // Handle thrown errors (including 403 and other backend errors)
+      const errorMessage = err.message || `Failed to fetch doctor details`;
+      setError(errorMessage);
+      setErrMsg(errorMessage);
+      console.error('Error fetching doctor details:', err);
     } finally {
       setIsLoading(false);
     }
@@ -119,23 +110,14 @@ const AppointmentDetails = () => {
 
     try {
       const receipt = uuid();
-      // Add current year to the date before formatting
-      const currentYear = new Date().getFullYear();
-      const dateWithYear = new Date(`${date} ${currentYear}`);
-      const formattedDate = format(dateWithYear, "yyyy-MM-dd");
       const appointmentId = uuid();
 
       const appointmentBooking = {
-        appointmentId,
         email: selectedPatient === "myself" ? email : formData.patientEmail,
-        status: AppointmentStatus.BOOKED,
-        time,
-        date: formattedDate,
         fullName:
           selectedPatient === "myself"
             ? formData.fullName
             : formData.patientFullName,
-        doctor: { doctorId: id },
         patientEmail:
           selectedPatient === "someone-else" ? formData.patientEmail : "",
         selectedPayment:
@@ -157,7 +139,7 @@ const AppointmentDetails = () => {
           "/api/payment/create-order",
           paymentInitData
         );
-        const { orderId, amount, currency, key } = razorResponse.data;
+        const { orderId, amount, currency, key } = razorResponse?.data;
 
         if (!window.Razorpay) {
           setErrMsg("Razorpay SDK not loaded");
@@ -190,34 +172,46 @@ const AppointmentDetails = () => {
               verificationData
             );
 
-            if (verifyResponse.data.status !== "success") {
+            if (!verifyResponse?.success) {
               setErrMsg("Payment verification failed!");
+              setIsSubmitting(false);
+              setIsLoading(false);
               return;
             }
 
-            const body = {
-              formData: appointmentBooking,
-              payment: {
-                receiptId: receipt,
-                paymentId: razorpay_payment_id,
-                orderId: razorpay_order_id,
-                doctorId: id,
-              },
-            };
+            try {
+              const body = {
+                slotId: slotId,
+                formData: appointmentBooking,
+                payment: {
+                  receiptId: receipt,
+                  paymentId: razorpay_payment_id,
+                  orderId: razorpay_order_id,
+                  doctorId: id,
+                },
+              };
 
-            console.log("Sending payload:", body);
-            setIsLoading(true);
-            const res = await api.post(BOOKED_URL, body);
-            console.log("Booking response:", res);
-            navigate("/thankyou", {
-              state: {
-                date,
-                time,
-                doctorName: doctorData?.firstName +" "+ doctorData?.lastName,
-                clinicName: doctorData?.clinicInfos?.clinicName,
-              },
-              replace: true
-            });
+              console.log("Sending payload:", body);
+              setIsLoading(true);
+              await api.post(BOOKED_URL, body);
+              console.log("Booking successful");
+              navigate("/thankyou", {
+                  state: {
+                    date,
+                    time,
+                    doctorName:
+                      doctorData?.firstName + " " + doctorData?.lastName,
+                    clinicName: doctorData?.clinicInfos?.clinicName,
+                  },
+                  replace: true,
+                });
+            } catch (err) {
+              console.error("Booking error:", err);
+              const errorMessage = err.message || `Booking failed (Status: ${err.status || 'Unknown'})`;
+              setErrMsg(errorMessage);
+              setIsSubmitting(false);
+              setIsLoading(false);
+            }
           },
           prefill: {
             name: appointmentBooking.fullName,
@@ -244,33 +238,42 @@ const AppointmentDetails = () => {
         rzp.open();
       } else {
         // Pay at Clinic flow
-        const body = {
-          formData: appointmentBooking,
-          payment: null,
-        };
+        try {
+          const body = {
+            slotId: slotId,
+            formData: appointmentBooking,
+            payment: null,
+          };
 
-        console.log("Sending payload:", body);
-        const res = await api.post(BOOKED_URL, body);
-        console.log("Booking response:", res);
-        navigate("/thankyou", {
-          state: {
-            date,
-            time,
-            doctorName: doctorData?.firstName +" "+ doctorData?.lastName,
-            clinicName: doctorData?.clinicInfos?.clinicName,
-          },
-          replace : true
-        });
+          console.log("Sending payload:", body);
+          await api.post(BOOKED_URL, body);
+          console.log("Booking successful");
+          navigate("/thankyou", {
+            state: {
+              date,
+              time,
+              doctorName: doctorData?.firstName + " " + doctorData?.lastName,
+              clinicName: doctorData?.clinicInfos?.clinicName,
+            },
+            replace: true,
+          });
+        } catch (err) {
+          console.error("Booking error:", err);
+          const errorMessage = err.message || `Booking failed (Status: ${err.status || 'Unknown'})`;
+          setErrMsg(errorMessage);
+          setIsSubmitting(false);
+          setIsLoading(false);
+        }
       }
     } catch (err) {
-      console.error(err);
-      setErrMsg(
-        err?.response?.status === 500
-          ? "Internal Server Error"
-          : "Booking Failed"
-      );
+      console.error("Error in handleSubmit:", err);
+      const errorMessage = err.message || 
+                          (err.status === 500 
+                            ? "Internal Server Error" 
+                            : `Booking Failed (Status: ${err.status || 'Unknown'})`);
+      setErrMsg(errorMessage);
       errRef.current?.focus();
-    } finally {      
+    } finally {
       setIsSubmitting(false);
       setIsLoading(false);
     }
@@ -363,7 +366,7 @@ const AppointmentDetails = () => {
                     <div className="w-24 h-24 bg-gradient-to-br from-blue-100 to-purple-100 rounded-2xl overflow-hidden flex-shrink-0 shadow-lg">
                       {defaultImage ? (
                         <img
-                          src={ defaultImage || doctorData.profilePhoto}
+                          src={defaultImage || doctorData.profilePhoto}
                           alt={doctorData.doctorName}
                           className="w-full h-full object-cover"
                           onError={(e) => {
@@ -420,7 +423,8 @@ const AppointmentDetails = () => {
                         {doctorData?.clinicInfos?.clinicName}
                       </p>
                       <p className="text-gray-600">
-                        {doctorData?.clinicInfos?.clinicAddress}, {doctorData?.clinicInfos?.clinicCity}
+                        {doctorData?.clinicInfos?.clinicAddress},{" "}
+                        {doctorData?.clinicInfos?.clinicCity}
                       </p>
                       <div className="flex items-center gap-2 mt-3">
                         <CheckCircle className="w-4 h-4 text-green-500" />

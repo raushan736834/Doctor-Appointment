@@ -16,9 +16,11 @@ const DoctorDashboard = () => {
   const { user } = useAuthWithAxios();
   const doctorId = user.doctorId || "";
   const name = user?.fullname?.split(" ")[0];
+  const consultationFees = user?.consultationFees;
   const [todayAppointments, setTodayAppointments] = useState([]);
   const [totalAppointmentsLength, setTotalAppointmentsLength] = useState(0);
-
+  const [totalRevenue, setTotalRevenue] = useState(0);
+  
   const [paginationInfo, setPaginationInfo] = useState({
     totalElements: 0,
     totalPages: 0,
@@ -32,31 +34,38 @@ const DoctorDashboard = () => {
   const fetchAllAppointment = async () => {
     try {
       const response = await api.get(
-        `/appointment/doctorAllAppointment/${doctorId}`
+        `/appointment/doctor/appointment-count/${doctorId}`
       );
       setTotalAppointmentsLength(response.data || 0);
+      setTotalRevenue(response.data * consultationFees || 0);
     } catch (error) {
       console.error("Error fetching total appointments:", error);
       setTotalAppointmentsLength(0);
     }
   };
-  console.log(todayAppointments);
+  
   const fetchTodayAppointment = async (
     currentPage = 0,
     size = ITEMS_PER_PAGE
   ) => {
     setIsLoading(true);
+    const today = new Date().toISOString().split("T")[0];
+    const params = new URLSearchParams();
+    params.append("startDate", today);
+    params.append("endDate", today);
+    params.append("page", currentPage);
+    params.append("size", size);
+    const statuses = ["BOOKED", "RESCHEDULED"];
+    statuses.forEach((status) => params.append("statuses", status));
 
     try {
       const response = await api.get(
-        `/appointment/doctorAppointment/${doctorId}?page=${currentPage}&size=${size}`
+        `/appointment/doctor/appointments/${doctorId}?${params.toString()}`
       );
 
-      const { totalElements, totalPages, number, first, last } =
-        response.data.page;
-      const { appointmentBookingList } = response?.data?._embedded;
-
-      setTodayAppointments(appointmentBookingList || []);
+      const { totalElements, totalPages, number, first, last } = response.data.page;
+    
+      setTodayAppointments(response?.data?.content || []);
       setPaginationInfo({
         totalElements: totalElements || 0,
         totalPages: totalPages || 0,
@@ -79,6 +88,7 @@ const DoctorDashboard = () => {
     } finally {
       setIsLoading(false);
     }
+
   };
 
   useEffect(() => {
@@ -114,6 +124,7 @@ const DoctorDashboard = () => {
 
       {/* Dashboard Stats */}
       <DoctorDashboardStats
+        totalRevenue={totalRevenue}
         totalBookings={totalAppointmentsLength}
         todayBookings={todayAppointments.length}
       />
@@ -178,19 +189,19 @@ const DoctorDashboard = () => {
               >
                 <div className="font-medium">
                   <span className="md:hidden font-semibold">Date: </span>
-                  {appt?.date}
+                  {appt?.appointmentDate}
                 </div>
                 <div>
                   <span className="md:hidden font-semibold">Time: </span>
-                  {appt?.time}
+                  {appt?.appointmentTime}
                 </div>
                 <div>
                   <span className="md:hidden font-semibold">Patient: </span>
-                  {appt?.fullName}
+                  {appt?.patientName}
                 </div>
                 <div className="text-purple-600 font-medium">
                   <span className="md:hidden font-semibold">Reason: </span>
-                  {appt?.selectedPayment}
+                  {appt?.paymentType}
                 </div>
                 <div>
                   <span className="md:hidden font-semibold">Status: </span>

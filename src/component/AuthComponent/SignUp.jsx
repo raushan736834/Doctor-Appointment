@@ -103,8 +103,7 @@ const SignUp = () => {
               password: values.password,
               roles: values.roles, // user or doctor
             };
-            console.log(userData)
-            debugger;
+            
             const response = await api.post(REGISTER_URL, userData);
             console.log(response);
 

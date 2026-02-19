@@ -1,140 +1,8 @@
-// // import { createContext, useState,useEffect } from "react";
-// // import OverlayLoader from "../Common/Loader";
-
-// // const AuthContext = createContext({});
-
-// // export const AuthProvider = ({ children }) => {
-// //   const [auth, setAuth] = useState({
-// //     accessToken:localStorage.getItem('token') || null,
-// //   });
-// //   const [isLoading,setIsLoading]=useState(false);
-// //   return (
-// //     <AuthContext.Provider value={{ auth, setAuth , isLoading,setIsLoading}}>
-// //       {children}
-// //       {isLoading &&
-// //         <OverlayLoader/>
-// //       }
-// //     </AuthContext.Provider>
-// //   );
-// // };
-
-// // export default AuthContext;
-// import { createContext, useState, useEffect } from "react";
-
-// Create AuthContext with clear structure
-// const AuthContext = createContext({});
-
-// export const AuthProvider = ({ children }) => {
-//   const [auth, setAuth] = useState({
-//     accessToken: localStorage.getItem("token") || null,
-//   });
-
-//   const [isLoading, setIsLoading] = useState(false);
-
-//   useEffect(() => {
-//     if (auth.accessToken) {
-//       localStorage.setItem("token", auth.accessToken);
-//     } else {
-//       localStorage.removeItem("token");
-//     }
-//   }, [auth.accessToken]);
-
-//   return (
-//     <AuthContext.Provider value={{ auth, setAuth, isLoading, setIsLoading }}>
-//       {children}
-//     </AuthContext.Provider>
-//   );
-// };
-
-// export default AuthContext;
-
-
-// AuthContext.jsx
-// import { createContext, useState, useEffect, useCallback } from "react";
-// import useAxios from "../../hooks/useAxios";
-
-// const AuthContext = createContext({});
-
-// export const AuthProvider = ({ children }) => {
-//   const [auth, setAuth] = useState(null); // {accessToken,email,role,fullname,doctorId,accountStatus}
-//   const [isLoading, setIsLoading] = useState(true);
-//   const [isAuthenticated, setIsAuthenticated] = useState(false);
-//   const api = useAxios();
-//   const accessToken = auth?.accessToken;
-//   // On app start, try to restore user from server if you're using httpOnly cookie refresh token
-//   useEffect(() => {
-//     (async () => {
-//       try {
-//         if (accessToken) {
-//           // If we have an access token, set it immediately
-//           setAuth({
-//             accessToken: accessToken,
-//           });
-//           setIsAuthenticated(true);
-//         }
-//         {console.log(auth)}
-//         // Try to get user info from server
-//         const res = await api.get("/auth/me");
-//         console.log("Auth me response:", res);
-        
-//         if (res.data) {
-//           const roles = (res.data.roles || "").split(",").map(r => r.trim());
-          
-//           setAuth(prev => ({
-//             ...prev,
-//             accessToken: accessToken || prev?.accessToken,
-//             email: res.data.email,
-//             role: roles,
-//             fullname: res.data.fullname,
-//           }));
-          
-//           if (roles.includes("DOCTOR")) {
-//             setAuth(prev => ({
-//               ...prev,
-//               doctorId: res.data?.doctorId,
-//               accountStatus: res.data?.accountStatus,
-//             }));
-//           }
-          
-//           setIsAuthenticated(true);
-//           console.log("Authentication successful:", auth);
-//         }
-//       } catch (err) {
-//         console.log("Authentication failed:", err);
-//         setAuth(null);
-//         setIsAuthenticated(false);
-//       } finally {
-//         setIsLoading(false);
-//       }
-//     })();
-//   }, [isAuthenticated]);
-
-//   const logout = useCallback(async () => {
-//     try {
-//       await api.post("/auth/logout");
-//     } catch (e) {
-//       // ignore logout error and clear client state anyway
-//     } finally {
-//       setAuth(null);
-//       setIsAuthenticated(false);
-//     }
-//   }, []);
-
-//   return (
-//     <AuthContext.Provider value={{ auth, setAuth, isLoading, setIsLoading, isAuthenticated, setIsAuthenticated, logout }}>
-//       {children}
-//     </AuthContext.Provider>
-//   );
-// };
-
-// export default AuthContext;
-
 import axiosInstance from '../../config/axiosConfig';
 import React, { createContext, useContext, useReducer, useEffect, useCallback } from 'react';
 
 const AuthContext = createContext();
 
-// Auth reducer for managing authentication state
 const authReducer = (state, action) => {
   switch (action.type) {
     case 'LOGIN_SUCCESS':
@@ -158,6 +26,7 @@ const authReducer = (state, action) => {
     case 'TOKEN_REFRESH_SUCCESS':
       return {
         ...state,
+        isAuthenticated: true, // Explicitly ensure isAuthenticated remains true
         accessToken: action.payload.accessToken,
         error: null
       };
@@ -207,15 +76,15 @@ export const AuthProvider = ({ children }) => {
       try {
         dispatch({ type: 'SET_LOADING', payload: true });
   
-        // Fix: axiosInstance.get takes (url, config) not (url, data, config)
-        const { data } = await axiosInstance.get('/auth/me', { withCredentials: true });
+        const response = await axiosInstance.get('/auth/me', { withCredentials: true });
+        const { data } = response?.data;
           
         if (data?.accessToken) {
           dispatch({
             type: 'LOGIN_SUCCESS',
             payload: {
               accessToken: data.accessToken,
-              user: data // This contains email, fullname, roles, etc.
+              user: data 
             }
           });
         } else {
@@ -235,7 +104,9 @@ export const AuthProvider = ({ children }) => {
       dispatch({ type: 'SET_LOADING', payload: true });
       dispatch({ type: 'CLEAR_ERROR' });
 
-      const { data } = await axiosInstance.post('/auth/login', { email, password }, { withCredentials: true });
+      const response = await axiosInstance.post('/auth/login', { email, password }, { withCredentials: true });
+      console.log(response);
+      const { data } = response?.data;
       if (data?.accessToken) {
         dispatch({
           type: 'LOGIN_SUCCESS',
@@ -272,17 +143,29 @@ export const AuthProvider = ({ children }) => {
 
   const refreshToken = useCallback(async () => {
     try {
-      const { data } = await axiosInstance.post('/auth/refresh-token', {}, { withCredentials: true });
-      if (data?.accessToken) {
+      console.log('Attempting to refresh access token...');
+      const response = await axiosInstance.post('/auth/refresh-token', {}, { withCredentials: true });
+      
+      // Response structure: { data: { success: true, message: "...", data: "token_string", status: 200 } }
+      const responseData = response?.data;
+      const token = responseData?.data; // The token is directly in response.data.data
+      
+      if (token && typeof token === 'string' && responseData?.success) {
+        console.log('Token refresh successful');
         dispatch({
           type: 'TOKEN_REFRESH_SUCCESS',
-          payload: { accessToken: data.accessToken }
+          payload: { accessToken: token }
         });
-        return data.accessToken;
+        return token;
       }
+      console.warn('Token refresh returned no access token or unsuccessful response');
       dispatch({ type: 'TOKEN_REFRESH_FAILED' });
       return null;
     } catch (error) {
+      console.error('Token refresh error:', error.response?.status, error.response?.data);
+      // Only dispatch TOKEN_REFRESH_FAILED - don't call logout here
+      // The logout will be handled by RequireAuth redirecting to login
+      // or by the component that catches the error
       dispatch({ type: 'TOKEN_REFRESH_FAILED' });
       return null;
     }

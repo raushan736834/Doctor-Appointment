@@ -31,11 +31,7 @@ class WebSocketService {
         Authorization: `Bearer ${accessToken}`,
         userEmail: userEmail,
       },
-      // Debug output
-      debug: (str) => {
-        console.log('STOMP Debug:', str);
-      },
-      
+          
       // Reconnect configuration
       reconnectDelay: 5000,
       heartbeatIncoming: 4000,
@@ -43,7 +39,6 @@ class WebSocketService {
       
       // Connection callback
       onConnect: (frame) => {
-        console.log('Connected to WebSocket server:', frame);
         this.connected = true;
         this.reconnectAttempts = 0;
 
@@ -53,7 +48,6 @@ class WebSocketService {
           (message) => {
             try {
               const notification = JSON.parse(message.body);
-              console.log('Received notification:', notification);
               onNotificationReceived(notification);
             } catch (error) {
               console.error('Error parsing notification:', error);
@@ -64,13 +58,10 @@ class WebSocketService {
             id: `sub-${userEmail}`,
           }
         );
-
-        console.log('Subscribed to notifications for:', userEmail);
       },
 
       // Disconnection callback
       onDisconnect: (frame) => {
-        console.log('Disconnected from WebSocket server:', frame);
         this.connected = false;
         if (this.subscription) {
           this.subscription.unsubscribe();

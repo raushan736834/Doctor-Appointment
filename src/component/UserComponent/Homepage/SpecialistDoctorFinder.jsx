@@ -32,13 +32,8 @@ const SpecialistDoctorsFinder = ({isLoading, setIsLoading}) => {
     try {
       const url = `/api/public/search?keyword=${encodeURIComponent(specialist)}`;
       const response = await api.get(url);
-      const json = response?.data?.data;
-      const list = Array.isArray(json)
-        ? json
-        : Array.isArray(json?.results)
-        ? json.results
-        : [];
-      setDoctor(list);
+      const json = response?.data || [];
+      setDoctor(json);
     } catch (error) {
       console.error("Error fetching doctors:", error);
       setErr("Failed to load doctors. Please try again later.");
@@ -51,13 +46,8 @@ const SpecialistDoctorsFinder = ({isLoading, setIsLoading}) => {
   const fetchSpecialist = async () => {
     try {
       const response = await api.get(SPECIALIST_URL);
-      const data = response?.data;
-      const list = Array.isArray(data)
-        ? data
-        : Array.isArray(data?.specialists)
-        ? data.specialists
-        : [];
-      setSpecialties(list);
+      const json = response?.data || [];
+      setSpecialties(json);
     } catch (error) {
       console.error("Error fetching specialists:", error);
       setErr("Failed to load specialists. Please try again later.");

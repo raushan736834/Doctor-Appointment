@@ -3,14 +3,13 @@ import { useToast } from "@chakra-ui/react";
 import ActionMenu from "./ActionMenu";
 import RescheduleModal from "./RescheduleModal";
 import CancelReasonModal from "./CancelReasonModal";
-import { cancelAppointmentByDoctor } from "../../constants/Method";
-import { useAuth } from "../GlobalComponent/AuthProvider";
+import { cancelAppointmentByDoctor, markAppointmentAsCompleted } from "../../constants/Method";
 import { CalendarX, ChevronLeft, ChevronRight, ListFilter } from "lucide-react";
 import FilterDateComponent from "./FilterDateComponent";
 import OverlayLoader from "../Common/Loader";
-import { AppointmentStatus } from "../../constants/slots";
+import { AppointmentStatus, ROLES } from "../../constants/slots";
 import { useApiService, useAuthWithAxios } from "../../hooks/useAuthWithAxios";
-
+import MarkAppointmentCompleteModal from "./MarkAppointmentCompleteModal";
 const tabs = ["Appointment", "Completed", "Rescheduled", "Cancelled"];
 
 const ITEMS_PER_PAGE = 5;
@@ -26,6 +25,7 @@ export default function Appointments() {
     to: today,
   });
   const [showCancelModal, setShowCancelModal] = useState(false);
+  const [showMarkCompletedModal, setShowMarkCompletedModal] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [isCancelling, setIsCancelling] = useState(false);
   const { user } = useAuthWithAxios();
@@ -75,16 +75,13 @@ export default function Appointments() {
     setIsLoading(true);
     try {
       const response = await api.get(
-        `/appointment/doctorAppointment/${doctorId}?${params.toString()}`
+        `/appointment/doctor/appointments/${doctorId}?${params.toString()}`
       );
 
       const {  totalElements, totalPages, number, first, last } =
-        response.data.page;
+        response.data.page;      
 
-      const { appointmentBookingList } = response?.data?._embedded;
-      
-
-      setTodayAppointments(appointmentBookingList || []);
+      setTodayAppointments(response?.data?.content || []);
       setPaginationInfo({
         totalElements: totalElements || 0,
         totalPages: totalPages || 0,
@@ -113,7 +110,7 @@ export default function Appointments() {
     if (doctorId) {
       fetchTodayAppointment(0, pageSize, activeTab);
     }
-  }, [doctorId, dateRange, activeTab]);
+  }, [doctorId, dateRange, activeTab, pageSize]);
 
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
@@ -127,11 +124,24 @@ export default function Appointments() {
     setOpenMenuIndex(null);
   };
 
-  const handleRescheduleSuccess = () => {
-    console.log("Appointment rescheduled successfully");
+  const handleRescheduleSuccess = async (updatedAppointment) => {
+    console.log("Appointment rescheduled successfully", updatedAppointment);
     setShowRescheduleModal(false);
     setSelectedAppointment(null);
-    // Refresh appointments list here if needed
+    
+    // Update the appointments list to reflect the rescheduling
+    if (updatedAppointment) {
+      setTodayAppointments((prevList) =>
+        prevList.map((appt) =>
+          appt.appointmentId === updatedAppointment.appointmentId
+            ? updatedAppointment
+            : appt
+        )
+      );
+    }
+    
+    // Refresh appointments list to ensure data consistency
+    await fetchTodayAppointment(currentPage, pageSize, activeTab);
   };
 
   const handleCloseRescheduleModal = () => {
@@ -151,37 +161,39 @@ export default function Appointments() {
 
     setIsCancelling(true);
 
-    const success = await cancelAppointmentByDoctor(
-      selectedAppointment,
-      cancelReason,
-      toast,
-      setIsLoading,
-      api,
-      (appointment, reason) => {
-        // Success callback
-        console.log(`Appointment cancelled successfully. Reason: ${reason}`);
+    try {
+      await cancelAppointmentByDoctor(
+        selectedAppointment,
+        cancelReason,
+        toast,
+        setIsLoading,
+        api,
+        (appointment, reason) => {
+          // Success callback
+          console.log(`Appointment cancelled successfully. Reason: ${reason}`);
 
-        // Update the appointments list to reflect the cancellation
-        setTodayAppointments((prevList) =>
-          prevList.map((appt) =>
-            appt.appointmentId === appointment.appointmentId
-              ? { ...appt, status: "CANCELLED", reason: reason }
-              : appt
-          )
-        );
+          // Update the appointments list to reflect the cancellation
+          setTodayAppointments((prevList) =>
+            prevList.map((appt) =>
+              appt.appointmentId === appointment.appointmentId
+                ? { ...appt, status: "CANCELLED", reason: reason }
+                : appt
+            )
+          );
 
-        setShowCancelModal(false);
-        setSelectedAppointment(null);
-      },
-      (error, appointment) => {
-        // Error callback
-        console.error("Cancellation failed:", error);
-        setShowCancelModal(false);
-        setSelectedAppointment(null);
-      }
-    );
-
-    setIsCancelling(false);
+          setShowCancelModal(false);
+          setSelectedAppointment(null);
+        },
+        (error, appointment) => {
+          // Error callback
+          console.error("Cancellation failed:", error);
+          setShowCancelModal(false);
+          setSelectedAppointment(null);
+        }
+      );
+    } finally {
+      setIsCancelling(false);
+    }
   };
 
   const handleCloseCancelModal = () => {
@@ -195,8 +207,37 @@ export default function Appointments() {
   };
 
   const markAsCompleted = (appointment) => {
-    console.log("Mark as completed for:", appointment);
+    setSelectedAppointment(appointment);
+    setShowMarkCompletedModal(true);
     setOpenMenuIndex(null);
+  };
+
+  const handleCloseMarkCompletedModal = () => {
+    setShowMarkCompletedModal(false);
+    setSelectedAppointment(null);
+  };
+
+  const handleConfirmMarkCompleted = async () => {
+    if (!selectedAppointment) return;
+    await markAppointmentAsCompleted(
+      selectedAppointment,
+      toast,
+      setIsLoading,
+      api,
+      (appointment) => {
+        console.log("Appointment marked as completed successfully", appointment);
+
+        setTodayAppointments((prevList) =>
+          prevList.map((appt) =>
+            appt.appointmentId === appointment.appointmentId
+              ? { ...appt, status: "COMPLETED" }
+              : appt
+          )
+        );
+        setShowMarkCompletedModal(false);
+        setSelectedAppointment(null);
+      }
+    );
   };
 
   return (
@@ -254,7 +295,7 @@ export default function Appointments() {
           <div>Patient Name</div>
           <div>Payment</div>
           <div>Date</div>
-          <div>Time Remaining</div>
+          <div>Time</div>
           <div>Status</div>
           <div>Consultation Fees</div>
           <div>Action</div>
@@ -278,14 +319,6 @@ export default function Appointments() {
               You don't have any appointments scheduled for today. Enjoy your
               day!
             </p>
-            {/* <div className="flex justify-center gap-4">
-              <button className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors">
-                View All Appointments
-              </button>
-              <button className="border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors">
-                Schedule New
-              </button>
-            </div> */}
           </div>
         )}
 
@@ -315,19 +348,19 @@ export default function Appointments() {
               >
                 <div className="flex md:block justify-between md:justify-center">
                   <span className="font-semibold md:hidden">Patient: </span>
-                  {appt?.fullName}
+                  {appt?.patientName}
                 </div>
                 <div className="flex md:block justify-between md:justify-center">
                   <span className="font-semibold md:hidden">Payment: </span>
-                  {appt?.selectedPayment}
+                  {appt?.paymentType}
+                </div>
+                <div className="flex md:block justify-between md:justify-center">
+                  <span className="font-semibold md:hidden">Date: </span>
+                  {appt?.appointmentDate}
                 </div>
                 <div className="flex md:block justify-between md:justify-center">
                   <span className="font-semibold md:hidden">Time: </span>
-                  {appt?.date}
-                </div>
-                <div className="flex md:block justify-between md:justify-center">
-                  <span className="font-semibold md:hidden">Time: </span>
-                  {appt?.time}
+                  {appt?.appointmentTime}
                 </div>
                 <div className="flex md:block justify-between md:justify-center">
                   <span className="font-semibold md:hidden">Status: </span>
@@ -347,7 +380,7 @@ export default function Appointments() {
                 </div>
                 <div className="flex md:block justify-between md:justify-center">
                   <span className="font-semibold ">₹ </span>
-                  {appt?.doctor?.professional?.consultationFees}
+                  {appt?.consultationFees}
                 </div>
                 <div className="flex md:block justify-center cursor-pointer text-lg hover:text-indigo-600 transition">
                   <ActionMenu
@@ -444,6 +477,7 @@ export default function Appointments() {
           selectedAppointment={selectedAppointment}
           onClose={handleCloseRescheduleModal}
           onRescheduleSuccess={handleRescheduleSuccess}
+          rescheduledBy={ROLES.doctor}
         />
       )}
 
@@ -455,7 +489,15 @@ export default function Appointments() {
           onConfirm={handleConfirmCancel}
           appointment={selectedAppointment}
           isLoading={isCancelling}
-          api
+        />
+      )}
+
+      {showMarkCompletedModal && selectedAppointment && (
+        <MarkAppointmentCompleteModal
+          isOpen={showMarkCompletedModal}
+          onClose={handleCloseMarkCompletedModal}
+          onConfirm={handleConfirmMarkCompleted}
+          appointment={selectedAppointment}
         />
       )}
     </div>

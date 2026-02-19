@@ -16,22 +16,21 @@ export function useBookedSlots(id, date) {
     const fetchSlots = async () => {
       setIsLoading(true);
       setError("");
-      console.log("booked slot " + isLoading)
       try {
-        const data = {
-          date: format(date, "yyyy-MM-dd"),
-          doctor: { doctorId : id },
-        };
-        const response = await api.post("/api/public/booked-slots", data);
+        const formattedDate = format(date, "yyyy-MM-dd");
+        const response = await api.get(`/api/public/booked-slots?doctorId=${id}&date=${formattedDate}`);
         if (isMounted) {
-          setBookedSlots((response.data || []).map((slot) => slot.trim()));
+          setBookedSlots((response || []).map((slot) => slot.trim()));
         }
       } catch (err) {
-        if (isMounted) setError("Failed to fetch availability");
+        if (isMounted) {
+          // Handle thrown errors (including 403 and other backend errors)
+          const errorMessage = err.message || `Failed to fetch booked slots`;
+          setError(errorMessage);
+          setBookedSlots([]);
+        }
       } finally {
         if (isMounted) setIsLoading(false);
-        console.log("booked slot " + isLoading)
-
       }
     };
 
@@ -39,7 +38,7 @@ export function useBookedSlots(id, date) {
     return () => {
       isMounted = false;
     };
-  }, [id, date]);
+  }, [id, date, api]);
 
   return { bookedSlots, isLoading, error };
 }

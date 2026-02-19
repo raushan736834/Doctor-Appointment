@@ -1,13 +1,19 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Edit3, Loader2, X } from 'lucide-react';
 import { useToast } from "@chakra-ui/react";
 import AppointmentForm from "../UserComponent/AppointmentForm";
-import { useApiService } from "../../hooks/useAuthWithAxios";
-const RescheduleModal = ({ selectedAppointment, onClose, onRescheduleSuccess }) => {
-  const [newData, setNewData] = useState({ id: "", date: "", time: "" });
+import { useApiService, useAuthWithAxios } from "../../hooks/useAuthWithAxios";
+const RescheduleModal = ({ selectedAppointment, onClose, onRescheduleSuccess, rescheduledBy }) => {
+  const [newData, setNewData] = useState({ id: "", slotId: "", slotTime: "", slotDate: "", displayTime: "" });
+  console.log(selectedAppointment)
+  const {user} = useAuthWithAxios();
+  const doctorId = user?.doctorId || selectedAppointment?.doctorId;
+  console.log(user)
+  console.log(doctorId);
   const [isLoading, setIsLoading] = useState(false);
   const toast = useToast();
   const api = useApiService();
+  const previousSlotIdRef = useRef(null);
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -21,26 +27,94 @@ const RescheduleModal = ({ selectedAppointment, onClose, onRescheduleSuccess }) 
 
   if (!selectedAppointment) return null;
 
-  const handleRescheduleApi = async ({ appointmentId, newDate, newTime }) => {
-    setNewData({ id: appointmentId, date: newDate, time: newTime });
+  // Unlock slot when component unmounts (modal closes or navigates away) or when slotId changes
+  useEffect(() => {
+    // Capture current slotId in closure for cleanup
+    const slotIdToUnlock = newData.slotId;
+    
+    // Update ref for tracking
+    previousSlotIdRef.current = slotIdToUnlock;
+    
+    // Cleanup: unlock the slot that was current when this effect ran
+    // - When slotId changes: unlocks the previous slotId (before change)
+    // - When component unmounts: unlocks the current slotId
+    return () => {
+      if (slotIdToUnlock) {
+        api.post("/api/slots/unlock", { slotId: slotIdToUnlock }).catch(console.error);
+      }
+    };
+  }, [newData.slotId, api]);
+
+  const unlockSlot = async (slotId) => {
+    if (!slotId) return;
+    try {
+      await api.post("/api/slots/unlock", { slotId });
+    } catch (error) {
+      console.error("Error unlocking slot:", error);
+    }
+  };
+
+  const handleSlotSelect = async (slot) => {
+    try {
+      const response = await api.post("/api/slots/lock", {
+        slotId: slot.slotId
+      });
+
+      if (response.status === 200) {
+        return true;
+      }
+    } catch (error) {
+      toast({
+        title: "Slot already taken",
+        status: "error",
+        position: "top-right",
+      });
+      return false;
+    }
+  };
+
+  const handleRescheduleApi = async ({ appointmentId, slotId, slotTime, slotDate, displayTime }) => {
+    // Unlock previous slot if user is changing to a different slot
+    if (newData.slotId && newData.slotId !== slotId) {
+      await unlockSlot(newData.slotId);
+    }
+
+    // Lock the slot when user selects a time
+    const lockSuccess = await handleSlotSelect({
+      slotId,
+      slotDate,
+      slotTime,
+      displayTime
+    });
+    
+    // Only update state if slot lock was successful
+    if (lockSuccess) {
+      setNewData({
+        id: appointmentId,
+        slotId: slotId,
+        slotTime: slotTime,
+        slotDate: slotDate,
+        displayTime: displayTime,
+        rescheduledBy: rescheduledBy
+      });
+    }
   };
   
   const confirmRescheduleAppointment = async () => {
     console.log(newData)
-    if (!newData.date || !newData.time) {
-      alert("Please select both date and time slot");
+    if (!newData.slotId) {
+      alert("Please select a time slot");
       return;
     }
-    console.log("set")
     setIsLoading(true);
     try {
       const data = {
         appointmentId: newData.id,
-        newDate: newData.date,
-        newTimeSlot: newData.time
+        newSlotId: newData.slotId,
+        rescheduledBy: newData.rescheduledBy
       };
 
-      const response = await api.put('appointment/reschedule-appointment', data);
+      const response = await api.put('appointment/common/reschedule-appointment', data);
       console.log(response);
       if (response.success) {
         toast({
@@ -52,11 +126,11 @@ const RescheduleModal = ({ selectedAppointment, onClose, onRescheduleSuccess }) 
           containerStyle: { marginTop: 20, marginRight: 5 },
         });
         
-        // Create updated appointment object
+        // Create updated appointment object with new date and time from selected slot
         const updatedAppointment = {
           ...selectedAppointment,
-          date: newData.date,
-          time: newData.time,
+          appointmentDate: newData.slotDate, // New date in YYYY-MM-DD format
+          appointmentTime: newData.displayTime || newData.slotTime, // Display time (12-hour format) or fallback to 24-hour
           status: "RESCHEDULED"
         };
         
@@ -88,12 +162,18 @@ const RescheduleModal = ({ selectedAppointment, onClose, onRescheduleSuccess }) 
                   Reschedule Appointment
                 </h3>
                 <p className="text-blue-100 mt-1">
-                  with Dr. {selectedAppointment?.doctor?.firstName} {selectedAppointment?.doctor?.lastName}
+                  with Dr. {selectedAppointment?.doctorName} 
                 </p>
               </div>
             </div>
             <button
-              onClick={onClose}
+              onClick={async () => {
+                // Unlock slot when closing modal via X button
+                if (newData.slotId) {
+                  await unlockSlot(newData.slotId);
+                }
+                onClose();
+              }}
               className="text-white/80 hover:text-white transition-colors"
             >
               <X className="w-6 h-6" />
@@ -107,17 +187,18 @@ const RescheduleModal = ({ selectedAppointment, onClose, onRescheduleSuccess }) 
           <div className="bg-blue-50 border-l-4 border-blue-500 rounded-lg p-4 mb-6">
             <p className="text-sm font-medium text-blue-900 mb-1">Current Appointment</p>
             <p className="text-blue-800">
-              <span className="font-semibold">Date:</span> {formatDate(selectedAppointment.date)}
+              <span className="font-semibold">Date:</span> {formatDate(selectedAppointment?.appointmentDate)}
               <span className="mx-3">•</span>
-              <span className="font-semibold">Time:</span> {selectedAppointment?.time}
+              <span className="font-semibold">Time:</span> {selectedAppointment?.appointmentTime}
             </p>
           </div>
 
           {/* New Appointment Selection */}
+         { console.log(selectedAppointment)}
           <div className="bg-gray-50 rounded-xl p-4">
             <h4 className="text-lg font-semibold text-gray-800 mb-4">Select New Date & Time</h4>
             <AppointmentForm
-              id={selectedAppointment?.doctor?.doctorId}
+              id={doctorId}
               isReschedule={true}
               appointmentId={selectedAppointment.appointmentId}
               onSelectionChange={handleRescheduleApi}
@@ -128,7 +209,13 @@ const RescheduleModal = ({ selectedAppointment, onClose, onRescheduleSuccess }) 
           {/* Action Buttons */}
           <div className="flex space-x-3 mt-6">
             <button
-              onClick={onClose}
+              onClick={async () => {
+                // Unlock slot when canceling/closing modal
+                if (newData.slotId) {
+                  await unlockSlot(newData.slotId);
+                }
+                onClose();
+              }}
               disabled={isLoading}
               className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors disabled:opacity-50"
             >
@@ -136,7 +223,7 @@ const RescheduleModal = ({ selectedAppointment, onClose, onRescheduleSuccess }) 
             </button>
             <button
               onClick={confirmRescheduleAppointment}
-              disabled={isLoading || !newData.date || !newData.time}
+              disabled={isLoading || !newData.slotId}
               className="flex-1 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl font-medium shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
             >
               {isLoading ? (

@@ -22,7 +22,20 @@ export const useAuthWithAxios = () => {
 };
 
 /**
+ * Custom API Error class with status and response data
+ */
+class ApiError extends Error {
+  constructor(message, status, data = null) {
+    super(message);
+    this.name = 'ApiError';
+    this.status = status;
+    this.data = data;
+  }
+}
+
+/**
  * API service hook that provides common API methods
+ * Throws errors for any backend error responses (4xx, 5xx)
  */
 export const useApiService = () => {
   const apiCall = useCallback(async (method, url, data = null, options = {}) => {
@@ -43,18 +56,45 @@ export const useApiService = () => {
       }
 
       const response = await axiosInstance(config);
-      return { success: true, data: response.data };
+      
+      // Explicitly check for error status codes (4xx, 5xx)
+      // Even if axios doesn't throw, treat these as errors and throw
+      const status = response?.status;
+      if (status >= 400) {
+        const errorMessage = response?.data?.error || 
+                            response?.data?.message ||
+                            response?.error || 
+                            `Request failed with status ${status}`;
+        console.error(`API ${method.toUpperCase()} ${url} returned error status ${status}:`, errorMessage);
+        
+        // Throw error for any backend error response
+        throw new ApiError(errorMessage, status, response?.data);
+      }
+      
+      // Return data directly for successful responses
+      return response.data;
     } catch (error) {
+      // If it's already an ApiError, re-throw it
+      if (error instanceof ApiError) {
+        throw error;
+      }
+      
+      // Handle axios errors
       console.error(`API ${method.toUpperCase()} ${url} failed:`, error);
+      
+      const status = error.response?.status;
       const errorMessage = error.response?.data?.error || 
                           error.response?.data?.message || 
                           error.message || 
                           'An error occurred';
-      return { 
-        success: false, 
-        error: errorMessage,
-        status: error.response?.status 
-      };
+      
+      // Explicitly handle 403 Forbidden errors
+      if (status === 403) {
+        console.error('403 Forbidden - Access denied:', errorMessage);
+      }
+      
+      // Throw error for any backend error response
+      throw new ApiError(errorMessage, status, error.response?.data);
     }
   }, []);
 

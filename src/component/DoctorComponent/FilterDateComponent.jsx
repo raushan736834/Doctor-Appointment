@@ -1,7 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
 
 const FilterDateComponent = ({ dateRange, onClose, onApply }) => {
-  const [localDateRange, setLocalDateRange] = useState(dateRange);
+  const today = new Date().toLocaleDateString('en-CA');
+  console.log(today);
+  const [localDateRange, setLocalDateRange] = useState({
+    from: today,
+    to: today,
+  });
 
   const dropdownRef = useRef();
 

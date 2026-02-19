@@ -4,8 +4,8 @@ const baseUrl = import.meta.env.VITE_BASE_URL;
 
 // Create axios instance
 const axiosInstance = axios.create({
-  baseURL: 'http://localhost:8080', // Adjust based on your backend URL
-  // baseURL : baseUrl, // Adjust based on your backend URL
+  // baseURL: 'http://localhost:8080', // Adjust based on your backend URL
+  baseURL : baseUrl, // Adjust based on your backend URL
   withCredentials: true, // Important for sending cookies
 });
 

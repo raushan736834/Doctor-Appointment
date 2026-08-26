@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useApiService } from "../../../hooks/useAuthWithAxios";
 
 const SEARCH_URL = "api/public/searchByCityAndSpecialist";
-const NEARBY_URL = "api/public/doctors/nearby";
+const NEARBY_URL = "api/public/nearby";
 
 const GEO = { IDLE: "idle", REQUESTING: "requesting", DETECTED: "detected", DENIED: "denied", ERROR: "error" };
 

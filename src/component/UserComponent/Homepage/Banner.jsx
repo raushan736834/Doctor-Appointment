@@ -91,8 +91,8 @@ const Banner = ({ specialists, cities, isLoading, setIsLoading }) => {
     setIsLoading(true);
     try {
       const response = await api.get(NEARBY_URL, {
-        lat: coords.lat,
-        lng: coords.lng,
+        latitude: coords.lat,
+        longitude: coords.lng,
         specialist: selectedSpecialist,
       });
       const doctors = Array.isArray(response?.data) ? response.data : Array.isArray(response) ? response : [];

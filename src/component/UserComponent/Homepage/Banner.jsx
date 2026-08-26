@@ -90,7 +90,7 @@ const Banner = ({ specialists, cities, isLoading, setIsLoading }) => {
     }
     setIsLoading(true);
     try {
-      const response = await api.get(NEARBY_URL, {
+      const response = await api.post(NEARBY_URL, {
         latitude: coords.lat,
         longitude: coords.lng,
         specialist: selectedSpecialist,

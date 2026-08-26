@@ -39,7 +39,7 @@ const Banner = ({ specialists, cities, isLoading, setIsLoading }) => {
       (e) => {
         setGeoState(e.code === e.PERMISSION_DENIED ? GEO.DENIED : GEO.ERROR);
       },
-      { timeout: 10000, maximumAge: 300000 }
+      { timeout: 10000, maximumAge: 0, enableHighAccuracy: true }
     );
   };
 

@@ -1,6 +1,6 @@
 [
     {
-        "id": "1941000",
+        "doctorId": "1941000",
         "profileImage": "https://imagesx.practo.com/providers/dr-mohan-mishra-ayurveda-jalandhar-aee1f6e0-c291-4423-beda-220a847d0cb3.jpg",
         "firstName": "Mohan",
         "lastName": "Mishra",
@@ -24,16 +24,14 @@
         },
         "doctorEducation": [
             {
-                "qualification": "BAMS",
-                "college": "Lal Bahadur Shastri Homoeopathic Medical College, Bhopal",
+                "degreeName": "BAMS",
+                "schoolName": "Lal Bahadur Shastri Homoeopathic Medical College, Bhopal",
                 "completionYear": 2013
             }
         ],
         "clinicInfos": {
             "clinicName": "Jiva Ayurveda Clinic",
             "clinicType": "",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "establishedYear": "",
             "clinicAddress": "Raja Bazar",
             "clinicCity": "Patna",
@@ -111,16 +109,14 @@
         },
         "doctorEducation": [
             {
-                "qualification": "BAMS",
-                "college": "Lal Bahadur Shastri Homoeopathic Medical College, Bhopal",
+                "degreeName": "BAMS",
+                "schoolName": "Lal Bahadur Shastri Homoeopathic Medical College, Bhopal",
                 "completionYear": 2013
             }
         ],
         "clinicInfos": {
             "clinicName": "Jiva Ayurveda Clinic",
             "clinicType": "Specialty Clinic",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "establishedYear": "",
             "clinicAddress": "Kankad Bagh",
             "clinicCity": "Patna",
@@ -178,7 +174,7 @@
         "profileImage": "https://imagesx.practo.com/providers/dr-kamlesh-kumar-cardiologist-patna-ae489147-dc8a-4fd6-9457-ac0b850d7806.jpg",
         "firstName": "Kamlesh",
         "lastName": "Sinha",
-        "email": "123@gmail.com",
+        "email": "1256@gmail.com",
         "phone": "",
         "dob": "",
         "gender": "male",
@@ -216,8 +212,6 @@
         "clinicInfos": {
             "clinicName": "Big Apollo Spectra Multi Speciality Hospital",
             "clinicType": "",
-            "clinicEmail": "",
-            "clinicPhone": "",
             "establishedYear": "",
             "consultationDuration": "45",
             "clinicAddress": "Patna",
@@ -295,18 +289,18 @@
         },
         "doctorEducation": [
             {
-                "qualification": "MBBS",
-                "college": "Rajiv Gandhi University of Health Sciences",
+                "degreeName": "MBBS",
+                "schoolName": "Rajiv Gandhi University of Health Sciences",
                 "completionYear": 2008
             },
             {
-                "qualification": "DM - Cardiology",
-                "college": "Jagadguru Jayadeva Murugarajendra Medical College (JJMMC)",
+                "degreeName": "DM - Cardiology",
+                "schoolName" : "Jagadguru Jayadeva Murugarajendra Medical College (JJMMC)",
                 "completionYear": 2014
             },
             {
-                "qualification": "MD - General Medicine",
-                "college": "Jagadguru Jayadeva Murugarajendra Medical College (JJMMC)",
+                "degreeName": "MD - General Medicine",
+                "schoolName": "Jagadguru Jayadeva Murugarajendra Medical College (JJMMC)",
                 "completionYear": 2014
             }
         ],
@@ -315,8 +309,6 @@
             "clinicType": "",
             "clinicCity": "Patna",
             "clinicAddress": "Boring Canal Road",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "clinicPincode": "",
             "clinicState": "Bihar",
             "establishedYear": "",
@@ -392,25 +384,23 @@
         },
         "doctorEducation": [
             {
-                "qualification": "MBBS",
-                "college": "Rajiv Gandhi University of Health Sciences",
+                "degreeName": "MBBS",
+                "schoolName": "Rajiv Gandhi University of Health Sciences",
                 "completionYear": 2008
             },
             {
-                "qualification": "MD - General Medicine",
-                "college": "Jagadguru Jayadeva Murugarajendra Medical College (JJMMC)",
+                "degreeName": "MD - General Medicine",
+                "schoolName": "Jagadguru Jayadeva Murugarajendra Medical College (JJMMC)",
                 "completionYear": 2014
             },
             {
-                "qualification": "DNB - Cardiology",
-                "college": "Jagadguru Jayadeva Murugarajendra Medical College (JJMMC)",
+                "degreeName": "DNB - Cardiology",
+                "schoolName": "Jagadguru Jayadeva Murugarajendra Medical College (JJMMC)",
                 "completionYear": 2014
             }
         ],
         "clinicInfos": {
             "clinicCity": "Patna",
-            "clinicEmail": "",
-            "clinicPhone": "",
             "clinicPincode": "",
             "clinicState": "",
             "consultationDuration": "45",
@@ -488,27 +478,25 @@
         },
         "doctorEducation": [
             {
-                "qualification": "MBBS",
-                "college": "Rajiv Gandhi University of Health Sciences",
+                "degreeName": "MBBS",
+                "schoolName": "Rajiv Gandhi University of Health Sciences",
                 "completionYear": 2008
             },
             {
-                "qualification": "MD - Medicine",
-                "college": "Jagadguru Jayadeva Murugarajendra Medical College (JJMMC)",
+                "degreeName": "MD - Medicine",
+                "schoolName": "Jagadguru Jayadeva Murugarajendra Medical College (JJMMC)",
                 "completionYear": 2014
             },
             {
-                "qualification": "DM - Cardiology",
-                "college": "Jagadguru Jayadeva Murugarajendra Medical College (JJMMC)",
+                "degreeName": "DM - Cardiology",
+                "schoolName": "Jagadguru Jayadeva Murugarajendra Medical College (JJMMC)",
                 "completionYear": 2014
             }
         ],
         "clinicInfos": {
             "clinicCity": "Patna",
             "clinicAddress": "Boring Canal Road",
-            "clinicPhone": "",
             "consultationDuration": "30",
-            "clinicEmail": "",
             "clinicPincode": "",
             "clinicState": "Bihar",
             "clinicType": "",
@@ -603,8 +591,6 @@
             "clinicName": "Dr.Mathura Prasad Clinic",
             "clinicAddress": "P.M.C.H",
             "clinicCity": "Patna",
-            "clinicEmail": "",
-            "clinicPhone": "",
             "clinicPincode": "",
             "clinicState": "Bihar",
             "consultationDuration": "45",
@@ -673,7 +659,6 @@
             "specialization": "Dermatologist",
             "yearOfExp": "10-20",
             "consultationFees": 300,
-            "subSpeciality": "",
             "currentHospital": "DVCS Clinic",
             "medicalCouncil": "",
             "medicalLicenseNumber": "10",
@@ -681,13 +666,13 @@
         },
         "doctorEducation": [
             {
-                "qualification": "MBBS",
-                "college": "Stanley Medical College & Hospital , Chennai",
+                "degreeName": "MBBS",
+                "schoolName": "Stanley Medical College & Hospital , Chennai",
                 "completionYear": 2003
             },
             {
-                "qualification": "MD - Dermatology , Venereology & Leprosy",
-                "college": "Rajendra Institute of Medical Sciences, Ranchi",
+                "degreeName": "MD - Dermatology , Venereology & Leprosy",
+                "schoolName": "Rajendra Institute of Medical Sciences, Ranchi",
                 "completionYear": 2008
             }
         ],
@@ -695,8 +680,6 @@
             "clinicCity": "Patna",
             "clinicAddress": "Ashiananagar",
             "clinicName": "DVCS Clinic",
-            "clinicEmail": "",
-            "clinicPhone": "",
             "clinicPincode": "",
             "clinicState": "Bihar",
             "consultationDuration": "60",
@@ -767,7 +750,6 @@
             "currentHospital": "Sinha Skin Hospital",
             "medicalCouncil": "",
             "medicalLicenseNumber": "11",
-            "subSpeciality": "",
             "languageKnown": ""
         },
         "doctorEducation": [
@@ -785,14 +767,12 @@
         "clinicInfos": {
             "clinicCity": "Patna",
             "clinicAddress": "Punaichak",
-            "clinicPhone": "",
             "clinicPincode": "",
             "clinicState": "Bihar",
             "establishedYear": "",
             "clinicName": "Sinha Skin Hospital",
             "consultationDuration": "45",
             "clinicType": "",
-            "clinicEmail": "",
             "operatingHours": [
                 {
                     "days": "MONDAY",
@@ -876,8 +856,6 @@
         "clinicInfos": {
             "clinicCity": "Patna",
             "clinicAddress": "Kankarbagh",
-            "clinicEmail": "",
-            "clinicPhone": "",
             "clinicPincode": "",
             "clinicState": "Bihar",
             "clinicType": "",
@@ -975,8 +953,6 @@
             "clinicType": "",
             "consultationDuration": "60",
             "establishedYear": "",
-            "clinicEmail": "",
-            "clinicPhone": "",
             "operatingHours": [
                 {
                     "days": "MONDAY",
@@ -1061,8 +1037,6 @@
         "clinicInfos": {
             "clinicName": "Mind and skin clinic",
             "clinicType": "",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "establishedYear": "",
             "clinicAddress": "Khazpura",
             "clinicCity": "Patna",
@@ -1153,8 +1127,6 @@
         "clinicInfos": {
             "clinicName": "Advance Skin Hair & Laser Clinic",
             "clinicType": "",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "establishedYear": "",
             "clinicAddress": "Rajendra Nagar",
             "clinicCity": "Patna",
@@ -1245,8 +1217,6 @@
         "clinicInfos": {
             "clinicName": "Dermawave Skin Laser and Hair Transplant Centre",
             "clinicType": "",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "establishedYear": "",
             "clinicAddress": "Khajpura",
             "clinicCity": "Patna",
@@ -1337,8 +1307,6 @@
         "clinicInfos": {
             "clinicName": "Dermawave Skin Laser and Hair Transplant Centre",
             "clinicType": "",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "establishedYear": "",
             "clinicAddress": "Khajpura",
             "clinicCity": "Patna",
@@ -1429,8 +1397,6 @@
         "clinicInfos": {
             "clinicName": "Redefine Skin & Dental Clinic",
             "clinicType": "",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "establishedYear": "",
             "clinicAddress": "Kankarbagh",
             "clinicCity": "Patna",
@@ -1526,8 +1492,6 @@
         "clinicInfos": {
             "clinicName": "ENT Planet",
             "clinicType": "",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "establishedYear": "",
             "clinicAddress": "Rajendra Nagar",
             "clinicCity": "Patna",
@@ -1618,8 +1582,6 @@
         "clinicInfos": {
             "clinicName": "Dr. Sanjay Kumar Shahi Clinic",
             "clinicType": "",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "establishedYear": "",
             "clinicAddress": "Boring Canal Road",
             "clinicCity": "Patna",
@@ -1710,8 +1672,6 @@
         "clinicInfos": {
             "clinicName": "Alam Clinic",
             "clinicType": "",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "establishedYear": "",
             "clinicAddress": "Tripolia",
             "clinicCity": "Patna",
@@ -1802,8 +1762,6 @@
         "clinicInfos": {
             "clinicName": "R.K. ENT clinic",
             "clinicType": "",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "establishedYear": "",
             "clinicAddress": "Kankarbagh",
             "clinicCity": "Patna",
@@ -1870,7 +1828,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": "",
+            "medicalLicenseNumber": "1011",
             "yearOfExp": "8",
             "specialization": "Ear-Nose-Throat (ENT) Specialist",
             "subSpeciality": null,
@@ -1889,8 +1847,6 @@
         "clinicInfos": {
             "clinicName": "Ear, Nose, Throat and Head Neck Clinic",
             "clinicType": "",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "establishedYear": "",
             "clinicAddress": "Kankarbagh",
             "clinicCity": "Patna",
@@ -1957,7 +1913,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": "",
+            "medicalLicenseNumber": "1012",
             "yearOfExp": "25",
             "specialization": "Ear-Nose-Throat (ENT) Specialist",
             "subSpeciality": null,
@@ -1981,8 +1937,6 @@
         "clinicInfos": {
             "clinicName": "Jai Hospital",
             "clinicType": "",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "establishedYear": "",
             "clinicAddress": "Anisabad",
             "clinicCity": "Patna",
@@ -2049,7 +2003,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": "",
+            "medicalLicenseNumber": "1013",
             "yearOfExp": "39",
             "specialization": "Ear-Nose-Throat (ENT) Specialist",
             "subSpeciality": null,
@@ -2073,8 +2027,6 @@
         "clinicInfos": {
             "clinicName": "Dr. Ajit kumar Clinic",
             "clinicType": "",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "establishedYear": "",
             "clinicAddress": "Kankarbagh",
             "clinicCity": "Patna",
@@ -2141,7 +2093,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": "",
+            "medicalLicenseNumber": "1014",
             "yearOfExp": "11",
             "specialization": "Ear-Nose-Throat (ENT) Specialist",
             "subSpeciality": null,
@@ -2165,8 +2117,6 @@
         "clinicInfos": {
             "clinicName": "Sai Primus ENT And Physiotherapy",
             "clinicType": "",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "establishedYear": "",
             "clinicAddress": "Mithapur",
             "clinicCity": "Patna",
@@ -2233,7 +2183,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": "",
+            "medicalLicenseNumber": "1015",
             "yearOfExp": "25",
             "specialization": "Ear-Nose-Throat (ENT) Specialist",
             "subSpeciality": null,
@@ -2257,8 +2207,6 @@
         "clinicInfos": {
             "clinicName": "Ojas ENT & Maternity Clinic",
             "clinicType": "",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "establishedYear": "",
             "clinicAddress": "Kankarbagh",
             "clinicCity": "Patna",
@@ -2325,7 +2273,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": "",
+            "medicalLicenseNumber": "1016",
             "yearOfExp": "31",
             "specialization": "Ear-Nose-Throat (ENT) Specialist",
             "subSpeciality": null,
@@ -2349,8 +2297,6 @@
         "clinicInfos": {
             "clinicName": "Ashwini ENT and Cosmetic Hospital",
             "clinicType": "",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "establishedYear": "",
             "clinicAddress": "Rajendra Nagar",
             "clinicCity": "Patna",
@@ -2417,7 +2363,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": "",
+            "medicalLicenseNumber": "1017",
             "yearOfExp": "24",
             "specialization": "Gastroenterologist",
             "subSpeciality": null,
@@ -2441,8 +2387,6 @@
         "clinicInfos": {
             "clinicName": "Big Apollo Spectra Multi Speciality Hospital",
             "clinicType": "",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "establishedYear": "",
             "clinicAddress": "Kankarbagh",
             "clinicCity": "Patna",
@@ -2509,7 +2453,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": "",
+            "medicalLicenseNumber": "1018",
             "yearOfExp": "18",
             "specialization": "Gastroenterologist",
             "subSpeciality": null,
@@ -2533,8 +2477,6 @@
         "clinicInfos": {
             "clinicName": "xyz clinic care",
             "clinicType": "",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "establishedYear": "",
             "clinicAddress": "Kankarbagh",
             "clinicCity": "Patna",
@@ -2601,7 +2543,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": "",
+            "medicalLicenseNumber": "1019",
             "yearOfExp": "23",
             "specialization": "Gastroenterologist",
             "subSpeciality": null,
@@ -2625,8 +2567,6 @@
         "clinicInfos": {
             "clinicName": "xyz clinic care",
             "clinicType": "",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "establishedYear": "",
             "clinicAddress": "Kankarbagh",
             "clinicCity": "Patna",
@@ -2693,7 +2633,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": "",
+            "medicalLicenseNumber": "1020",
             "yearOfExp": "19",
             "specialization": "Gastroenterologist",
             "subSpeciality": null,
@@ -2717,8 +2657,6 @@
         "clinicInfos": {
             "clinicName": "Near Mangal Market, & Atlantis Hospital",
             "clinicType": "",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "establishedYear": "",
             "clinicAddress": "Jawahar Lal Nehru Marg",
             "clinicCity": "Patna",
@@ -2785,7 +2723,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": "",
+            "medicalLicenseNumber": "1021",
             "yearOfExp": "16",
             "specialization": "Gastroenterologist",
             "subSpeciality": null,
@@ -2809,8 +2747,6 @@
         "clinicInfos": {
             "clinicName": "Narayan Clinic",
             "clinicType": "",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "establishedYear": "",
             "clinicAddress": "Kankarbagh",
             "clinicCity": "Patna",
@@ -2877,7 +2813,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": null,
+            "medicalLicenseNumber": "1022",
             "yearOfExp": "45",
             "specialization": "General Physician",
             "subSpeciality": null,
@@ -2902,7 +2838,6 @@
             "clinicName": "Mukul Kumar Clinic",
             "clinicType": null,
             "clinicPhone": null,
-            "clinicEmail": "",
             "establishedYear": null,
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -2969,7 +2904,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": null,
+            "medicalLicenseNumber": "1023",
             "yearOfExp": "26",
             "specialization": "General Physician",
             "subSpeciality": null,
@@ -2994,7 +2929,6 @@
             "clinicName": "Sangita Kumari Clinic",
             "clinicType": null,
             "clinicPhone": null,
-            "clinicEmail": "",
             "establishedYear": null,
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -3061,7 +2995,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": null,
+            "medicalLicenseNumber": "1024",
             "yearOfExp": "52",
             "specialization": "General Physician",
             "subSpeciality": null,
@@ -3081,7 +3015,6 @@
             "clinicName": "P.Prasad Clinic",
             "clinicType": null,
             "clinicPhone": null,
-            "clinicEmail": "",
             "establishedYear": null,
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -3148,7 +3081,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": null,
+            "medicalLicenseNumber": "1025",
             "yearOfExp": "52",
             "specialization": "General Physician",
             "subSpeciality": null,
@@ -3168,7 +3101,6 @@
             "clinicName": "Kumar Fracture & Orthopaedic Centre",
             "clinicType": null,
             "clinicPhone": null,
-            "clinicEmail": "",
             "establishedYear": null,
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -3235,7 +3167,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": null,
+            "medicalLicenseNumber": "1026",
             "yearOfExp": "49",
             "specialization": "General Physician",
             "subSpeciality": null,
@@ -3260,7 +3192,6 @@
             "clinicName": "Care Poly Clinic & Surgical Center",
             "clinicType": null,
             "clinicPhone": null,
-            "clinicEmail": "",
             "establishedYear": null,
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -3327,7 +3258,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": null,
+            "medicalLicenseNumber": "1027",
             "yearOfExp": "49",
             "specialization": "General Physician",
             "subSpeciality": null,
@@ -3352,7 +3283,6 @@
             "clinicName": "Lakhmani Pain Clinic",
             "clinicType": null,
             "clinicPhone": null,
-            "clinicEmail": "",
             "establishedYear": null,
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -3419,7 +3349,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": null,
+            "medicalLicenseNumber": "1028",
             "yearOfExp": "44",
             "specialization": "General Physician",
             "subSpeciality": null,
@@ -3444,7 +3374,6 @@
             "clinicName": "D N singh Clinic",
             "clinicType": null,
             "clinicPhone": null,
-            "clinicEmail": "",
             "establishedYear": null,
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -3511,7 +3440,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": null,
+            "medicalLicenseNumber": "1029",
             "yearOfExp": "15",
             "specialization": "General Physician",
             "subSpeciality": null,
@@ -3531,7 +3460,6 @@
             "clinicName": "Janki Diabetes Care Center (Kunal Kundan)",
             "clinicType": null,
             "clinicPhone": null,
-            "clinicEmail": "",
             "establishedYear": null,
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -3598,7 +3526,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": null,
+            "medicalLicenseNumber": "1030",
             "yearOfExp": "14",
             "specialization": "General Physician",
             "subSpeciality": null,
@@ -3628,7 +3556,6 @@
             "clinicName": "Life Line Health Care",
             "clinicType": null,
             "clinicPhone": null,
-            "clinicEmail": "",
             "establishedYear": null,
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -3695,7 +3622,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": null,
+            "medicalLicenseNumber": "1031",
             "yearOfExp": "9",
             "specialization": "General Physician",
             "subSpeciality": null,
@@ -3715,7 +3642,6 @@
             "clinicName": "Imam’s Mother and Child Care Clinic",
             "clinicType": null,
             "clinicPhone": null,
-            "clinicEmail": "",
             "establishedYear": null,
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -3782,7 +3708,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": null,
+            "medicalLicenseNumber": "1032",
             "yearOfExp": "37",
             "specialization": "General Surgeon",
             "subSpeciality": null,
@@ -3807,7 +3733,6 @@
             "clinicName": "Chest Clinic",
             "clinicType": null,
             "clinicPhone": null,
-            "clinicEmail": "",
             "establishedYear": null,
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -3874,7 +3799,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": null,
+            "medicalLicenseNumber": "1033",
             "yearOfExp": "13",
             "specialization": "General Surgeon",
             "subSpeciality": null,
@@ -3899,7 +3824,6 @@
             "clinicName": "Save life Hospital",
             "clinicType": null,
             "clinicPhone": null,
-            "clinicEmail": "",
             "establishedYear": null,
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -3966,7 +3890,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": null,
+            "medicalLicenseNumber": "1034",
             "yearOfExp": "11",
             "specialization": "General Surgeon",
             "subSpeciality": null,
@@ -3986,7 +3910,6 @@
             "clinicName": "Max CareNCure Hospital",
             "clinicType": null,
             "clinicPhone": null,
-            "clinicEmail": "",
             "establishedYear": null,
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -4053,7 +3976,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": null,
+            "medicalLicenseNumber": "1035",
             "yearOfExp": "9",
             "specialization": "General Surgeon",
             "subSpeciality": null,
@@ -4078,7 +4001,6 @@
             "clinicName": "M M Uddin",
             "clinicType": null,
             "clinicPhone": null,
-            "clinicEmail": "",
             "establishedYear": null,
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -4145,7 +4067,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": null,
+            "medicalLicenseNumber": "1036",
             "yearOfExp": "35",
             "specialization": "General Surgeon",
             "subSpeciality": null,
@@ -4170,7 +4092,6 @@
             "clinicName": "Kamy General Hospital",
             "clinicType": null,
             "clinicPhone": null,
-            "clinicEmail": "",
             "establishedYear": null,
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -4237,7 +4158,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": null,
+            "medicalLicenseNumber": "1037",
             "yearOfExp": "11",
             "specialization": "General Surgeon",
             "subSpeciality": null,
@@ -4262,7 +4183,6 @@
             "clinicName": "Healer Health Care",
             "clinicType": null,
             "clinicPhone": null,
-            "clinicEmail": "",
             "establishedYear": null,
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -4329,7 +4249,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": null,
+            "medicalLicenseNumber": "1038",
             "yearOfExp": "9",
             "specialization": "General Surgeon",
             "subSpeciality": null,
@@ -4354,7 +4274,6 @@
             "clinicName": "Hanuman Care",
             "clinicType": null,
             "clinicPhone": null,
-            "clinicEmail": "",
             "establishedYear": null,
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -4421,7 +4340,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": null,
+            "medicalLicenseNumber": "1039",
             "yearOfExp": "45",
             "specialization": "General Surgeon",
             "subSpeciality": null,
@@ -4446,7 +4365,6 @@
             "clinicName": "Kusum Hospital",
             "clinicType": null,
             "clinicPhone": null,
-            "clinicEmail": "",
             "establishedYear": null,
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -4513,7 +4431,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": null,
+            "medicalLicenseNumber": "1040",
             "yearOfExp": "34",
             "specialization": "General Surgeon",
             "subSpeciality": null,
@@ -4548,7 +4466,6 @@
             "clinicName": "Health Care Center",
             "clinicType": null,
             "clinicPhone": null,
-            "clinicEmail": "",
             "establishedYear": null,
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -4615,7 +4532,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": null,
+            "medicalLicenseNumber": "1041",
             "yearOfExp": "17",
             "specialization": "General Surgeon",
             "subSpeciality": null,
@@ -4640,7 +4557,6 @@
             "clinicName": "Sarv Chikitsa",
             "clinicType": null,
             "clinicPhone": null,
-            "clinicEmail": "",
             "establishedYear": null,
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -4707,7 +4623,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": null,
+            "medicalLicenseNumber": "1042",
             "yearOfExp": "23",
             "specialization": "Gynecologist/Obstetrician",
             "subSpeciality": null,
@@ -4737,7 +4653,6 @@
             "clinicName": "Indira IVF - Fertility and IVF Center",
             "clinicType": null,
             "clinicPhone": null,
-            "clinicEmail": "",
             "establishedYear": null,
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -4804,7 +4719,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": null,
+            "medicalLicenseNumber": "1043",
             "yearOfExp": "42",
             "specialization": "Gynecologist/Obstetrician",
             "subSpeciality": null,
@@ -4834,7 +4749,6 @@
             "clinicName": "Big Apollo Spectra Multi Speciality Hospital",
             "clinicType": null,
             "clinicPhone": null,
-            "clinicEmail": "",
             "establishedYear": null,
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -4901,7 +4815,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": null,
+            "medicalLicenseNumber": "1044",
             "yearOfExp": "11",
             "specialization": "Homoeopath",
             "subSpeciality": null,
@@ -4921,7 +4835,6 @@
             "clinicName": "Krishna Homoeopathic Clinic",
             "clinicType": null,
             "clinicPhone": null,
-            "clinicEmail": "",
             "establishedYear": null,
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -4988,7 +4901,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": null,
+            "medicalLicenseNumber": "1045",
             "yearOfExp": "37",
             "specialization": "Homoeopath",
             "subSpeciality": null,
@@ -5008,7 +4921,6 @@
             "clinicName": "Dr. G. R. Agrawal",
             "clinicType": null,
             "clinicPhone": null,
-            "clinicEmail": "",
             "establishedYear": null,
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -5075,7 +4987,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": null,
+            "medicalLicenseNumber": "1046",
             "yearOfExp": "34",
             "specialization": "Homoeopath",
             "subSpeciality": null,
@@ -5100,7 +5012,6 @@
             "clinicName": "Homeo Foundation",
             "clinicType": null,
             "clinicPhone": null,
-            "clinicEmail": "",
             "establishedYear": null,
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -5167,7 +5078,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": null,
+            "medicalLicenseNumber": "1047",
             "yearOfExp": "11",
             "specialization": "Homoeopath",
             "subSpeciality": null,
@@ -5187,7 +5098,6 @@
             "clinicName": "R.C. Homoeo Clinic",
             "clinicType": null,
             "clinicPhone": null,
-            "clinicEmail": "",
             "establishedYear": null,
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -5254,7 +5164,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": null,
+            "medicalLicenseNumber": "1048",
             "yearOfExp": "34",
             "specialization": "Homoeopath",
             "subSpeciality": null,
@@ -5274,7 +5184,6 @@
             "clinicName": "Vishwaraj Aarogya Homeo Niketan",
             "clinicType": null,
             "clinicPhone": null,
-            "clinicEmail": "",
             "establishedYear": null,
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -5341,7 +5250,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": null,
+            "medicalLicenseNumber": "1049",
             "yearOfExp": "6",
             "specialization": "Homoeopath",
             "subSpeciality": null,
@@ -5361,7 +5270,6 @@
             "clinicName": "Multicare Homeo Clinic",
             "clinicType": null,
             "clinicPhone": null,
-            "clinicEmail": "",
             "establishedYear": null,
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -5428,7 +5336,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": null,
+            "medicalLicenseNumber": "1050",
             "yearOfExp": "13",
             "specialization": "Homoeopath",
             "subSpeciality": null,
@@ -5458,7 +5366,6 @@
             "clinicName": "Niramaya Homoeopathic & Diet Clinic",
             "clinicType": null,
             "clinicPhone": null,
-            "clinicEmail": "",
             "establishedYear": null,
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -5525,7 +5432,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": null,
+            "medicalLicenseNumber": "1051",
             "yearOfExp": "0",
             "specialization": "Homoeopath",
             "subSpeciality": null,
@@ -5545,7 +5452,6 @@
             "clinicName": "Prakash Homeo Clinic",
             "clinicType": null,
             "clinicPhone": null,
-            "clinicEmail": "",
             "establishedYear": null,
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -5612,7 +5518,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": null,
+            "medicalLicenseNumber": "1052",
             "yearOfExp": "45",
             "specialization": "Homoeopath",
             "subSpeciality": null,
@@ -5632,7 +5538,6 @@
             "clinicName": "Sinha Homeo Research Centre and Drug Transmission Clinic",
             "clinicType": null,
             "clinicPhone": null,
-            "clinicEmail": "",
             "establishedYear": null,
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -5699,7 +5604,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": null,
+            "medicalLicenseNumber": "1053",
             "yearOfExp": "21",
             "specialization": "Homoeopath",
             "subSpeciality": null,
@@ -5719,7 +5624,6 @@
             "clinicName": "Aanand Homoeo Clinic",
             "clinicType": null,
             "clinicPhone": null,
-            "clinicEmail": "",
             "establishedYear": null,
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -5786,7 +5690,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": null,
+            "medicalLicenseNumber": "1054",
             "yearOfExp": "22",
             "specialization": "Neonatologist",
             "subSpeciality": null,
@@ -5821,7 +5725,6 @@
             "clinicName": "Patna Children Hospital And Newborn Care Centre",
             "clinicType": null,
             "clinicPhone": null,
-            "clinicEmail": "",
             "establishedYear": null,
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -5888,7 +5791,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": null,
+            "medicalLicenseNumber": "1055",
             "yearOfExp": "12",
             "specialization": "Nephrologist/Renal Specialist",
             "subSpeciality": null,
@@ -5918,7 +5821,6 @@
             "clinicName": "Big Apollo Spectra Multi Speciality Hospital",
             "clinicType": null,
             "clinicPhone": null,
-            "clinicEmail": "",
             "establishedYear": null,
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -5985,7 +5887,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": null,
+            "medicalLicenseNumber": "1056",
             "yearOfExp": "13",
             "specialization": "Nephrologist/Renal Specialist",
             "subSpeciality": null,
@@ -6015,7 +5917,6 @@
             "clinicName": "Wellness Kidney Clinic",
             "clinicType": null,
             "clinicPhone": null,
-            "clinicEmail": "",
             "establishedYear": null,
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -6082,7 +5983,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": null,
+            "medicalLicenseNumber": "1057",
             "yearOfExp": "35",
             "specialization": "Nephrologist/Renal Specialist",
             "subSpeciality": null,
@@ -6112,7 +6013,6 @@
             "clinicName": "Baidyanath Kidney Hospital",
             "clinicType": null,
             "clinicPhone": null,
-            "clinicEmail": "",
             "establishedYear": null,
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -6179,7 +6079,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": null,
+            "medicalLicenseNumber": "1058",
             "yearOfExp": "30",
             "specialization": "Neurologist",
             "subSpeciality": null,
@@ -6209,7 +6109,6 @@
             "clinicName": "Big Apollo Spectra Multi Speciality Hospital",
             "clinicType": null,
             "clinicPhone": null,
-            "clinicEmail": "",
             "establishedYear": null,
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -6276,7 +6175,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": null,
+            "medicalLicenseNumber": "1059",
             "yearOfExp": "46",
             "specialization": "Neurologist",
             "subSpeciality": null,
@@ -6306,7 +6205,6 @@
             "clinicName": "Neurology Clinic",
             "clinicType": null,
             "clinicPhone": null,
-            "clinicEmail": "",
             "establishedYear": null,
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -6373,7 +6271,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": null,
+            "medicalLicenseNumber": "1060",
             "yearOfExp": "17",
             "specialization": "Neurologist",
             "subSpeciality": null,
@@ -6398,7 +6296,6 @@
             "clinicName": "Neuro Centre",
             "clinicType": null,
             "clinicPhone": null,
-            "clinicEmail": "",
             "establishedYear": null,
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -6465,7 +6362,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": null,
+            "medicalLicenseNumber": "1061",
             "yearOfExp": "16",
             "specialization": "Neurologist",
             "subSpeciality": null,
@@ -6495,7 +6392,6 @@
             "clinicName": "Shyam Neuro Centre",
             "clinicType": null,
             "clinicPhone": null,
-            "clinicEmail": "",
             "establishedYear": null,
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -6562,7 +6458,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": null,
+            "medicalLicenseNumber": "1062",
             "yearOfExp": "19",
             "specialization": "Ophthalmologist",
             "subSpeciality": null,
@@ -6587,7 +6483,6 @@
             "clinicName": "Divyajyoti Eye Clinic",
             "clinicType": null,
             "clinicPhone": null,
-            "clinicEmail": "",
             "establishedYear": null,
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -6654,7 +6549,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": null,
+            "medicalLicenseNumber": "1063",
             "yearOfExp": "13",
             "specialization": "Ophthalmologist",
             "subSpeciality": null,
@@ -6679,7 +6574,6 @@
             "clinicName": "Lahan Netralay",
             "clinicType": null,
             "clinicPhone": null,
-            "clinicEmail": "",
             "establishedYear": null,
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -6746,7 +6640,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": null,
+            "medicalLicenseNumber": "1064",
             "yearOfExp": "15",
             "specialization": "Ophthalmologist",
             "subSpeciality": null,
@@ -6766,7 +6660,6 @@
             "clinicName": "Divya jyoti netralaya",
             "clinicType": null,
             "clinicPhone": null,
-            "clinicEmail": "",
             "establishedYear": null,
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -6833,7 +6726,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": null,
+            "medicalLicenseNumber": "1065",
             "yearOfExp": "17",
             "specialization": "Ophthalmologist",
             "subSpeciality": null,
@@ -6858,7 +6751,6 @@
             "clinicName": "Sharda Eye and Dental Hospital",
             "clinicType": null,
             "clinicPhone": null,
-            "clinicEmail": "",
             "establishedYear": null,
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -6925,7 +6817,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": null,
+            "medicalLicenseNumber": "1066",
             "yearOfExp": "17",
             "specialization": "Ophthalmologist",
             "subSpeciality": null,
@@ -6945,7 +6837,6 @@
             "clinicName": "Swastik Eye Care Centre",
             "clinicType": null,
             "clinicPhone": null,
-            "clinicEmail": "",
             "establishedYear": null,
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -7012,7 +6903,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": null,
+            "medicalLicenseNumber": "1067",
             "yearOfExp": "12",
             "specialization": "Ophthalmologist",
             "subSpeciality": null,
@@ -7037,7 +6928,6 @@
             "clinicName": "Sarvdrishti Eye Hospital",
             "clinicType": null,
             "clinicPhone": null,
-            "clinicEmail": "",
             "establishedYear": null,
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -7104,7 +6994,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": "",
+            "medicalLicenseNumber": "1068",
             "yearOfExp": 18,
             "specialization": "Ophthalmologist",
             "subSpeciality": null,
@@ -7123,8 +7013,6 @@
         "clinicInfos": {
             "clinicName": "BSL Eye Care",
             "clinicType": "",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "establishedYear": "",
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -7191,7 +7079,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": "",
+            "medicalLicenseNumber": "1069",
             "yearOfExp": 14,
             "specialization": "Ophthalmologist",
             "subSpeciality": null,
@@ -7225,8 +7113,6 @@
         "clinicInfos": {
             "clinicName": "Buddha Eye Care and Laser Center",
             "clinicType": "",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "establishedYear": "",
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -7293,7 +7179,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": "",
+            "medicalLicenseNumber": "1070",
             "yearOfExp": 23,
             "specialization": "Orthopedist",
             "subSpeciality": null,
@@ -7317,8 +7203,6 @@
         "clinicInfos": {
             "clinicName": "Ortho World",
             "clinicType": "",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "establishedYear": "",
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -7385,7 +7269,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": "",
+            "medicalLicenseNumber": "1071",
             "yearOfExp": 11,
             "specialization": "Orthopedist",
             "subSpeciality": null,
@@ -7414,8 +7298,6 @@
         "clinicInfos": {
             "clinicName": "Medstar Hospital",
             "clinicType": "",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "establishedYear": "",
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -7482,7 +7364,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": "",
+            "medicalLicenseNumber": "1072",
             "yearOfExp": 15,
             "specialization": "Orthopedist",
             "subSpeciality": null,
@@ -7506,8 +7388,6 @@
         "clinicInfos": {
             "clinicName": "O2O Clinic",
             "clinicType": "",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "establishedYear": "",
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -7574,7 +7454,7 @@
         "state": "Bihar",
         "+pincode": "",
         "professional": {
-            "medicalLicenseNumber": "",
+            "medicalLicenseNumber": "1073",
             "yearOfExp": 26,
             "specialization": "Orthopedist",
             "subSpeciality": null,
@@ -7598,8 +7478,6 @@
         "clinicInfos": {
             "clinicName": "Progressive Spine And Orthopaedics",
             "clinicType": "",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "establishedYear": "",
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -7666,7 +7544,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": "",
+            "medicalLicenseNumber": "1074",
             "yearOfExp": 20,
             "specialization": "Orthopedist",
             "subSpeciality": null,
@@ -7695,8 +7573,6 @@
         "clinicInfos": {
             "clinicName": "Big Apollo Spectra Multi Speciality Hospital",
             "clinicType": "",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "establishedYear": "",
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -7763,7 +7639,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": "",
+            "medicalLicenseNumber": "1075",
             "yearOfExp": 14,
             "specialization": "Pediatrician",
             "subSpeciality": null,
@@ -7787,8 +7663,6 @@
         "clinicInfos": {
             "clinicName": "Shishu Mangal Clinic",
             "clinicType": "",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "establishedYear": "",
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -7855,7 +7729,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": "",
+            "medicalLicenseNumber": "1076",
             "yearOfExp": 11,
             "specialization": "Pediatrician",
             "subSpeciality": null,
@@ -7879,8 +7753,6 @@
         "clinicInfos": {
             "clinicName": "Dr K.k.Singh Clinic",
             "clinicType": "",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "establishedYear": "",
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -7947,7 +7819,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": "",
+            "medicalLicenseNumber": "1077",
             "yearOfExp": 34,
             "specialization": "Pediatrician",
             "subSpeciality": null,
@@ -7971,8 +7843,6 @@
         "clinicInfos": {
             "clinicName": "Kid Care Clinic",
             "clinicType": "",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "establishedYear": "",
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -8039,7 +7909,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": "",
+            "medicalLicenseNumber": "1078",
             "yearOfExp": 19,
             "specialization": "Pediatrician",
             "subSpeciality": null,
@@ -8063,8 +7933,6 @@
         "clinicInfos": {
             "clinicName": "Sunrise Newborn And Child Care",
             "clinicType": "",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "establishedYear": "",
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -8131,7 +7999,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": "",
+            "medicalLicenseNumber": "1079",
             "yearOfExp": 44,
             "specialization": "Pediatrician",
             "subSpeciality": null,
@@ -8160,8 +8028,6 @@
         "clinicInfos": {
             "clinicName": "Shailendra Kumar Clinic",
             "clinicType": "",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "establishedYear": "",
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -8228,7 +8094,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": "",
+            "medicalLicenseNumber": "1080",
             "yearOfExp": 16,
             "specialization": "Pediatrician",
             "subSpeciality": null,
@@ -8247,8 +8113,6 @@
         "clinicInfos": {
             "clinicName": "Vani Healthcare",
             "clinicType": "",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "establishedYear": "",
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -8315,7 +8179,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": "",
+            "medicalLicenseNumber": "1081",
             "yearOfExp": 11,
             "specialization": "Pediatrician",
             "subSpeciality": null,
@@ -8344,8 +8208,6 @@
         "clinicInfos": {
             "clinicName": "New Born And Child Care With Vaccination Center",
             "clinicType": "",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "establishedYear": "",
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -8412,7 +8274,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": "",
+            "medicalLicenseNumber": "1082",
             "yearOfExp": 36,
             "specialization": "Pediatrician",
             "subSpeciality": null,
@@ -8436,8 +8298,6 @@
         "clinicInfos": {
             "clinicName": "New Born Care Centre",
             "clinicType": "",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "establishedYear": "",
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -8504,7 +8364,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": "",
+            "medicalLicenseNumber": "1083",
             "yearOfExp": 14,
             "specialization": "Pediatrician",
             "subSpeciality": null,
@@ -8528,8 +8388,6 @@
         "clinicInfos": {
             "clinicName": "Aadya Childcare Centre",
             "clinicType": "",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "establishedYear": "",
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -8596,7 +8454,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": "",
+            "medicalLicenseNumber": "1084",
             "yearOfExp": 8,
             "specialization": "Pediatrician",
             "subSpeciality": null,
@@ -8620,8 +8478,6 @@
         "clinicInfos": {
             "clinicName": "Omya child care",
             "clinicType": "",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "establishedYear": "",
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -8688,7 +8544,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": "",
+            "medicalLicenseNumber": "1085",
             "yearOfExp": 23,
             "specialization": "Physiotherapist",
             "subSpeciality": null,
@@ -8707,8 +8563,6 @@
         "clinicInfos": {
             "clinicName": "Anumeha Physio Care Centre",
             "clinicType": "",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "establishedYear": "",
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -8775,7 +8629,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": "",
+            "medicalLicenseNumber": "1086",
             "yearOfExp": 17,
             "specialization": "Physiotherapist",
             "subSpeciality": null,
@@ -8794,8 +8648,6 @@
         "clinicInfos": {
             "clinicName": "Needs Physiotherapy Centre",
             "clinicType": "",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "establishedYear": "",
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -8862,7 +8714,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": "",
+            "medicalLicenseNumber": "1087",
             "yearOfExp": 29,
             "specialization": "Physiotherapist",
             "subSpeciality": null,
@@ -8881,8 +8733,6 @@
         "clinicInfos": {
             "clinicName": "Patliputra physiotherapy",
             "clinicType": "",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "establishedYear": "",
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -8949,7 +8799,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": "",
+            "medicalLicenseNumber": "1088",
             "yearOfExp": 11,
             "specialization": "Physiotherapist",
             "subSpeciality": null,
@@ -8968,8 +8818,6 @@
         "clinicInfos": {
             "clinicName": "Care and Cure Physiotherapy Center",
             "clinicType": "",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "establishedYear": "",
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -9036,7 +8884,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": "",
+            "medicalLicenseNumber": "1089",
             "yearOfExp": 11,
             "specialization": "Physiotherapist",
             "subSpeciality": null,
@@ -9055,8 +8903,6 @@
         "clinicInfos": {
             "clinicName": "Shree Balaji Physithrapy Clinic",
             "clinicType": "",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "establishedYear": "",
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -9123,7 +8969,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": "",
+            "medicalLicenseNumber": "1090",
             "yearOfExp": 16,
             "specialization": "Physiotherapist",
             "subSpeciality": null,
@@ -9142,8 +8988,6 @@
         "clinicInfos": {
             "clinicName": "Pain Cure Physiotherapy Clinic & Rehabilitation Centre",
             "clinicType": "",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "establishedYear": "",
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -9210,7 +9054,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": "",
+            "medicalLicenseNumber": "1091",
             "yearOfExp": 7,
             "specialization": "Physiotherapist",
             "subSpeciality": null,
@@ -9229,8 +9073,6 @@
         "clinicInfos": {
             "clinicName": "Advance Physiotherapy & Rehab Centre",
             "clinicType": "",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "establishedYear": "",
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -9297,7 +9139,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": "",
+            "medicalLicenseNumber": "1092",
             "yearOfExp": 2,
             "specialization": "Physiotherapist",
             "subSpeciality": null,
@@ -9316,8 +9158,6 @@
         "clinicInfos": {
             "clinicName": "Samay Hospital",
             "clinicType": "",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "establishedYear": "",
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -9384,7 +9224,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": "",
+            "medicalLicenseNumber": "1093",
             "yearOfExp": "8",
             "specialization": "Physiotherapist",
             "subSpeciality": "",
@@ -9408,8 +9248,6 @@
         "clinicInfos": {
             "clinicName": "CasaMed",
             "clinicType": "",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "establishedYear": "",
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -9476,7 +9314,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": "",
+            "medicalLicenseNumber": "1094",
             "yearOfExp": "33",
             "specialization": "Psychiatrist",
             "subSpeciality": "",
@@ -9500,8 +9338,6 @@
         "clinicInfos": {
             "clinicName": "Mind and skin clinic",
             "clinicType": "",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "establishedYear": "",
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -9568,7 +9404,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": "",
+            "medicalLicenseNumber": "1095",
             "yearOfExp": "20",
             "specialization": "Psychiatrist",
             "subSpeciality": "",
@@ -9592,8 +9428,6 @@
         "clinicInfos": {
             "clinicName": "Manas Clinic",
             "clinicType": "",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "establishedYear": "",
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -9660,7 +9494,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": "",
+            "medicalLicenseNumber": "1096",
             "yearOfExp": "16",
             "specialization": "Psychiatrist",
             "subSpeciality": "",
@@ -9684,8 +9518,6 @@
         "clinicInfos": {
             "clinicName": "Ashalok Neuropsychiatry Clinic",
             "clinicType": "",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "establishedYear": "",
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -9752,7 +9584,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": "",
+            "medicalLicenseNumber": "1097",
             "yearOfExp": "14",
             "specialization": "Psychiatrist",
             "subSpeciality": "",
@@ -9776,8 +9608,6 @@
         "clinicInfos": {
             "clinicName": "Budhha Neuropsychiatry",
             "clinicType": "",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "establishedYear": "",
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -9844,7 +9674,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": "",
+            "medicalLicenseNumber": "1098",
             "yearOfExp": "44",
             "specialization": "Psychiatrist",
             "subSpeciality": "",
@@ -9873,8 +9703,6 @@
         "clinicInfos": {
             "clinicName": "Laser Clinic",
             "clinicType": "",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "establishedYear": "",
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -9941,7 +9769,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": "",
+            "medicalLicenseNumber": "1099",
             "yearOfExp": "20",
             "specialization": "Sexologist",
             "subSpeciality": "",
@@ -9965,8 +9793,6 @@
         "clinicInfos": {
             "clinicName": "Manas Clinic",
             "clinicType": "",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "establishedYear": "",
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -10033,7 +9859,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": "",
+            "medicalLicenseNumber": "1100",
             "yearOfExp": "42",
             "specialization": "Sexologist",
             "subSpeciality": "",
@@ -10052,8 +9878,6 @@
         "clinicInfos": {
             "clinicName": "Aarogyam Clinical Hospital",
             "clinicType": "",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "establishedYear": "",
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -10120,7 +9944,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": "",
+            "medicalLicenseNumber": "1101",
             "yearOfExp": "18",
             "specialization": "Sexologist",
             "subSpeciality": "",
@@ -10149,8 +9973,6 @@
         "clinicInfos": {
             "clinicName": "Nadiad Urology and Eye Center",
             "clinicType": "",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "establishedYear": "",
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -10217,7 +10039,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": "",
+            "medicalLicenseNumber": "1102",
             "yearOfExp": "14",
             "specialization": "Veterinarian",
             "subSpeciality": "",
@@ -10241,8 +10063,6 @@
         "clinicInfos": {
             "clinicName": "",
             "clinicType": "",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "establishedYear": "",
             "clinicAddress": "",
             "clinicCity": "Patna",
@@ -10309,7 +10129,7 @@
         "state": "Bihar",
         "pincode": "",
         "professional": {
-            "medicalLicenseNumber": "",
+            "medicalLicenseNumber": "1103",
             "yearOfExp": "26",
             "specialization": "Yoga & Naturopathy",
             "subSpeciality": "",
@@ -10333,8 +10153,6 @@
         "clinicInfos": {
             "clinicName": "Divya Arogyam Nature Cure Hospital",
             "clinicType": "",
-            "clinicPhone": "",
-            "clinicEmail": "",
             "establishedYear": "",
             "clinicAddress": "",
             "clinicCity": "Patna",

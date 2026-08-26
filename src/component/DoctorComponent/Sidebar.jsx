@@ -18,7 +18,7 @@ const ROUTES = [
   },
   {
     name: "Patients",
-    path: "#", 
+    path: "patients", 
     icon: <PersonStanding />,
   },
   {

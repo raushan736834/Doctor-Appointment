@@ -10,6 +10,7 @@ import {
   ChevronDownIcon,
   MenuIcon,
   XIcon,
+  PersonStandingIcon,
 } from "lucide-react";
 import Searchbar from "../Common/Searchbar";
 
@@ -119,6 +120,21 @@ const ProfileDropdown = () => {
                   <UserIcon />
                 </div>
                 <span className="font-medium">Your Profile</span>
+              </Link>
+
+              <Link
+                onClick={() => {
+                  setIsOpen(false);
+                }}
+                to={"/patients"}
+                className="flex items-center w-full px-3 py-3 text-sm text-gray-700 
+                         hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 
+                         rounded-xl transition-all duration-200 group"
+              >
+                <div className="text-gray-400 mr-3 group-hover:text-blue-500">
+                  <PersonStandingIcon />
+                </div>
+                <span className="font-medium">Patients</span>
               </Link>
 
               <Link

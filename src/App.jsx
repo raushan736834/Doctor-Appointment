@@ -44,6 +44,7 @@ import DoctorOnboarding from "./component/DoctorComponent/DoctorOnboarding";
 import { useAuth } from "./component/GlobalComponent/AuthProvider";
 import UserLayout from "./layouts/UserLayout";
 import AfterReviewStep from "./component/DoctorComponent/AfterReviewStep";
+import BulkPatientOnboarding from "./component/DoctorComponent/BulkPatientOnboarding";
 import { useAuthWithAxios } from "./hooks/useAuthWithAxios";
 
 const AppLayout = () => {
@@ -111,6 +112,7 @@ const AppContent = () => {
                     element={<AppointmentDetails />}
                   />
                   <Route path="booking-details" element={<BookingDetails />} />
+                  <Route path="patients" element={<BulkPatientOnboarding />} />
                 </Route>
               </Route>
               <Route element={<RequireAuth allowedRoles={[ROLES.doctor]} />}>
@@ -133,6 +135,7 @@ const AppContent = () => {
                     element={<DoctorPersonalInfo />}
                   />
                   <Route path="appointments" element={<Appointments />} />
+                  <Route path="patients" element={<BulkPatientOnboarding />} />
                   <Route path="settings" element={<DoctorSetting />}>
                     <Route
                       index
